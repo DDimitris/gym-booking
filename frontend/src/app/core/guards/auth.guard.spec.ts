@@ -6,6 +6,7 @@ import { AuthService } from '../services/auth.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserService } from '../services/user.service';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
@@ -20,9 +21,9 @@ describe('AuthGuard', () => {
       'getRoles'
     ]);
 
-    const authSpy = jasmine.createSpyObj('AuthService', [
-      'hasRole'
-    ]);
+    const authSpy = jasmine.createSpyObj('AuthService', ['hasRole']);
+    const userSpy = jasmine.createSpyObj('UserService', ['getMe']);
+    userSpy.getMe.and.returnValue(of({ id: 1, role: 'MEMBER' } as any));
     
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
@@ -30,7 +31,7 @@ describe('AuthGuard', () => {
         AuthGuard,
         { provide: KeycloakService, useValue: keycloakSpy },
         { provide: AuthService, useValue: authSpy },
-        UserService
+        { provide: UserService, useValue: userSpy }
       ]
     });
 
