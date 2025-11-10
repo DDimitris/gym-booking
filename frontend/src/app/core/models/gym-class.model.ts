@@ -4,7 +4,7 @@ export interface GymClass {
     description: string;
     capacity: number;
     durationMinutes: number;
-    instructorId: number | null;
+    trainerId: number | null; // renamed from instructorId
     startTime: string;
     endTime: string;
     location: string;

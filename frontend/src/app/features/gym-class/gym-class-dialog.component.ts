@@ -51,14 +51,14 @@ import { User } from '../../core/models/user.model';
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Instructor</mat-label>
-          <mat-select formControlName="instructorId" required>
+          <mat-label>Trainer</mat-label>
+          <mat-select formControlName="trainerId" required>
             <mat-option *ngFor="let trainer of trainers" [value]="trainer.id">
               {{trainer.name}}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="classForm.get('instructorId')?.hasError('required')">
-            Instructor is required
+          <mat-error *ngIf="classForm.get('trainerId')?.hasError('required')">
+            Trainer is required
           </mat-error>
         </mat-form-field>
       </mat-dialog-content>
@@ -97,11 +97,14 @@ export class GymClassDialogComponent {
       description: [''],
       capacity: ['', [Validators.required, Validators.min(1)]],
       durationMinutes: ['', [Validators.required, Validators.min(15)]],
-      instructorId: ['', Validators.required]
+  trainerId: ['', Validators.required]
     });
 
     if (data) {
-      this.classForm.patchValue(data);
+      this.classForm.patchValue({
+        ...data,
+        trainerId: (data as any).trainerId ?? (data as any).instructorId
+      });
     }
 
     this.loadTrainers();
@@ -117,8 +120,13 @@ export class GymClassDialogComponent {
 
   onSubmit(): void {
     if (this.classForm.valid) {
-      // Align payload with backend DTO expectations (instructorId instead of trainerId)
-      this.dialogRef.close(this.classForm.value);
+      // Map to backend DTO (trainerId expected; include legacy instructorId for safety during transition)
+      const value = this.classForm.value;
+      this.dialogRef.close({
+        ...value,
+        trainerId: value.trainerId,
+        instructorId: value.trainerId // transitional field
+      });
     }
   }
 }
