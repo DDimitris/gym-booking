@@ -41,8 +41,8 @@ public class GymClassController {
             }
         }
         GymClass gymClass = convertToEntity(gymClassDTO);
-        GymClass savedClass = gymClassService.createGymClass(java.util.Objects.requireNonNull(gymClass),
-                java.util.Objects.requireNonNull(gymClassDTO.getInstructorId()));
+    GymClass savedClass = gymClassService.createGymClass(java.util.Objects.requireNonNull(gymClass),
+        java.util.Objects.requireNonNull(gymClassDTO.getTrainerId()));
         return ResponseEntity.ok(convertToDTO(savedClass));
     }
 
@@ -74,13 +74,20 @@ public class GymClassController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
-    @GetMapping("/instructor/{instructorId}")
-    public ResponseEntity<List<GymClassDTO>> getGymClassesByInstructor(@PathVariable Long instructorId) {
-        List<GymClass> classes = gymClassService.findByTrainer(java.util.Objects.requireNonNull(instructorId));
+    @GetMapping("/trainer/{trainerId}")
+    public ResponseEntity<List<GymClassDTO>> getGymClassesByTrainer(@PathVariable Long trainerId) {
+        List<GymClass> classes = gymClassService.findByTrainer(java.util.Objects.requireNonNull(trainerId));
         List<GymClassDTO> classDTOs = classes.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(classDTOs);
+    }
+
+    // Backward-compatibility alias (to be removed after UI migration)
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    @GetMapping("/instructor/{instructorId}")
+    public ResponseEntity<List<GymClassDTO>> getGymClassesByInstructor(@PathVariable Long instructorId) {
+        return getGymClassesByTrainer(instructorId);
     }
 
     // Removed search endpoint - use class types to filter instead
@@ -92,7 +99,7 @@ public class GymClassController {
         dto.setDescription(gymClass.getDescription());
         dto.setCapacity(gymClass.getCapacity());
         dto.setDurationMinutes(gymClass.getDurationMinutes());
-        dto.setInstructorId(gymClass.getTrainer() != null ? gymClass.getTrainer().getId() : null);
+    dto.setTrainerId(gymClass.getTrainer() != null ? gymClass.getTrainer().getId() : null);
         dto.setClassTypeId(gymClass.getClassType() != null ? gymClass.getClassType().getId() : null);
         dto.setStatus(gymClass.getStatus() != null ? gymClass.getStatus().name() : "SCHEDULED");
         dto.setStartTime(gymClass.getStartTime());

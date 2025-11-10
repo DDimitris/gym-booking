@@ -16,7 +16,8 @@ public class ClassTypeDTO {
 
     private String description;
 
-    private Long instructorId;
+    // Renamed from instructorId -> trainerId for consistency
+    private Long trainerId;
 
     private Boolean isActive;
 }

@@ -28,7 +28,8 @@ public class GymClassDTO {
     private Integer durationMinutes;
 
     @NotNull
-    private Long instructorId;
+    // Renamed from instructorId -> trainerId for consistency
+    private Long trainerId;
 
     // Optional for create; returned in responses for filtering
     private Long classTypeId;
