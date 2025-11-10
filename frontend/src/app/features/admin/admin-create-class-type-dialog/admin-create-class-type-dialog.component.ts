@@ -75,12 +75,11 @@ export class AdminCreateClassTypeDialogComponent {
 
   create(): void {
   if (!this.name) return;
-  this.classTypeService.createClassType({
+    this.classTypeService.createClassType({
       id: 0,
       name: this.name,
       description: this.description,
-  trainerId: this.trainerId,
-  instructorId: this.trainerId, // transitional
+      trainerId: this.trainerId,
       isActive: true
     }).subscribe({
       next: () => {
