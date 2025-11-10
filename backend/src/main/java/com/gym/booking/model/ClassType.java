@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "class_types")
 @lombok.Getter
 @lombok.Setter
-@lombok.ToString(exclude = {"trainer"})
+@lombok.ToString(exclude = { "trainer" })
 public class ClassType extends BaseEntity {
 
     @NotBlank

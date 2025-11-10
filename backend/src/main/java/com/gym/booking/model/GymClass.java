@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "class_instances")
 @lombok.Getter
 @lombok.Setter
-@lombok.ToString(exclude = {"classType", "trainer"})
+@lombok.ToString(exclude = { "classType", "trainer" })
 public class GymClass extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

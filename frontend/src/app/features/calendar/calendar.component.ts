@@ -13,6 +13,8 @@ import { KeycloakService } from '../../core/services/keycloak.service';
 import { GymClass } from '../../core/models/gym-class.model';
 import { ClassType } from '../../core/models/class-type.model';
 import { forkJoin } from 'rxjs';
+import { UserService } from '../../core/services/user.service';
+import type { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-calendar',
@@ -55,12 +57,14 @@ export class CalendarComponent implements OnInit {
   
   isAdmin = false;
   isInstructor = false;
+  private trainersMap: Map<number, string> = new Map();
 
   constructor(
     private gymClassService: GymClassService,
     private classTypeService: ClassTypeService,
     private bookingService: BookingService,
-    private kc: KeycloakService
+    private kc: KeycloakService,
+    private users: UserService
   ) {}
 
   ngOnInit(): void {
@@ -74,11 +78,16 @@ export class CalendarComponent implements OnInit {
   loadData(): void {
     forkJoin({
       classes: this.gymClassService.getAllGymClasses(),
-      classTypes: this.classTypeService.getActiveClassTypes()
+      classTypes: this.classTypeService.getActiveClassTypes(),
+      trainers: this.users.getAllTrainers()
     }).subscribe({
-      next: ({ classes, classTypes }) => {
+      next: ({ classes, classTypes, trainers }) => {
         this.allClasses = classes;
         this.classTypes = classTypes;
+        // Build trainers map (id -> display name)
+        this.trainersMap = new Map(
+          trainers.map((u: User) => [u.id, (u.name || u.email || `User#${u.id}`)])
+        );
         this.filterAndUpdateCalendar();
       },
       error: (err) => {
@@ -222,5 +231,12 @@ export class CalendarComponent implements OnInit {
     this.toastMessage = message;
     this.toastType = type;
     setTimeout(() => { this.toastMessage = null; }, 4000);
+  }
+
+  get trainerName(): string {
+    if (!this.selectedClass) return '';
+    const id = (this.selectedClass as any).trainerId ?? (this.selectedClass as any).instructorId;
+    if (!id) return '';
+    return this.trainersMap.get(id) || '';
   }
 }

@@ -55,7 +55,7 @@ import { ClassType } from '../../../core/models/class-type.model';
         </div>
 
         <div class="row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="date-field">
             <mat-label>Date</mat-label>
             <input matInput [matDatepicker]="picker" [(ngModel)]="startDateObj" name="startDateObj" required>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -107,17 +107,23 @@ import { ClassType } from '../../../core/models/class-type.model';
   `,
   styles: [`
     .full-width { width: 100%; }
-    .row { display: flex; gap: 12px; }
-    .row > * { flex: 1; }
+    .row { display: flex; gap: 12px; align-items: flex-end; }
+    .row .date-field { flex: 2; min-width: 260px; }
+    .row .time-selectors { flex: 1; min-width: 220px; }
     .message.info { color: #1976d2; }
     .message.success { color: #2e7d32; }
     .message.error { color: #d32f2f; }
     .time-selectors { display: flex; gap: 12px; }
+    .time-selectors > * { flex: 1; }
     .recurrence-box { margin-top: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 4px; }
     .days { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
     .label { font-size: 12px; color: #555; }
     .weeks-field { width: 160px; }
     .hint { font-size: 12px; color: #555; }
+    @media (max-width: 720px) {
+      .row { flex-wrap: wrap; }
+      .row .date-field, .row .time-selectors { flex: 1 1 100%; min-width: 0; }
+    }
   `]
 })
 export class AdminCreateClassDialogComponent {

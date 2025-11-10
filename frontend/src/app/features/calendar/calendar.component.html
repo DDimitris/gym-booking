@@ -53,6 +53,9 @@
           <div class="detail-row">
             <strong>Location:</strong> {{ selectedClass.location || "N/A" }}
           </div>
+          <div class="detail-row" *ngIf="trainerName">
+            <strong>Trainer:</strong> {{ trainerName }}
+          </div>
           <div class="detail-row">
             <strong>Available Spots:</strong>
             <span

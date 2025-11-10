@@ -41,8 +41,8 @@ public class GymClassController {
             }
         }
         GymClass gymClass = convertToEntity(gymClassDTO);
-    GymClass savedClass = gymClassService.createGymClass(java.util.Objects.requireNonNull(gymClass),
-        java.util.Objects.requireNonNull(gymClassDTO.getTrainerId()));
+        GymClass savedClass = gymClassService.createGymClass(java.util.Objects.requireNonNull(gymClass),
+                java.util.Objects.requireNonNull(gymClassDTO.getTrainerId()));
         return ResponseEntity.ok(convertToDTO(savedClass));
     }
 
@@ -99,7 +99,7 @@ public class GymClassController {
         dto.setDescription(gymClass.getDescription());
         dto.setCapacity(gymClass.getCapacity());
         dto.setDurationMinutes(gymClass.getDurationMinutes());
-    dto.setTrainerId(gymClass.getTrainer() != null ? gymClass.getTrainer().getId() : null);
+        dto.setTrainerId(gymClass.getTrainer() != null ? gymClass.getTrainer().getId() : null);
         dto.setClassTypeId(gymClass.getClassType() != null ? gymClass.getClassType().getId() : null);
         dto.setStatus(gymClass.getStatus() != null ? gymClass.getStatus().name() : "SCHEDULED");
         dto.setStartTime(gymClass.getStartTime());
