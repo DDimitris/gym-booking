@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "class_instances")
+@lombok.Getter
+@lombok.Setter
+@lombok.ToString(exclude = {"classType", "trainer"})
 public class GymClass extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,79 +58,6 @@ public class GymClass extends BaseEntity {
     @Transient
     public String getName() {
         return classType != null ? classType.getName() : null;
-    }
-
-    // Getters and Setters
-    public ClassType getClassType() {
-        return classType;
-    }
-
-    public void setClassType(ClassType classType) {
-        this.classType = classType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public Integer getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public User getTrainer() {
-        return trainer;
-    }
-
-    public void setTrainer(User trainer) {
-        this.trainer = trainer;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public ClassStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ClassStatus status) {
-        this.status = status;
     }
 
     public Boolean getIsCancelled() {
