@@ -110,7 +110,7 @@ export class CalendarComponent implements OnInit {
       end: c.endTime,
       extendedProps: {
         description: c.description,
-        instructorId: c.instructorId,
+        trainerId: (c as any).trainerId ?? (c as any).instructorId,
         capacity: c.capacity,
         location: c.location,
         classTypeId: c.classTypeId,

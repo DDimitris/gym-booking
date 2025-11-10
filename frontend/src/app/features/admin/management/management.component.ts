@@ -162,7 +162,7 @@ export class ManagementComponent {
       id: t.id,
       name: this.edited.name || t.name,
       description: this.edited.description || t.description,
-      instructorId: t.instructorId,
+      trainerId: (t as any).trainerId ?? (t as any).instructorId,
       isActive: t.isActive
     };
     this.classTypeService.updateClassType(t.id, payload).subscribe({
