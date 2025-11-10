@@ -94,8 +94,10 @@ jobs:
         run: |
           VERSION=${{ github.run_number }}
           SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "owner_lc=${OWNER_LC}" >> $GITHUB_OUTPUT
 
       - name: Build and push backend image
         uses: docker/build-push-action@v6
@@ -104,9 +106,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/gym-booking-backend:${{ steps.meta.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/gym-booking-backend:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.short_sha }}
-            ${{ github.ref == 'refs/heads/master' && format('ghcr.io/{0}/gym-booking-backend:latest', github.repository_owner) || '' }}
+            ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}
+            ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.short_sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -115,6 +116,11 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/gym-booking-frontend:${{ steps.meta.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/gym-booking-frontend:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.short_sha }}
-            ${{ github.ref == 'refs/heads/master' && format('ghcr.io/{0}/gym-booking-frontend:latest', github.repository_owner) || '' }}
+            ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}
+            ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.short_sha }}
+
+      - name: Tag latest images (master only)
+        if: github.ref == 'refs/heads/master'
+        run: |
+          docker buildx imagetools create -t ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:latest ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}
+          docker buildx imagetools create -t ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:latest ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}
