@@ -1,0 +1,131 @@
+package com.gym.booking.service;
+
+import com.gym.booking.model.Booking;
+import com.gym.booking.model.GymClass;
+import com.gym.booking.model.User;
+import com.gym.booking.repository.BookingRepository;
+import com.gym.booking.exception.ResourceNotFoundException;
+import com.gym.booking.exception.BookingException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@Transactional
+public class BookingService {
+    private final BookingRepository bookingRepository;
+    private final GymClassService gymClassService;
+    private final UserService userService;
+    private final BillingService billingService;
+
+    public BookingService(BookingRepository bookingRepository,
+            GymClassService gymClassService,
+            UserService userService,
+            @Lazy BillingService billingService) {
+        this.bookingRepository = bookingRepository;
+        this.gymClassService = gymClassService;
+        this.userService = userService;
+        this.billingService = billingService;
+    }
+
+    public Booking createBooking(Long userId, Long classInstanceId) {
+        if (userId == null) {
+            throw new BookingException("User id is required");
+        }
+        if (classInstanceId == null) {
+            throw new BookingException("Class instance id is required");
+        }
+        User user = userService.findById(userId);
+        GymClass classInstance = gymClassService.findById(classInstanceId);
+
+        validateBooking(user, classInstance);
+
+        Booking booking = new Booking();
+        booking.setUser(user);
+        booking.setClassInstance(classInstance);
+        booking.setStatus(Booking.BookingStatus.BOOKED);
+        return bookingRepository.save(booking);
+    }
+
+    private void validateBooking(User user, GymClass classInstance) {
+        // Disallow self-booking for staff (ADMIN/TRAINER) – they must book on behalf
+        // of members instead
+        if (user.getRole() == User.UserRole.TRAINER || user.getRole() == User.UserRole.ADMIN) {
+            throw new BookingException(
+                    "Staff cannot book themselves into classes; book on behalf of a member instead.");
+        }
+        if (classInstance.isCancelled()) {
+            throw new BookingException("This class has been cancelled");
+        }
+
+        if (classInstance.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new BookingException("Cannot book past classes");
+        }
+
+        long confirmedBookings = bookingRepository.countByClassInstanceAndStatus(
+                classInstance, Booking.BookingStatus.BOOKED);
+        if (confirmedBookings >= classInstance.getCapacity()) {
+            throw new BookingException("Class is fully booked");
+        }
+
+        List<Booking> existingBookings = bookingRepository.findByClassInstanceAndUserAndStatus(
+                classInstance, user, Booking.BookingStatus.BOOKED);
+        if (!existingBookings.isEmpty()) {
+            throw new BookingException("User already has a booking for this class");
+        }
+    }
+
+    public void cancelBooking(Long bookingId) {
+        Booking booking = findById(bookingId);
+        if (booking.getClassInstance().getStartTime().isBefore(LocalDateTime.now())) {
+            throw new BookingException("Cannot cancel past bookings");
+        }
+        booking.setStatus(Booking.BookingStatus.CANCELLED_BY_USER);
+        booking.setCancelledAt(LocalDateTime.now());
+        bookingRepository.save(booking);
+
+        // Create billing event if same-day cancellation
+        billingService.createCancellationCharge(booking);
+    }
+
+    public void markCompleted(Long bookingId) {
+        Booking booking = findById(bookingId);
+        booking.setStatus(Booking.BookingStatus.COMPLETED);
+        booking.setAttendedAt(LocalDateTime.now());
+        bookingRepository.save(booking);
+    }
+
+    public List<Booking> findByUser(Long userId) {
+        if (userId == null) {
+            return java.util.Collections.emptyList();
+        }
+        User user = userService.findById(userId);
+        return bookingRepository.findByUser(user);
+    }
+
+    public List<Booking> findByClassInstance(Long classInstanceId) {
+        if (classInstanceId == null) {
+            return java.util.Collections.emptyList();
+        }
+        GymClass classInstance = gymClassService.findById(classInstanceId);
+        return bookingRepository.findByClassInstance(classInstance);
+    }
+
+    public long countBookedByClassInstance(Long classInstanceId) {
+        if (classInstanceId == null) {
+            return 0L;
+        }
+        GymClass classInstance = gymClassService.findById(classInstanceId);
+        return bookingRepository.countByClassInstanceAndStatus(classInstance, Booking.BookingStatus.BOOKED);
+    }
+
+    public Booking findById(Long id) {
+        if (id == null) {
+            throw new BookingException("Booking id is required");
+        }
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id));
+    }
+}

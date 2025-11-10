@@ -1,0 +1,110 @@
+<div class="admin-create-class-container">
+  <div class="page-header">
+    <h1>Create Class</h1>
+    <a class="btn-secondary" routerLink="/admin/athletes">← Back to Admin</a>
+  </div>
+
+  <div *ngIf="message" class="notice" [ngClass]="messageType">
+    {{ message }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading instructors...</div>
+  <div *ngIf="!isLoading && instructors.length === 0" class="notice info">
+    No instructors available yet. Promote an athlete to Instructor from the
+    Admin → Athletes page, then return here to create a class.
+  </div>
+
+  <form *ngIf="!isLoading" (ngSubmit)="submit()" class="form-grid">
+    <div class="form-group">
+      <label>Class Name</label>
+      <input type="text" [(ngModel)]="name" name="name" required />
+    </div>
+
+    <div class="form-group">
+      <label>Instructor</label>
+      <select [(ngModel)]="instructorId" name="instructorId" required>
+        <option [ngValue]="null" disabled>Select instructor</option>
+        <option *ngFor="let i of instructors" [ngValue]="i.id">
+          {{ i.name }}
+        </option>
+      </select>
+      <small *ngIf="!instructorId" class="hint">Select an instructor.</small>
+    </div>
+
+    <div class="form-group">
+      <label>Class Type</label>
+      <select [(ngModel)]="classTypeId" name="classTypeId" required>
+        <option [ngValue]="null" disabled>Select class type</option>
+        <option *ngFor="let t of classTypes" [ngValue]="t.id">
+          {{ t.name }}
+        </option>
+      </select>
+      <small *ngIf="!classTypeId" class="hint">Select a class type.</small>
+    </div>
+
+    <div class="form-group">
+      <label>Capacity</label>
+      <input
+        type="number"
+        [(ngModel)]="capacity"
+        name="capacity"
+        min="1"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Duration (minutes)</label>
+      <input
+        type="number"
+        [(ngModel)]="durationMinutes"
+        name="durationMinutes"
+        min="15"
+        step="5"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Start Date</label>
+      <input type="date" [(ngModel)]="startDate" name="startDate" required />
+      <small *ngIf="!startDate" class="hint">Start date is required.</small>
+    </div>
+
+    <div class="form-group">
+      <label>Start Time</label>
+      <input type="time" [(ngModel)]="startTime" name="startTime" required />
+      <small *ngIf="!startTime" class="hint">Start time is required.</small>
+    </div>
+
+    <div class="form-group full">
+      <label>Description</label>
+      <textarea
+        [(ngModel)]="description"
+        name="description"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-group full">
+      <label>Location</label>
+      <input type="text" [(ngModel)]="location" name="location" />
+    </div>
+
+    <div class="form-actions full">
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="
+          !instructorId ||
+          !classTypeId ||
+          !name.trim() ||
+          !startDate ||
+          !startTime
+        "
+      >
+        Create
+      </button>
+    </div>
+  </form>
+</div>

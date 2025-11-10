@@ -1,0 +1,39 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout
+*.java text
+*.properties text
+*.xml text
+*.yml text
+*.yaml text
+*.json text
+*.ts text
+*.js text
+*.html text
+*.css text
+*.scss text
+*.md text
+*.sql text
+
+# Maven wrapper
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Windows-specific files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files
+*.jar binary
+*.war binary
+*.ear binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.woff2 binary

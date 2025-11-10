@@ -1,0 +1,87 @@
+/* Global styles and theme tokens */
+
+:root {
+	--color-bg: #0b1220;
+	--color-surface: #0f172a;
+	--color-surface-2: #111827;
+	--color-border: #24304a;
+	--color-text: #e5e7eb;
+	--color-text-muted: #9ca3af;
+	--color-primary: #2563eb; /* Indigo-600 */
+	--color-primary-700: #1d4ed8;
+	--color-accent: #10b981; /* Emerald-500 */
+	--radius: 10px;
+}
+
+/* Light theme overrides */
+:root.light {
+	--color-bg: #f7fafc;
+	--color-surface: #ffffff;
+	--color-surface-2: #f8fafc;
+	--color-border: #e5e7eb;
+	--color-text: #111827;
+	--color-text-muted: #6b7280;
+	--color-primary: #2563eb;
+	--color-primary-700: #1d4ed8;
+	--color-accent: #059669;
+}
+
+html, body { height: 100%; }
+body {
+	margin: 0;
+	font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background: var(--color-bg);
+	color: var(--color-text);
+	transition: background .2s ease, color .2s ease;
+}
+
+/* Containers */
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.page { padding: 24px; }
+
+/* Buttons */
+.btn { border: none; cursor: pointer; border-radius: 8px; font-weight: 600; }
+.btn.primary { background: var(--color-primary); color: #fff; padding: 10px 16px; }
+.btn.primary:hover { background: var(--color-primary-700); }
+.btn.ghost { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); padding: 10px 14px; }
+.btn.ghost:hover { background: rgba(255,255,255,0.04); }
+
+/* Typography scale */
+h1, .h1 { font-size: clamp(28px, 3.2vw, 40px); line-height: 1.1; margin: 0 0 8px; }
+h2, .h2 { font-size: clamp(22px, 2.6vw, 32px); line-height: 1.15; margin: 0 0 8px; }
+h3, .h3 { font-size: clamp(18px, 2.2vw, 24px); line-height: 1.2; margin: 0 0 6px; }
+p.lead { font-size: 18px; color: var(--color-text-muted); }
+
+/* Cards */
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); }
+.card.pad { padding: 16px; }
+
+/* Dialogs - global polish */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: 12px !important;
+}
+.mat-mdc-dialog-container .mdc-dialog__title { font-weight: 700; letter-spacing: .2px; }
+.mat-mdc-dialog-container .mdc-dialog__content { color: var(--color-text); }
+
+/* Tables */
+.mat-mdc-table { background: var(--color-surface); }
+.mat-mdc-header-row { background: #0b1430; }
+.mat-mdc-header-cell { color: var(--color-text-muted); }
+.mat-mdc-row { border-bottom: 1px solid var(--color-border); }
+
+/* Form fields density */
+.mat-mdc-form-field { width: 100%; }
+.mat-mdc-text-field-wrapper { border-radius: 10px !important; }
+
+/* Links */
+a { color: var(--color-primary); }
+a:hover { color: var(--color-primary-700); }
+
+/* Utility */
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 12px; }
+.spacer { flex: 1; }

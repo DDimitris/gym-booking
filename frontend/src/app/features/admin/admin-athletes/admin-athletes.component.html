@@ -1,0 +1,197 @@
+<div class="admin-athletes-container">
+  <div class="page-header">
+    <h1>Member Management</h1>
+    <div class="header-actions">
+      <button class="btn-secondary" routerLink="/admin/billing">
+        View All Billing
+      </button>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Search by name or email..."
+      class="search-input"
+    />
+    <button class="btn-secondary" (click)="loadMembers()" title="Refresh list">
+      🔄 Refresh
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading members...</div>
+
+  <div *ngIf="!isLoading && filteredMembers.length === 0" class="empty-state">
+    <p *ngIf="searchTerm">No members found matching "{{ searchTerm }}"</p>
+    <p *ngIf="!searchTerm">No members registered yet.</p>
+  </div>
+
+  <div
+    *ngIf="!isLoading && filteredMembers.length > 0"
+    class="athletes-table-container"
+  >
+    <table class="athletes-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Base Cost</th>
+          <th>Bonus Days</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of filteredMembers">
+          <td>{{ m.name }}</td>
+          <td>{{ m.email }}</td>
+          <td>
+            <span
+              class="role-badge"
+              [ngClass]="'role-' + m.role.toLowerCase()"
+              >{{ m.role }}</span
+            >
+          </td>
+          <td>€{{ m.baseCost || 0 }}</td>
+          <td>{{ m.bonusDays || 0 }}</td>
+          <td>
+            <span
+              class="status-badge"
+              [ngClass]="'status-' + (m.status || 'ACTIVE').toLowerCase()"
+              >{{ m.status || "ACTIVE" }}</span
+            >
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button
+                class="btn-small btn-primary"
+                (click)="openBaseCostModal(m)"
+                title="Set Base Cost"
+              >
+                💲 Set Cost
+              </button>
+              <button
+                class="btn-small btn-success"
+                (click)="openBonusDaysModal(m)"
+                title="Assign Bonus Days"
+              >
+                🎁 Bonus
+              </button>
+              <button
+                class="btn-small btn-info"
+                (click)="viewBilling(m)"
+                title="View Billing"
+              >
+                📊 Billing
+              </button>
+              <button
+                *ngIf="m.role === 'MEMBER'"
+                class="btn-small btn-warning"
+                (click)="openPromoteModal(m)"
+                title="Promote to Trainer"
+              >
+                ⬆️ Promote
+              </button>
+              <button
+                class="btn-small btn-danger"
+                (click)="deleteUser(m)"
+                title="Delete Member"
+              >
+                🗑️ Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="trainers-section" *ngIf="!isLoading">
+    <h2>Trainers</h2>
+    <table class="athletes-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of trainers">
+          <td>{{ t.name }}</td>
+          <td>{{ t.email }}</td>
+          <td><span class="role-badge role-trainer">TRAINER</span></td>
+          <td>
+            <span
+              class="status-badge"
+              [ngClass]="'status-' + (t.status || 'ACTIVE').toLowerCase()"
+              >{{ t.status || "ACTIVE" }}</span
+            >
+          </td>
+          <td>
+            <button class="btn-small btn-danger" (click)="deleteUser(t)">
+              🗑️ Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modalTitle }}</h2>
+        <button class="btn-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedMember">
+          <p><strong>Member:</strong> {{ selectedMember.name }}</p>
+          <p><strong>Email:</strong> {{ selectedMember.email }}</p>
+          <div *ngIf="modalMode === 'baseCost'" class="form-group">
+            <label>Base Cost per Class (€):</label>
+            <input
+              type="number"
+              [(ngModel)]="inputValue"
+              min="0"
+              step="0.01"
+              class="form-input"
+            />
+            <small
+              >This is the amount charged for same-day cancellations.</small
+            >
+          </div>
+          <div *ngIf="modalMode === 'bonusDays'" class="form-group">
+            <label>Bonus Days:</label>
+            <input
+              type="number"
+              [(ngModel)]="inputValue"
+              min="0"
+              step="1"
+              class="form-input"
+            />
+            <small>Number of free classes without cancellation charges.</small>
+          </div>
+          <div *ngIf="modalMode === 'promote'" class="confirm-message">
+            <p>
+              ⚠️ Are you sure you want to promote
+              <strong>{{ selectedMember.name }}</strong> to Trainer?
+            </p>
+            <p>This will allow them to create and manage gym classes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn-primary" (click)="saveChanges()">
+          {{ modalMode === "promote" ? "Promote" : "Save" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

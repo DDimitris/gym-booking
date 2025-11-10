@@ -1,0 +1,235 @@
+<div class="activity-history-container">
+  <h1 *ngIf="!isInstructor">My Activity History</h1>
+  <h1 *ngIf="isInstructor">My Classes</h1>
+
+  <div *ngIf="isLoading" class="loading">Loading your activity history...</div>
+
+  <div *ngIf="!isLoading">
+    <!-- Instructor view: upcoming classes -->
+    <section class="bookings-section" *ngIf="isInstructor">
+      <h2>Upcoming Classes ({{ upcomingClasses.length }})</h2>
+      <div *ngIf="upcomingClasses.length === 0" class="empty-state">
+        No upcoming classes you're instructing.
+      </div>
+      <div class="bookings-grid">
+        <div *ngFor="let c of upcomingClasses" class="booking-card">
+          <div class="booking-header">
+            <h3>{{ c.name }}</h3>
+            <span class="badge badge-primary">Scheduled</span>
+          </div>
+          <div class="booking-details">
+            <div class="detail-row">
+              <strong>Type:</strong> {{ getClassTypeName(c.classTypeId) }}
+            </div>
+            <div class="detail-row">
+              <strong>Start:</strong> {{ c.startTime | date : "medium" }}
+            </div>
+            <div class="detail-row">
+              <strong>End:</strong> {{ c.endTime | date : "medium" }}
+            </div>
+            <div class="detail-row">
+              <strong>Location:</strong> {{ c.location || "TBD" }}
+            </div>
+            <div class="detail-row">
+              <strong>Capacity:</strong> {{ c.capacity }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Member view toggle controls -->
+    <div *ngIf="!isInstructor" class="view-toggle">
+      <button class="btn-secondary" (click)="toggleCombined()">
+        {{
+          combinedView
+            ? "Split Upcoming/Past View"
+            : "Combined Chronological View"
+        }}
+      </button>
+    </div>
+
+    <!-- Member view: upcoming bookings (hidden when combined) -->
+    <section class="bookings-section" *ngIf="!isInstructor && !combinedView">
+      <h2>Upcoming Classes ({{ upcomingBookings.length }})</h2>
+
+      <div *ngIf="upcomingBookings.length === 0" class="empty-state">
+        No upcoming classes. <a href="/">Book a class</a> to get started!
+      </div>
+
+      <div class="bookings-grid">
+        <div *ngFor="let booking of upcomingBookings" class="booking-card">
+          <div class="booking-header">
+            <h3>{{ booking.gymClass?.name || "Unknown Class" }}</h3>
+            <span class="badge" [ngClass]="getStatusBadgeClass(booking.status)">
+              {{ getStatusLabel(booking.status) }}
+            </span>
+          </div>
+
+          <div class="booking-details">
+            <div class="detail-row">
+              <strong>Type:</strong> {{ booking.classTypeName || "N/A" }}
+            </div>
+            <div class="detail-row">
+              <strong>Start:</strong>
+              {{ booking.gymClass?.startTime | date : "medium" }}
+            </div>
+            <div class="detail-row">
+              <strong>End:</strong>
+              {{ booking.gymClass?.endTime | date : "medium" }}
+            </div>
+            <div class="detail-row">
+              <strong>Location:</strong>
+              {{ booking.gymClass?.location || "TBD" }}
+            </div>
+            <div class="detail-row">
+              <strong>Booked:</strong> {{ booking.bookedAt | date : "short" }}
+            </div>
+          </div>
+
+          <div class="booking-actions">
+            <button
+              *ngIf="canCancel(booking)"
+              class="btn-danger"
+              (click)="cancelBooking(booking)"
+            >
+              Cancel Booking
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Instructor view: past classes -->
+    <section class="bookings-section" *ngIf="isInstructor">
+      <h2>Past Classes ({{ pastClasses.length }})</h2>
+      <div *ngIf="pastClasses.length === 0" class="empty-state">
+        No past classes.
+      </div>
+      <div class="bookings-grid">
+        <div *ngFor="let c of pastClasses" class="booking-card past">
+          <div class="booking-header">
+            <h3>{{ c.name }}</h3>
+            <span class="badge badge-success">Completed</span>
+          </div>
+          <div class="booking-details">
+            <div class="detail-row">
+              <strong>Type:</strong> {{ getClassTypeName(c.classTypeId) }}
+            </div>
+            <div class="detail-row">
+              <strong>Date:</strong> {{ c.startTime | date : "medium" }}
+            </div>
+            <div class="detail-row">
+              <strong>Location:</strong> {{ c.location || "TBD" }}
+            </div>
+            <div class="detail-row">
+              <strong>Capacity:</strong> {{ c.capacity }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Member view: past bookings (hidden when combined) -->
+    <section class="bookings-section" *ngIf="!isInstructor && !combinedView">
+      <h2>Past Classes ({{ pastBookings.length }})</h2>
+      <!-- Member view: combined chronological list -->
+      <section class="bookings-section" *ngIf="!isInstructor && combinedView">
+        <h2>All Bookings ({{ allBookingsChrono.length }})</h2>
+        <div *ngIf="allBookingsChrono.length === 0" class="empty-state">
+          No bookings yet.
+        </div>
+        <div class="bookings-grid">
+          <div
+            *ngFor="let booking of allBookingsChrono"
+            class="booking-card"
+            [class.past]="isPastClass(booking)"
+          >
+            <div class="booking-header">
+              <h3>{{ booking.gymClass?.name || "Unknown Class" }}</h3>
+              <span
+                class="badge"
+                [ngClass]="getStatusBadgeClass(booking.status)"
+              >
+                {{ getStatusLabel(booking.status) }}
+              </span>
+            </div>
+            <div class="booking-details">
+              <div class="detail-row">
+                <strong>Type:</strong> {{ booking.classTypeName || "N/A" }}
+              </div>
+              <div class="detail-row">
+                <strong>Start:</strong>
+                {{ booking.gymClass?.startTime | date : "medium" }}
+              </div>
+              <div class="detail-row">
+                <strong>End:</strong>
+                {{ booking.gymClass?.endTime | date : "medium" }}
+              </div>
+              <div class="detail-row">
+                <strong>Location:</strong>
+                {{ booking.gymClass?.location || "TBD" }}
+              </div>
+              <div class="detail-row">
+                <strong>Booked:</strong> {{ booking.bookedAt | date : "short" }}
+              </div>
+              <div class="detail-row" *ngIf="booking.completedAt">
+                <strong>Completed:</strong>
+                {{ booking.completedAt | date : "short" }}
+              </div>
+              <div class="detail-row" *ngIf="booking.cancelledAt">
+                <strong>Cancelled:</strong>
+                {{ booking.cancelledAt | date : "short" }}
+              </div>
+            </div>
+            <div
+              class="booking-actions"
+              *ngIf="canCancel(booking) && !isPastClass(booking)"
+            >
+              <button class="btn-danger" (click)="cancelBooking(booking)">
+                Cancel Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div *ngIf="pastBookings.length === 0" class="empty-state">
+        No past classes yet.
+      </div>
+
+      <div class="bookings-grid">
+        <div *ngFor="let booking of pastBookings" class="booking-card past">
+          <div class="booking-header">
+            <h3>{{ booking.gymClass?.name || "Unknown Class" }}</h3>
+            <span class="badge" [ngClass]="getStatusBadgeClass(booking.status)">
+              {{ getStatusLabel(booking.status) }}
+            </span>
+          </div>
+
+          <div class="booking-details">
+            <div class="detail-row">
+              <strong>Type:</strong> {{ booking.classTypeName || "N/A" }}
+            </div>
+            <div class="detail-row">
+              <strong>Date:</strong>
+              {{ booking.gymClass?.startTime | date : "medium" }}
+            </div>
+            <div class="detail-row">
+              <strong>Location:</strong>
+              {{ booking.gymClass?.location || "TBD" }}
+            </div>
+            <div class="detail-row" *ngIf="booking.completedAt">
+              <strong>Completed:</strong>
+              {{ booking.completedAt | date : "short" }}
+            </div>
+            <div class="detail-row" *ngIf="booking.cancelledAt">
+              <strong>Cancelled:</strong>
+              {{ booking.cancelledAt | date : "short" }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

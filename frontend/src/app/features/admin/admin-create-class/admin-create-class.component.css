@@ -1,0 +1,10 @@
+.admin-create-class-container { padding: 1rem; }
+.page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+.form-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.form-group { display:flex; flex-direction:column; }
+.form-group.full { grid-column: 1 / -1; }
+.form-actions { display:flex; justify-content:flex-end; }
+input, select, textarea { padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+.btn-primary { background:#1976d2; color:white; border:none; padding:0.6rem 1rem; border-radius:4px; cursor:pointer; }
+.btn-secondary { background:#eee; color:#333; border:none; padding:0.5rem 0.8rem; border-radius:4px; cursor:pointer; text-decoration:none; }
+@media(max-width: 768px){ .form-grid { grid-template-columns: 1fr; } }

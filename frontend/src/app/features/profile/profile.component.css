@@ -1,0 +1,12 @@
+.profile-container{max-width:860px;margin:2rem auto;padding:1rem}
+.profile-grid{display:grid;grid-template-columns:220px 1fr;gap:1.5rem}
+.avatar{width:200px;height:200px;border-radius:8px;object-fit:cover;background:#f2f2f2}
+.avatar.placeholder{display:flex;align-items:center;justify-content:center;color:#777}
+label{display:block;margin-top:.75rem;font-weight:600}
+input{width:100%;padding:.5rem;margin-top:.25rem}
+.billing{margin-top:1rem}
+.actions{margin-top:1rem}
+.notice{margin:.5rem 0;padding:.5rem;border-radius:4px}
+.notice.success{background:#e8f5e9}
+.notice.error{background:#ffebee}
+.notice.info{background:#e3f2fd}

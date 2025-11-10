@@ -1,0 +1,76 @@
+<div class="layout-shell">
+  <header class="app-header">
+    <div class="header-inner container">
+      <div
+        class="brand-group"
+        (click)="kc.isAuthenticated() ? null : kcLogin()"
+      >
+        <div class="logo">🏋️</div>
+        <span class="brand-text">Gym Booking</span>
+      </div>
+      <button
+        class="menu-toggle"
+        *ngIf="kc.isReady() && kc.isAuthenticated()"
+        (click)="toggleMenu()"
+        aria-label="Toggle menu"
+      >
+        ☰
+      </button>
+      <nav
+        class="primary-nav"
+        *ngIf="kc.isReady() && kc.isAuthenticated()"
+        [class.open]="mobileMenuOpen"
+      >
+        <a routerLink="/classes" routerLinkActive="active">Classes</a>
+        <a *ngIf="showHistory" routerLink="/history" routerLinkActive="active"
+          >My History</a
+        >
+        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+        <a
+          *ngIf="showManagement"
+          routerLink="/admin/management"
+          routerLinkActive="active"
+          >Management</a
+        >
+      </nav>
+      <div class="user-actions" *ngIf="kc.isReady()">
+        <ng-container *ngIf="kc.isAuthenticated(); else guest">
+          <div class="user-chip" title="{{ roleLabel }}">
+            <span class="avatar" aria-hidden="true">{{ displayInitial }}</span>
+            <span class="uname">{{ displayName }}</span>
+            <span class="role" *ngIf="roleLabel">{{ roleLabel }}</span>
+          </div>
+          <button class="btn ghost" (click)="logout()">Logout</button>
+          <button
+            class="btn ghost toggle"
+            (click)="toggleTheme()"
+            aria-label="Toggle theme"
+          >
+            🌓
+          </button>
+        </ng-container>
+        <ng-template #guest>
+          <button class="btn primary" (click)="kcLogin()">Login</button>
+          <button
+            class="btn ghost toggle"
+            (click)="toggleTheme()"
+            aria-label="Toggle theme"
+          >
+            🌓
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </header>
+  <main class="app-main container">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="app-footer container">
+    <span
+      >&copy; {{ currentYear }} Gym Booking •
+      <a href="https://example.com" target="_blank" rel="noopener"
+        >Docs</a
+      ></span
+    >
+  </footer>
+</div>

@@ -1,0 +1,40 @@
+<div class="profile-container" *ngIf="me as user">
+  <h1>My Profile</h1>
+
+  <div class="notice" *ngIf="message" [ngClass]="messageType">
+    {{ message }}
+  </div>
+
+  <div class="profile-grid">
+    <div class="avatar-block">
+      <img
+        *ngIf="user.avatarUrl; else noAvatar"
+        [src]="user.avatarUrl"
+        alt="Avatar"
+        class="avatar"
+      />
+      <ng-template #noAvatar>
+        <div class="avatar placeholder">No Avatar</div>
+      </ng-template>
+      <label>Avatar URL</label>
+      <input type="url" [(ngModel)]="user.avatarUrl" />
+    </div>
+
+    <div class="info-block">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="user.name" />
+
+      <label>Email</label>
+      <input type="email" [ngModel]="user.email" disabled />
+
+      <div class="billing">
+        <strong>Total Owed:</strong>
+        <span>{{ totalOwed === null ? "—" : "$" + totalOwed }}</span>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" (click)="save()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

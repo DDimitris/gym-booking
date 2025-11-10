@@ -1,0 +1,166 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AdminService } from '../../../core/services/admin.service';
+import { KeycloakService } from '../../../core/services/keycloak.service';
+import { BillingReport } from '../../../core/models/billing.model';
+
+@Component({
+  selector: 'app-admin-billing',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './admin-billing.component.html',
+  styleUrls: ['./admin-billing.component.css']
+})
+export class AdminBillingComponent implements OnInit {
+  reports: BillingReport[] = [];
+  memberId: number | null = null;
+  isLoading = true;
+  selectedEventIds: Set<number> = new Set<number>();
+  
+  // Date range
+  startDate = '';
+  endDate = '';
+
+  constructor(
+    private adminService: AdminService,
+    private kc: KeycloakService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    // Check if user is admin (Keycloak-only)
+    if (!(this.kc.isReady() && this.kc.isAuthenticated() && this.kc.getRoles().includes('ADMIN'))) {
+      console.warn('Access denied. Admin privileges required.');
+      this.router.navigate(['/']);
+      return;
+    }
+
+    // Set default date range (last 30 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    this.endDate = this.formatDate(today);
+    this.startDate = this.formatDate(thirtyDaysAgo);
+
+    // Check if viewing specific member
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('memberId');
+      if (id) {
+        this.memberId = parseInt(id);
+      }
+      this.loadReports();
+    });
+  }
+
+  formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  loadReports(): void {
+    this.isLoading = true;
+    this.selectedEventIds.clear();
+
+    if (this.memberId) {
+      // Load single member report
+      this.adminService.getMemberReport(this.memberId, this.startDate, this.endDate).subscribe({
+        next: (report) => {
+          this.reports = [report];
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading member report:', err);
+          alert('Failed to load billing report. Please try again.');
+          this.isLoading = false;
+        }
+      });
+    } else {
+      // Load all billing events
+      this.adminService.getAllBillingEvents(this.startDate, this.endDate).subscribe({
+        next: (reports) => {
+          this.reports = reports;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading billing reports:', err);
+          alert('Failed to load billing reports. Please try again.');
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  applyDateFilter(): void {
+    this.loadReports();
+  }
+
+  exportToCSV(): void {
+    if (this.reports.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+
+    // Build CSV content
+  let csv = 'Member Name,Email,Base Cost,Bonus Days,Total Owed,Event Date,Amount,Reason,Settled\n';
+    
+    this.reports.forEach(report => {
+      if (report.events.length === 0) {
+        // Include member even if no events
+        csv += `"${report.userName}","","€${report.baseCost}","${report.bonusDays}","€${report.totalOwed}","","","",""\n`;
+      } else {
+        report.events.forEach(event => {
+          csv += `"${report.userName}","","€${report.baseCost}","${report.bonusDays}","€${report.totalOwed}","${event.eventDate}","€${event.amount}","${event.reason}","${event.settled ? 'Yes' : 'No'}"\n`;
+        });
+      }
+    });
+
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `billing-report-${this.startDate}-to-${this.endDate}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  backToMembers(): void {
+    this.router.navigate(['/admin/members']);
+  }
+
+  get totalOwedAcrossAll(): number {
+    return this.reports.reduce((sum, report) => sum + report.totalOwed, 0);
+  }
+
+  get totalEventsCount(): number {
+    return this.reports.reduce((sum, report) => sum + report.events.length, 0);
+  }
+
+  // Selection helpers
+  isSelected(eventId: number): boolean { return this.selectedEventIds.has(eventId); }
+  toggleEventSelection(eventId: number, checked: boolean): void {
+    if (checked) this.selectedEventIds.add(eventId); else this.selectedEventIds.delete(eventId);
+  }
+  selectAllPendingInReport(report: BillingReport, checked: boolean): void {
+    const ids = report.events.filter(e => !e.settled).map(e => (e as any).id || (e as any).eventId || e.bookingId);
+    // Prefer id if present on event summaries; backend DTO includes id
+    report.events.forEach(e => {
+      const id = (e as any).id ?? (e as any).eventId ?? e.bookingId;
+      if (!e.settled && typeof id === 'number') {
+        if (checked) this.selectedEventIds.add(id); else this.selectedEventIds.delete(id);
+      }
+    });
+  }
+
+  markSelectedAsPaid(): void {
+    if (this.selectedEventIds.size === 0) return;
+    const ids = Array.from(this.selectedEventIds.values());
+    this.adminService.settleBillingEvents(ids).subscribe({
+      next: () => { this.loadReports(); },
+      error: (err) => { console.error('Failed to settle events', err); alert('Failed to mark as paid.'); }
+    });
+  }
+}

@@ -1,0 +1,93 @@
+<div class="calendar-container">
+  <!-- simple toast -->
+  <div *ngIf="toastMessage" class="toast" [ngClass]="toastType">
+    {{ toastMessage }}
+  </div>
+  <div class="calendar-header">
+    <h1>Gym Classes Calendar</h1>
+    <div class="filter-section">
+      <label for="classTypeFilter">Filter by Class Type:</label>
+      <select
+        id="classTypeFilter"
+        [(ngModel)]="selectedClassTypeId"
+        (ngModelChange)="onClassTypeFilterChange()"
+      >
+        <option [ngValue]="null">All Classes</option>
+        <option *ngFor="let classType of classTypes" [ngValue]="classType.id">
+          {{ classType.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <full-calendar [options]="calendarOptions"></full-calendar>
+
+  <!-- Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedClass?.name }}</h2>
+        <button class="btn-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="selectedClass">
+          <div class="detail-row">
+            <strong>Type:</strong> {{ classTypeName }}
+          </div>
+          <div class="detail-row">
+            <strong>Description:</strong>
+            {{ selectedClass.description || "N/A" }}
+          </div>
+          <div class="detail-row">
+            <strong>Start:</strong>
+            {{ selectedClass.startTime | date : "medium" }}
+          </div>
+          <div class="detail-row">
+            <strong>End:</strong> {{ selectedClass.endTime | date : "medium" }}
+          </div>
+          <div class="detail-row">
+            <strong>Duration:</strong>
+            {{ selectedClass.durationMinutes }} minutes
+          </div>
+          <div class="detail-row">
+            <strong>Location:</strong> {{ selectedClass.location || "N/A" }}
+          </div>
+          <div class="detail-row">
+            <strong>Available Spots:</strong>
+            <span
+              [class.text-danger]="isFull"
+              [class.text-warning]="availableSpots <= 2 && !isFull"
+            >
+              {{ availableSpots }} / {{ selectedClass.capacity }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <strong>Status:</strong> {{ selectedClass.status }}
+          </div>
+
+          <div *ngIf="isFull" class="alert alert-warning">
+            This class is currently full
+          </div>
+
+          <div class="billing-notice">
+            <strong>⚠️ Cancellation Policy:</strong> Cancellations within 24
+            hours of class time will be charged the base cost.
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Close</button>
+        <button
+          class="btn-primary"
+          (click)="bookClass()"
+          [disabled]="isFull || selectedClass?.status !== 'SCHEDULED'"
+          *ngIf="!(isAdmin || isInstructor)"
+        >
+          Book Class
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

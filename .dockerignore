@@ -1,0 +1,42 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE files
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+
+# Build directories
+**/target/
+**/dist/
+**/node_modules/
+**/.angular/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Documentation
+docs/
+*.md
+
+# Test files
+**/test/
+**/tests/
+**/*.spec.ts
+**/*.test.ts
+
+# Docker files
+**/Dockerfile
+**/.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
