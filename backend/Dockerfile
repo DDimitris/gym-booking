@@ -20,6 +20,8 @@ RUN ./mvnw clean package -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
 FROM eclipse-temurin:21-jre-alpine
+# Install curl for healthchecks
+RUN apk add --no-cache curl
 VOLUME /tmp
 ARG DEPENDENCY=/workspace/app/target/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
