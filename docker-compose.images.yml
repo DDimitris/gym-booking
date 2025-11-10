@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: gym-booking-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: gym_booking,keycloak
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gym-booking-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: gym-booking-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_DB_SCHEMA: public
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: edge
+      PROXY_ADDRESS_FORWARDING: "true"
+      KC_HOSTNAME: localhost:8180
+      KEYCLOAK_FRONTEND_URL: http://localhost/auth
+    ports:
+      - "8180:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - start-dev
+      - --import-realm
+      - --health-enabled=true
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - gym-booking-network
+
+  backend:
+    image: ghcr.io/ddimitris/gym-booking-backend:latest
+    container_name: gym-booking-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gym_booking
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth
+      KEYCLOAK_REALM: gym-booking
+      KEYCLOAK_RESOURCE: gym-booking-client
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - gym-booking-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: ghcr.io/ddimitris/gym-booking-frontend:latest
+    container_name: gym-booking-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - API_URL=http://backend:8080
+      - KEYCLOAK_URL=http://keycloak:8080/auth
+    networks:
+      - gym-booking-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  gym-booking-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
