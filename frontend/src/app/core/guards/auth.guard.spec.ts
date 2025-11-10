@@ -3,6 +3,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AuthGuard } from './auth.guard';
 import { KeycloakService } from '../services/keycloak.service';
 import { AuthService } from '../services/auth.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserService } from '../services/user.service';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 
 describe('AuthGuard', () => {
@@ -23,11 +25,12 @@ describe('AuthGuard', () => {
     ]);
     
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
         AuthGuard,
         { provide: KeycloakService, useValue: keycloakSpy },
-        { provide: AuthService, useValue: authSpy }
+        { provide: AuthService, useValue: authSpy },
+        UserService
       ]
     });
 
