@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface ClassTypeRepository extends JpaRepository<ClassType, Long> {
     Optional<ClassType> findByName(String name);
 
-    List<ClassType> findByInstructor(User instructor);
+    List<ClassType> findByTrainer(User trainer);
 
     List<ClassType> findByIsActiveTrue();
 }

@@ -27,13 +27,13 @@ public class ClassTypeService {
         this.gymClassRepository = gymClassRepository;
     }
 
-    public ClassType createClassType(@NonNull ClassType classType, Long instructorId) {
-        if (instructorId != null) {
-            User instructor = userService.findById(instructorId);
-            if (instructor.getRole() != User.UserRole.TRAINER) {
+    public ClassType createClassType(@NonNull ClassType classType, Long trainerId) {
+        if (trainerId != null) {
+            User trainer = userService.findById(trainerId);
+            if (trainer.getRole() != User.UserRole.TRAINER) {
                 throw new IllegalArgumentException("Only trainers can be assigned to a class type");
             }
-            classType.setInstructor(instructor);
+            classType.setTrainer(trainer);
         }
         classType.setIsActive(true);
         return classTypeRepository.save(classType);
@@ -67,9 +67,9 @@ public class ClassTypeService {
         return classTypeRepository.findByIsActiveTrue();
     }
 
-    public List<ClassType> findByInstructor(@NonNull Long instructorId) {
-        User instructor = userService.findById(instructorId);
-        return classTypeRepository.findByInstructor(instructor);
+    public List<ClassType> findByTrainer(@NonNull Long trainerId) {
+        User trainer = userService.findById(trainerId);
+        return classTypeRepository.findByTrainer(trainer);
     }
 
     public ClassType findById(@NonNull Long id) {

@@ -95,7 +95,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .title { font-weight: 600; }
     .desc { color: #555; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .middle { width: 140px; text-align: center; font-variant-numeric: tabular-nums; }
-    .right { width: 96px; display: flex; justify-content: flex-end; }
+    .right { width: auto; min-width: 140px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
   `]
 })
 export class GymClassListComponent implements OnInit {

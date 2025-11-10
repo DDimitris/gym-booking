@@ -43,7 +43,7 @@ export class ActivityHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     // Route is guarded; assume authenticated
-    this.isInstructor = this.kc.isReady() && this.kc.isAuthenticated() && (this.kc.getRoles().includes('INSTRUCTOR') || this.kc.getRoles().includes('TRAINER'));
+  this.isInstructor = this.kc.isReady() && this.kc.isAuthenticated() && (this.kc.getRoles().includes('TRAINER') || this.kc.getRoles().includes('INSTRUCTOR'));
     this.loadActivityHistory();
   }
 
@@ -61,7 +61,7 @@ export class ActivityHistoryComponent implements OnInit {
           }).subscribe({
             next: ({ classes, classTypes }) => {
               this.classTypes = classTypes;
-              this.classes = classes.filter(c => c.instructorId === myId);
+              this.classes = classes.filter(c => (c as any).trainerId === myId || (c as any).instructorId === myId);
               this.isLoading = false;
             },
             error: (err) => {

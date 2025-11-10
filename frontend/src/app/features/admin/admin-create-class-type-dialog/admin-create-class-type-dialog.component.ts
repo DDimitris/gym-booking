@@ -18,8 +18,8 @@ import { User } from '../../../core/models/user.model';
     <div mat-dialog-content>
       <form (ngSubmit)="create()" #form="ngForm">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Instructor</mat-label>
-          <mat-select [(ngModel)]="instructorId" name="instructorId">
+          <mat-label>Trainer</mat-label>
+          <mat-select [(ngModel)]="trainerId" name="trainerId">
             <mat-option *ngFor="let i of instructors" [value]="i.id">{{ i.name }}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -49,7 +49,7 @@ import { User } from '../../../core/models/user.model';
 export class AdminCreateClassTypeDialogComponent {
   name = '';
   description = '';
-  instructorId: number | null = null;
+  trainerId: number | null = null;
   message: string | null = null;
   messageType: 'success' | 'error' | 'info' = 'info';
   instructors: User[] = [];
@@ -79,7 +79,7 @@ export class AdminCreateClassTypeDialogComponent {
       id: 0,
       name: this.name,
       description: this.description,
-      instructorId: this.instructorId,
+      trainerId: this.trainerId,
       isActive: true
     }).subscribe({
       next: () => {

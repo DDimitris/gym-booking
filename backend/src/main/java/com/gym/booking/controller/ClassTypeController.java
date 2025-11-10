@@ -51,7 +51,7 @@ public class ClassTypeController {
         }
         ClassType classType = convertToEntity(classTypeDTO);
         ClassType savedClassType = classTypeService.createClassType(Objects.requireNonNull(classType),
-                classTypeDTO.getInstructorId());
+                classTypeDTO.getTrainerId());
         return ResponseEntity.ok(convertToDTO(savedClassType));
     }
 
@@ -120,7 +120,7 @@ public class ClassTypeController {
         dto.setId(classType.getId());
         dto.setName(classType.getName());
         dto.setDescription(classType.getDescription());
-        dto.setInstructorId(classType.getInstructor() != null ? classType.getInstructor().getId() : null);
+        dto.setTrainerId(classType.getTrainer() != null ? classType.getTrainer().getId() : null);
         dto.setIsActive(classType.getIsActive());
         return dto;
     }

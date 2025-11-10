@@ -13,6 +13,8 @@ RUN npm run build
 
 # Use stable nginx version for production
 FROM nginx:1.24-alpine
+# Install wget for healthchecks
+RUN apk add --no-cache wget
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

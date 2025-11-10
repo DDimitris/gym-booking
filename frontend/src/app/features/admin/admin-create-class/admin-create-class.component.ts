@@ -28,7 +28,7 @@ export class AdminCreateClassComponent implements OnInit {
   description = '';
   capacity = 5;
   durationMinutes = 60;
-  instructorId: number | null = null;
+  trainerId: number | null = null;
   classTypeId: number | null = null;
   startDate = ''; // YYYY-MM-DD
   startTime = '';// HH:mm
@@ -50,7 +50,7 @@ export class AdminCreateClassComponent implements OnInit {
       return;
     }
 
-    this.adminService.getInstructors().subscribe({
+  this.adminService.getInstructors().subscribe({
       next: (instructors) => {
         this.instructors = instructors;
         // Load class types too
@@ -80,7 +80,7 @@ export class AdminCreateClassComponent implements OnInit {
       }
       return;
     }
-    if (!this.instructorId) { this.messageType = 'error'; this.message = 'Please select an instructor.'; return; }
+  if (!this.trainerId) { this.messageType = 'error'; this.message = 'Please select a trainer.'; return; }
     if (!this.name.trim()) { this.messageType = 'error'; this.message = 'Please enter a class name.'; return; }
     if (!this.classTypeId) { this.messageType = 'error'; this.message = 'Please select a class type.'; return; }
     if (!this.startDate || !this.startTime) { this.messageType = 'error'; this.message = 'Please select start date and time.'; return; }
@@ -92,12 +92,13 @@ export class AdminCreateClassComponent implements OnInit {
     const endDateObj = new Date(startDateObj.getTime() + this.durationMinutes * 60000);
     const end = this.formatLocalDateTime(endDateObj);
 
-    const payload: any = {
+  const payload: any = {
       name: this.name,
       description: this.description,
       capacity: this.capacity,
       durationMinutes: this.durationMinutes,
-      instructorId: this.instructorId,
+  trainerId: this.trainerId,
+  instructorId: this.trainerId, // transitional
       classTypeId: this.classTypeId,
       startTime: start,
       endTime: end,

@@ -20,9 +20,9 @@ import { ClassType } from '../../../core/models/class-type.model';
     <div mat-dialog-content>
       <form (ngSubmit)="submit()" #form="ngForm">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Instructor</mat-label>
-                <mat-select [(ngModel)]="instructorId" name="instructorId" required>
-                  <mat-option *ngFor="let i of instructors" [value]="i.id">{{ i.name }}</mat-option>
+                <mat-label>Trainer</mat-label>
+                <mat-select [(ngModel)]="trainerId" name="trainerId" required>
+                  <mat-option *ngFor="let t of trainers" [value]="t.id">{{ t.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
 
@@ -55,7 +55,7 @@ import { ClassType } from '../../../core/models/class-type.model';
         </div>
 
         <div class="row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="date-field">
             <mat-label>Date</mat-label>
             <input matInput [matDatepicker]="picker" [(ngModel)]="startDateObj" name="startDateObj" required>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -107,21 +107,27 @@ import { ClassType } from '../../../core/models/class-type.model';
   `,
   styles: [`
     .full-width { width: 100%; }
-    .row { display: flex; gap: 12px; }
-    .row > * { flex: 1; }
+    .row { display: flex; gap: 12px; align-items: flex-end; }
+    .row .date-field { flex: 2; min-width: 260px; }
+    .row .time-selectors { flex: 1; min-width: 220px; }
     .message.info { color: #1976d2; }
     .message.success { color: #2e7d32; }
     .message.error { color: #d32f2f; }
     .time-selectors { display: flex; gap: 12px; }
+    .time-selectors > * { flex: 1; }
     .recurrence-box { margin-top: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 4px; }
     .days { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
     .label { font-size: 12px; color: #555; }
     .weeks-field { width: 160px; }
     .hint { font-size: 12px; color: #555; }
+    @media (max-width: 720px) {
+      .row { flex-wrap: wrap; }
+      .row .date-field, .row .time-selectors { flex: 1 1 100%; min-width: 0; }
+    }
   `]
 })
 export class AdminCreateClassDialogComponent {
-  instructors: User[] = [];
+  trainers: User[] = [];
   classTypes: ClassType[] = [];
   message: string | null = null;
   messageType: 'success' | 'error' | 'info' = 'info';
@@ -130,7 +136,7 @@ export class AdminCreateClassDialogComponent {
   description = '';
   capacity = 5;
   durationMinutes = 60;
-  instructorId: number | null = null;
+  trainerId: number | null = null;
   classTypeId: number | null = null;
   startDateObj: Date | null = null;
   startHour: number | null = null;
@@ -153,7 +159,7 @@ export class AdminCreateClassDialogComponent {
   hours = Array.from({ length: 24 }, (_, i) => i);
   minutes = [0, 15, 30, 45];
 
-  instructorLocked = false;
+  trainerLocked = false;
 
   constructor(
     private dialogRef: MatDialogRef<AdminCreateClassDialogComponent>,
@@ -167,7 +173,7 @@ export class AdminCreateClassDialogComponent {
   }
 
   get canSubmit(): boolean {
-    const baseOk = !!(this.instructorId && this.classTypeId && this.name && this.startDateObj && this.startHour !== null && this.startMinute !== null && this.capacity > 0 && this.durationMinutes >= 15);
+    const baseOk = !!(this.trainerId && this.classTypeId && this.name && this.startDateObj && this.startHour !== null && this.startMinute !== null && this.capacity > 0 && this.durationMinutes >= 15);
     if (!this.recurring) return baseOk;
     return baseOk && this.selectedDays.length > 0 && this.repeatWeeks >= 1;
   }
@@ -180,8 +186,8 @@ export class AdminCreateClassDialogComponent {
   load(): void {
     // Load all trainers for both admins and instructors from /api/users/instructors
     this.users.getAllTrainers().subscribe({
-      next: (list) => { this.instructors = list; },
-      error: () => { this.instructors = []; }
+      next: (list) => { this.trainers = list; },
+      error: () => { this.trainers = []; }
     });
 
     // Load class types independently
@@ -263,7 +269,8 @@ export class AdminCreateClassDialogComponent {
       description: this.description,
       capacity: this.capacity,
       durationMinutes: this.durationMinutes,
-      instructorId: this.instructorId,
+      trainerId: this.trainerId,
+      instructorId: this.trainerId,
       classTypeId: this.classTypeId,
       startTime: this.formatLocalDateTime(start),
       endTime: endIso,

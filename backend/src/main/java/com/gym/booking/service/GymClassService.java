@@ -20,8 +20,8 @@ public class GymClassService {
         this.userService = userService;
     }
 
-    public GymClass createGymClass(@NonNull GymClass gymClass, @NonNull Long instructorId) {
-        User instructor = userService.findById(instructorId);
+    public GymClass createGymClass(@NonNull GymClass gymClass, @NonNull Long trainerId) {
+        User instructor = userService.findById(trainerId);
         // Allow ADMIN or TRAINER to create classes
         if (instructor.getRole() != User.UserRole.TRAINER && instructor.getRole() != User.UserRole.ADMIN) {
             throw new IllegalArgumentException("The specified user is not authorized to be a trainer for a class");

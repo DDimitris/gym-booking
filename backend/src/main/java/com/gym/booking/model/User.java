@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "users")
+@lombok.Getter
+@lombok.Setter
+@lombok.ToString(exclude = {})
 public class User extends BaseEntity {
 
     @Column(unique = true)
@@ -56,84 +59,4 @@ public class User extends BaseEntity {
         DELETED
     }
 
-    // Getters and Setters
-    public String getKeycloakId() {
-        return keycloakId;
-    }
-
-    public void setKeycloakId(String keycloakId) {
-        this.keycloakId = keycloakId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
-    public String getAuthProvider() {
-        return authProvider;
-    }
-
-    public void setAuthProvider(String authProvider) {
-        this.authProvider = authProvider;
-    }
-
-    public String getOauthId() {
-        return oauthId;
-    }
-
-    public void setOauthId(String oauthId) {
-        this.oauthId = oauthId;
-    }
-
-    public BigDecimal getBaseCost() {
-        return baseCost;
-    }
-
-    public void setBaseCost(BigDecimal baseCost) {
-        this.baseCost = baseCost;
-    }
-
-    public Integer getBonusDays() {
-        return bonusDays;
-    }
-
-    public void setBonusDays(Integer bonusDays) {
-        this.bonusDays = bonusDays;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
 }

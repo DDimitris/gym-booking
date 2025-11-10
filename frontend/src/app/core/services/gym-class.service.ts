@@ -28,8 +28,13 @@ export class GymClassService {
     return this.http.get<GymClass[]>(this.apiUrl);
   }
 
+  getGymClassesByTrainer(trainerId: number): Observable<GymClass[]> {
+    return this.http.get<GymClass[]>(`${this.apiUrl}/trainer/${trainerId}`);
+  }
+
+  // Backward-compatible helper while UI migrates
   getGymClassesByInstructor(instructorId: number): Observable<GymClass[]> {
-    return this.http.get<GymClass[]>(`${this.apiUrl}/instructor/${instructorId}`);
+    return this.getGymClassesByTrainer(instructorId);
   }
 
   // NOTE: Backend search endpoint removed; client-side filtering is used instead.

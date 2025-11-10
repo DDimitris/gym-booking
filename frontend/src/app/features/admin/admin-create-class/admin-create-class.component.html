@@ -8,10 +8,10 @@
     {{ message }}
   </div>
 
-  <div *ngIf="isLoading" class="loading">Loading instructors...</div>
+  <div *ngIf="isLoading" class="loading">Loading trainers...</div>
   <div *ngIf="!isLoading && instructors.length === 0" class="notice info">
-    No instructors available yet. Promote an athlete to Instructor from the
-    Admin → Athletes page, then return here to create a class.
+    No trainers available yet. Promote a member to Trainer from the Admin →
+    Athletes page, then return here to create a class.
   </div>
 
   <form *ngIf="!isLoading" (ngSubmit)="submit()" class="form-grid">
@@ -21,14 +21,14 @@
     </div>
 
     <div class="form-group">
-      <label>Instructor</label>
-      <select [(ngModel)]="instructorId" name="instructorId" required>
-        <option [ngValue]="null" disabled>Select instructor</option>
+      <label>Trainer</label>
+      <select [(ngModel)]="trainerId" name="trainerId" required>
+        <option [ngValue]="null" disabled>Select trainer</option>
         <option *ngFor="let i of instructors" [ngValue]="i.id">
           {{ i.name }}
         </option>
       </select>
-      <small *ngIf="!instructorId" class="hint">Select an instructor.</small>
+      <small *ngIf="!trainerId" class="hint">Select a trainer.</small>
     </div>
 
     <div class="form-group">
@@ -96,11 +96,7 @@
         type="submit"
         class="btn-primary"
         [disabled]="
-          !instructorId ||
-          !classTypeId ||
-          !name.trim() ||
-          !startDate ||
-          !startTime
+          !trainerId || !classTypeId || !name.trim() || !startDate || !startTime
         "
       >
         Create
