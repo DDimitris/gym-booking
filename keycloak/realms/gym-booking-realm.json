@@ -7,18 +7,9 @@
   "displayNameHtml": "Gym Booking Application",
   "roles": {
     "realm": [
-      {
-        "name": "ADMIN",
-        "description": "Administrator role"
-      },
-      {
-        "name": "TRAINER",
-        "description": "Gym trainer role"
-      },
-      {
-        "name": "MEMBER",
-        "description": "Gym member role"
-      }
+      { "name": "ADMIN", "description": "Administrator role" },
+      { "name": "TRAINER", "description": "Gym trainer role" },
+      { "name": "MEMBER", "description": "Gym member role" }
     ]
   },
   "clients": [
@@ -27,16 +18,12 @@
       "enabled": true,
       "publicClient": true,
       "redirectUris": [
-        "http://localhost/*",
-        "http://localhost/",
-        "http://localhost/classes",
         "https://localhost",
-        "https://localhost/*",
         "https://localhost/",
+        "https://localhost/*",
         "https://localhost/classes"
       ],
       "webOrigins": [
-        "http://localhost",
         "https://localhost"
       ],
       "defaultClientScopes": [
@@ -46,7 +33,7 @@
         "profile",
         "email"
       ],
-  "rootUrl": "https://localhost",
+      "rootUrl": "https://localhost",
       "baseUrl": "/",
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
@@ -57,7 +44,7 @@
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "pkce.enforced": "true",
-        "post.logout.redirect.uris": "http://localhost http://localhost/ http://localhost/* https://localhost https://localhost/ https://localhost/*",
+        "post.logout.redirect.uris": "https://localhost https://localhost/ https://localhost/*",
         "oauth2.device.authorization.grant.enabled": "false"
       },
       "protocol": "openid-connect",
@@ -83,38 +70,20 @@
     {
       "username": "admin",
       "enabled": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "admin",
-          "temporary": true
-        }
-      ],
+      "credentials": [{ "type": "password", "value": "admin", "temporary": true }],
       "requiredActions": ["UPDATE_PASSWORD"],
       "realmRoles": ["ADMIN"]
     },
     {
       "username": "trainer",
       "enabled": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "trainer",
-          "temporary": false
-        }
-      ],
+      "credentials": [{ "type": "password", "value": "trainer", "temporary": false }],
       "realmRoles": ["TRAINER"]
     },
     {
       "username": "member",
       "enabled": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "member",
-          "temporary": false
-        }
-      ],
+      "credentials": [{ "type": "password", "value": "member", "temporary": false }],
       "realmRoles": ["MEMBER"]
     }
   ]
