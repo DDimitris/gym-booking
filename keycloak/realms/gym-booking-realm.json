@@ -29,10 +29,14 @@
       "redirectUris": [
         "http://localhost/*",
         "http://localhost/",
-        "http://localhost/classes"
+        "http://localhost/classes",
+        "https://localhost/*",
+        "https://localhost/",
+        "https://localhost/classes"
       ],
       "webOrigins": [
-        "http://localhost"
+        "http://localhost",
+        "https://localhost"
       ],
       "defaultClientScopes": [
         "web-origins",
