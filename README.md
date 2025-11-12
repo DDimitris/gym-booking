@@ -49,7 +49,7 @@ Note on collaboration: This project is a cooperative work between the repository
 - Node.js 20+ (for local development)
 - Maven (for local development)
 
-## Quick Start
+## Quick Start (HTTPS-only)
 
 ### Running with Docker
 
@@ -59,15 +59,16 @@ Note on collaboration: This project is a cooperative work between the repository
    cd gym-booking
    ```
 
-2. Start the application using Docker Compose:
+2. Start the application using Docker Compose (HTTPS):
    ```bash
    docker compose up -d
    ```
 
 3. Access the applications:
-   - Frontend: http://localhost
-   - Keycloak Admin Console: http://localhost:8180 (realm import auto-applied)
-   - Backend API: http://localhost:8080
+   - Frontend: https://localhost (HTTP redirects to HTTPS)
+   - Keycloak Admin Console: https://localhost/auth/admin (realm import auto-applied)
+   - Backend API via proxy: https://localhost/api
+   - Direct backend (container-mapped): http://localhost:8080
    - Swagger UI: http://localhost:8080/swagger-ui.html
 
 ### Local Development Setup (optional)
@@ -94,7 +95,7 @@ Note on collaboration: This project is a cooperative work between the repository
 
 ### Keycloak Setup
 
-1. Access Keycloak Admin Console at http://localhost:8180
+1. Access Keycloak Admin Console at https://localhost/auth/admin
 2. Login with:
    - Username: admin
    - Password: admin
@@ -102,8 +103,8 @@ Note on collaboration: This project is a cooperative work between the repository
 4. Create client: 'gym-booking-client'
 5. Configure client:
    - Access Type: public
-   - Valid Redirect URIs: http://localhost/*
-   - Web Origins: *
+   - Valid Redirect URIs: https://localhost/*
+   - Web Origins: https://localhost
 
 ### Roles
 The canonical application roles are:

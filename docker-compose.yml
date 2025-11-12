@@ -37,11 +37,9 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge
       PROXY_ADDRESS_FORWARDING: "true"
-      # Use only KC_HOSTNAME_URL to avoid conflict (KC_HOSTNAME + KC_HOSTNAME_URL together not allowed)
-      KC_HOSTNAME_URL: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST:-localhost}/auth
-      KEYCLOAK_FRONTEND_URL: ${PUBLIC_SCHEME:-http}://${PUBLIC_HOST:-localhost}/auth
-    ports:
-      - "8180:8080"
+      # Public host URL (use only KC_HOSTNAME_URL to avoid conflict with KC_HOSTNAME)
+      KC_HOSTNAME_URL: ${PUBLIC_SCHEME:-https}://${PUBLIC_HOST:-localhost}/auth
+      KEYCLOAK_FRONTEND_URL: ${PUBLIC_SCHEME:-https}://${PUBLIC_HOST:-localhost}/auth
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,7 +66,7 @@ services:
     container_name: gym-booking-keycloak-realm-prep
     environment:
       PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
-      PUBLIC_SCHEME: ${PUBLIC_SCHEME:-http}
+      PUBLIC_SCHEME: ${PUBLIC_SCHEME:-https}
     working_dir: /work
     volumes:
       - ./keycloak/realms:/work
@@ -108,8 +106,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: gym-booking-frontend
+    # Expose both 80 and 443 publicly (80 redirects to 443)
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
       - backend
     environment:
@@ -117,8 +117,13 @@ services:
       - KEYCLOAK_URL=http://keycloak:8080/auth
     networks:
       - gym-booking-network
+    volumes:
+      # Override nginx config with HTTPS-enabled config
+      - ./frontend/nginx-https.conf:/etc/nginx/conf.d/default.conf:ro
+      # Mount certificates (place your certs in ./certs)
+      - ./certs:/etc/nginx/certs:ro
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      test: ["CMD", "wget", "-q", "--spider", "https://localhost:443"]
       interval: 30s
       timeout: 10s
       retries: 3

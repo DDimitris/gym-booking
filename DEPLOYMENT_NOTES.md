@@ -3,7 +3,7 @@
 These notes explain how to run and deploy the gym-booking stack (Angular frontend, Spring Boot backend, Keycloak) with both HTTP and HTTPS, how to switch hosts/domains, manage certificates, and keep secrets out of git history.
 
 ### 1. Overview
-Services (frontend, backend, Keycloak, Postgres) are orchestrated via `docker-compose.yml` (HTTP) and `docker-compose.https.yml` (HTTPS). The frontend nginx serves the SPA and reverse-proxies `/api` (backend) and `/auth` (Keycloak) on the same origin to eliminate CORS issues.
+Services (frontend, backend, Keycloak, Postgres) are orchestrated via a single HTTPS-first `docker-compose.yml`. The frontend nginx serves the SPA and reverse-proxies `/api` (backend) and `/auth` (Keycloak) on the same origin to eliminate CORS issues. Port 80 redirects to 443.
 
 ### 2. Environment Variables (.env)
 Copy `.env.example` to `.env` at the repository root.
@@ -27,7 +27,7 @@ Self-signed dev certs live in `certs/` (ignored by git). Regenerate with provide
 Recommended permissions: restrict `privkey.pem` to owner read only.
 
 ### 5. HTTPS Stack
-Use `docker-compose.https.yml` for TLS termination.
+The default `docker-compose.yml` uses TLS termination at the frontend.
 Key points:
 - Port 80 redirects to 443.
 - HSTS enabled (adjust max-age if needed).
