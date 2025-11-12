@@ -2,11 +2,11 @@ export const environment = {
   production: true,
   apiUrl: '/api',
   keycloak: {
-    // Use direct Keycloak origin in production to ensure silent SSO cookies match path/host
-    // The nginx proxy at /auth can cause cookie path mismatches ("/realms" vs "/auth/realms").
-    url: 'http://localhost:8180',
+    // Use same-origin proxy path so all requests share origin & CSP allowances; avoids cross-origin cookie & CSP issues.
+    // Nginx proxies /auth -> keycloak:8080/ so Keycloak receives expected paths.
+    url: '/auth',
     realm: 'gym-booking',
     clientId: 'gym-booking-client'
   },
-  showAuthDebug: false
+  showAuthDebug: true
 };

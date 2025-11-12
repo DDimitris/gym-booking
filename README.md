@@ -165,114 +165,184 @@ The API documentation is available through Swagger UI at http://localhost:8080/s
 - DELETE /api/bookings/{id} - Cancel a booking
 
 ## Security
+# Gym Booking System
 
-- JWT-based authentication using Keycloak
-- Role-based access control with on-the-fly normalization of legacy roles
-- Secure password handling
-- CORS configuration
-- HTTPS support in production
+Full-stack class scheduling and booking, powered by Spring Boot (Java 21), Angular, PostgreSQL, and Keycloak—fully Dockerized with CI/CD and production-ready profiles.
 
-## Development
+Note: This project is built collaboratively by Dimitris and an AI programming assistant. Many refinements (role model, migrations, CI/CD, metrics, Docker, and UI polish) were implemented iteratively.
 
-### Backend Development
+## What’s inside
 
-```bash
-cd backend
-./mvnw spring-boot:run
+- Authentication/authorization via Keycloak; roles: ADMIN, TRAINER, MEMBER (legacy INSTRUCTOR/ATHLETE normalized)
+- Booking, schedule, and class management with a modern Angular UI
+- Docker Compose stacks: dev build, images, and production
+- DB migrations with Flyway (dev-only seeds isolated from prod)
+- Observability: Spring Boot Actuator + Micrometer Prometheus metrics, JSON logs
+- CI/CD: tests, coverage, build and push images to GHCR, Trivy vulnerability scan
+- Hardened containers (non-root users), nginx security headers, static asset caching
+
+## Project structure
+
+```
+backend/     # Spring Boot service (Actuator, JWT security)
+frontend/    # Angular app served by nginx
+keycloak/    # Dev realm import (not used in prod compose)
+docker-compose.yml            # Dev: builds from source (profile=dev)
+docker-compose.images.yml     # Runs published images (latest)
+docker-compose.prod.yml       # Prod-like: pinned tags, profile=prod
 ```
 
-### Frontend Development
+## Running locally
 
-```bash
-cd frontend
-npm install
-npm start
+Prereqs: Docker Desktop. For local development outside Docker, you’ll also need Java 21 and Node 20, but Docker is recommended.
+
+### Dev stack (build from source, with dev seeds)
+
+```powershell
+# from repo root
+docker compose up -d
 ```
 
-### Running Tests
+Endpoints:
+- Frontend: http://localhost
+- Backend: http://localhost:8080
+- Keycloak: http://localhost:8180
+- Health: http://localhost:8080/actuator/health
 
-Backend tests:
-```bash
-cd backend
-./mvnw test
+### Run from images (latest)
+
+```powershell
+docker compose -f docker-compose.images.yml up -d
 ```
 
-Frontend tests:
-```bash
-cd frontend
-npm test
+### Prod-like stack (pinned tags, no dev seeds, extra hardening)
+
+```powershell
+# use a GH Actions run number (e.g., 123) as IMAGE_TAG
+$env:IMAGE_TAG="123"; docker compose -f docker-compose.prod.yml up -d
 ```
 
-## Current Status and Roadmap
+Notes:
+- In prod compose, Keycloak realm is not auto-imported; configure it once and persist in its DB.
+- Backend runs `SPRING_PROFILES_ACTIVE=prod` in prod compose; dev compose uses `dev`.
 
-Recent highlights:
-- Consolidated role model to ADMIN, TRAINER, MEMBER; legacy INSTRUCTOR/ATHLETE still recognized and normalized.
-- Added Admin promotion flow (Member → Trainer).
-- Dockerized local stack (frontend, backend, db, keycloak).
-- UI shell modernization: new header/footer, hero landing, dark/light theme.
-- Fixed trainer Management access and member History access issues.
+## Profiles and data seeding
 
-Upcoming refactor branch (planned):
-- Rename `instructorId` → `trainerId` across backend/DB/frontend with a Flyway migration.
-- Introduce Lombok to reduce boilerplate in DTOs/entities.
-- Add Spring Boot Actuator for health endpoints and observability.
-- Standardize dialog styles and add a centralized toast/notification system.
-- Strengthen tests and linting in containerized CI.
+- dev profile:
+   - Flyway locations: `db/migration` + `db/dev-data/high` (V1000+ dev seeds only)
+   - Seeds trainer/member users and sample classes.
+
+- prod profile:
+   - Flyway location: `db/migration` only
+   - No seed data, just schema and reference types.
+
+Flyway versioning: dev-only seeds are at very high versions (V1000+) to avoid conflicts with main migrations.
+
+## Metrics and logs
+
+- Actuator endpoints (prod and dev):
+   - `/actuator/health` – health status
+   - `/actuator/metrics` – list of meter names
+   - `/actuator/prometheus` – Prometheus-format metrics (enabled in prod profile too)
+
+- What you get out-of-the-box:
+   - JVM metrics: memory, GC pauses, threads
+   - HTTP server metrics: request counts and timings (by method/status/route)
+   - Hikari datasource metrics: connection pool
+   - Process/system metrics: CPU, uptime
+
+- How to view locally:
+   - From host (if backend is mapped to 8080):
+      - http://localhost:8080/actuator/metrics
+      - http://localhost:8080/actuator/prometheus
+   - From inside container:
+      - `docker exec gym-booking-backend curl -s http://localhost:8080/actuator/prometheus`
+
+- Prometheus/Grafana (optional):
+   - Add a Prometheus job scraping `backend:8080/actuator/prometheus`.
+   - Import a standard Spring Boot dashboard in Grafana (JVM + HTTP panels).
+
+- Logging:
+   - Prod profile prints JSON logs to stdout for easy ingestion (ELK/Loki/Datadog).
+
+## Security headers (frontend)
+
+`frontend/nginx.conf` includes:
+- Content-Security-Policy (tighten for your domain if hosting under HTTPS)
+- HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- Aggressive static asset caching, no-cache for `index.html`
+
+## CI/CD pipeline
+
+Workflow `.github/workflows/ci-cd.yml`:
+- Tests: Maven backend tests (Jacoco coverage), Angular tests (headless Chrome) + typecheck
+- Build: Docker Buildx; push to GHCR with incremental tags (`run_number` and `run_number-shortSHA`)
+- Latest tags only on master via imagetools
+- Security: Trivy image scan (non-blocking; can be made gating)
+
+Artifacts: Jacoco HTML report and frontend coverage are uploaded for quick inspection.
+
+## API documentation
+
+Swagger UI (if enabled) at http://localhost:8080/swagger-ui.html.
+
+## Common endpoints
+
+- Classes
+   - GET /api/classes – list
+   - POST /api/classes – create (Admin/Trainer)
+   - PUT /api/classes/{id} – update (Admin/Trainer)
+   - DELETE /api/classes/{id} – delete (Admin)
+
+- Class types
+   - GET /api/class-types – list
+   - GET /api/class-types/active – list active
+   - POST /api/class-types – create (Admin/Trainer)
+   - PUT /api/class-types/{id} – update (Admin/Trainer)
+   - DELETE /api/class-types/{id} – delete (guarded if referenced)
+
+- Bookings
+   - GET /api/bookings – user’s bookings
+   - POST /api/bookings – create booking
+   - DELETE /api/bookings/{id} – cancel booking
+
+## Security
+
+- JWT-based auth via Keycloak (resource server)
+- Role normalization (INSTRUCTOR→TRAINER, ATHLETE→MEMBER)
+- CORS handled by backend and nginx; set CSP for your domain in production
+- Containers run as non-root
+
+## Development quick commands
+
+Backend:
+```powershell
+cd backend; ./mvnw test
+```
+
+Frontend:
+```powershell
+cd frontend; npm test
+```
 
 ## Deployment
 
-1. Build the images:
-   ```bash
-   docker-compose build
-   ```
+Use `docker-compose.images.yml` for quick runs, and `docker-compose.prod.yml` with pinned tags for production.
 
-2. Deploy the stack:
-   ```bash
-   docker-compose up -d
-   ```
+## Environment variables
 
-3. Scale if needed:
-   ```bash
-   docker-compose up -d --scale backend=2
-   ```
+Backend:
+- `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
+- `SPRING_PROFILES_ACTIVE`
+- `OAUTH2_JWKS_URI`
 
-## Environment Variables
-
-### Backend
-- `SPRING_DATASOURCE_URL`: Database URL
-- `SPRING_DATASOURCE_USERNAME`: Database username
-- `SPRING_DATASOURCE_PASSWORD`: Database password
-- `KEYCLOAK_AUTH_SERVER_URL`: Keycloak server URL
-- `KEYCLOAK_REALM`: Keycloak realm name
-- `KEYCLOAK_RESOURCE`: Keycloak client ID
-
-### Frontend
-- `API_URL`: Backend API URL
-- `KEYCLOAK_URL`: Keycloak server URL
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+Frontend:
+- `API_URL`, `KEYCLOAK_URL`
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the development team.
-
-## Acknowledgments
-
-- Spring Boot team for the excellent framework
-- Angular team for the powerful frontend framework
-- Keycloak team for the robust authentication solution
-- All contributors and users of this project
+MIT. See `LICENSE`.
 
 ---
 
-Made with ❤️ by Dimitris & GitHub Copilot
+Built with ❤️ by Dimitris & Copilot

@@ -1,4 +1,4 @@
--- Seed mock users: 1 admin, 2 trainers, 20 athletes
+-- (Marker file scheduled for removal) Empty to avoid duplicate Flyway execution.
 -- Safe to re-run via Flyway in empty DBs; will conflict on unique email if already present
 
 INSERT INTO users (id, name, email, role, auth_provider, status, created_at)

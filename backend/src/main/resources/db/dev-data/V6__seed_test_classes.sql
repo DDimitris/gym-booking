@@ -1,4 +1,4 @@
--- Seed sample class instances for testing
+-- DEV-ONLY: This content moved to version 1001 to avoid collision with main migrations.
 -- Assumes users seeded in V5: admin id=1, instructors id=2,3
 -- Uses existing class_types seeded in V2
 
