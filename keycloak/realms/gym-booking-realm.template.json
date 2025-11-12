@@ -1,0 +1,90 @@
+{
+  "id": "gym-booking",
+  "realm": "gym-booking",
+  "enabled": true,
+  "registrationAllowed": true,
+  "displayName": "Gym Booking Application",
+  "displayNameHtml": "Gym Booking Application",
+  "roles": {
+    "realm": [
+      { "name": "ADMIN", "description": "Administrator role" },
+      { "name": "TRAINER", "description": "Gym trainer role" },
+      { "name": "MEMBER", "description": "Gym member role" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "gym-booking-client",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}",
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}/",
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}/*",
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}/classes"
+      ],
+      "webOrigins": [
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}"
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "rootUrl": "${PUBLIC_SCHEME}://${PUBLIC_HOST}",
+      "baseUrl": "/",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "fullScopeAllowed": true,
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "pkce.enforced": "true",
+        "post.logout.redirect.uris": "${PUBLIC_SCHEME}://${PUBLIC_HOST} ${PUBLIC_SCHEME}://${PUBLIC_HOST}/ ${PUBLIC_SCHEME}://${PUBLIC_HOST}/*",
+        "oauth2.device.authorization.grant.enabled": "false"
+      },
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "admin", "temporary": true }],
+      "requiredActions": ["UPDATE_PASSWORD"],
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "trainer",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "trainer", "temporary": false }],
+      "realmRoles": ["TRAINER"]
+    },
+    {
+      "username": "member",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "member", "temporary": false }],
+      "realmRoles": ["MEMBER"]
+    }
+  ]
+}

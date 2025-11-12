@@ -45,6 +45,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      keycloak-realm-prep:
+        condition: service_completed_successfully
     command:
       - start-dev
       - --import-realm
@@ -58,6 +60,19 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - gym-booking-network
+
+  keycloak-realm-prep:
+    image: alpine:3
+    container_name: gym-booking-keycloak-realm-prep
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
+      PUBLIC_SCHEME: ${PUBLIC_SCHEME:-http}
+    working_dir: /work
+    volumes:
+      - ./keycloak/realms:/work
+    command: sh -lc "apk add --no-cache gettext >/dev/null 2>&1; envsubst < /work/gym-booking-realm.template.json > /work/gym-booking-realm.json"
     networks:
       - gym-booking-network
 
