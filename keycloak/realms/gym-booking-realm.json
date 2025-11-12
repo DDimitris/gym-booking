@@ -46,7 +46,7 @@
         "profile",
         "email"
       ],
-      "rootUrl": "http://localhost",
+  "rootUrl": "https://localhost",
       "baseUrl": "/",
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
