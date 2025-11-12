@@ -9,6 +9,14 @@ export class KeycloakService {
 
   async init(): Promise<boolean> {
     try {
+      if (environment.showAuthDebug) {
+        // Minimal sensitive-free debug context
+        console.log('[Auth] Initializing Keycloak', {
+          url: environment.keycloak.url,
+          realm: environment.keycloak.realm,
+          clientId: environment.keycloak.clientId
+        });
+      }
       this.keycloak = new (Keycloak as any)({
         url: environment.keycloak.url,
         realm: environment.keycloak.realm,
@@ -16,16 +24,29 @@ export class KeycloakService {
       });
 
       const options: KeycloakInitOptions = {
-        onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
+        // Switch to login-required to bypass silent SSO until iframe CSP issue resolved
+        onLoad: 'login-required',
         pkceMethod: 'S256'
       } as any;
 
   const authenticated = await (this.keycloak as any).init(options);
+      if (environment.showAuthDebug) {
+        const parsed: any = (this.keycloak as any)?.tokenParsed;
+        console.log('[Auth] Keycloak init result', {
+          authenticated,
+          hasToken: !!(this.keycloak as any)?.token,
+          subject: parsed?.sub,
+          username: parsed?.preferred_username,
+          roles: [
+            ...(parsed?.realm_access?.roles || []),
+            ...((parsed?.roles as string[]) || [])
+          ]
+        });
+      }
       this.ready = true;
       return authenticated;
     } catch (e) {
-      console.warn('Keycloak init failed, falling back to mock auth.', e);
+      console.error('[Auth] Keycloak init failed', e);
       this.ready = false;
       return false;
     }
@@ -34,9 +55,24 @@ export class KeycloakService {
   isReady(): boolean { return this.ready; }
   isAuthenticated(): boolean { return !!this.keycloak?.authenticated; }
   getToken(): string | null { return this.keycloak?.token || null; }
-  async login(): Promise<void> { await this.keycloak?.login(); }
-  async logout(): Promise<void> { await this.keycloak?.logout({ redirectUri: window.location.origin }); }
-  async updateToken(minValidity = 30): Promise<boolean> { return await this.keycloak?.updateToken(minValidity) || false; }
+  async login(): Promise<void> {
+    if (environment.showAuthDebug) console.log('[Auth] login() called');
+    await this.keycloak?.login();
+  }
+  async logout(): Promise<void> {
+    if (environment.showAuthDebug) console.log('[Auth] logout() called');
+    await this.keycloak?.logout({ redirectUri: window.location.origin });
+  }
+  async updateToken(minValidity = 30): Promise<boolean> {
+    try {
+      const res = await this.keycloak?.updateToken(minValidity);
+      if (environment.showAuthDebug) console.log('[Auth] updateToken()', { res });
+      return res || false;
+    } catch (e) {
+      if (environment.showAuthDebug) console.error('[Auth] updateToken() failed', e);
+      return false;
+    }
+  }
   async getProfile(): Promise<KeycloakProfile | undefined> { return this.keycloak ? await this.keycloak.loadUserProfile() : undefined; }
   getParsedToken(): KeycloakTokenParsed | undefined { return this.keycloak?.tokenParsed; }
   getRoles(): string[] {

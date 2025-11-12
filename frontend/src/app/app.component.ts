@@ -97,10 +97,13 @@ export class AppComponent implements OnInit {
   private applyTheme(next: 'dark' | 'light'): void {
     this.theme = next;
     const root = document.documentElement;
+    const body = document.body;
     if (next === 'light') {
       root.classList.add('light');
+      body.classList.add('light');
     } else {
       root.classList.remove('light');
+      body.classList.remove('light');
     }
     localStorage.setItem('theme', next);
   }

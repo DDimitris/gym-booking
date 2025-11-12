@@ -48,6 +48,12 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw -q -B -DskipITs=true test
+      - name: Publish backend coverage
+        if: matrix.part == 'backend'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jacoco-report
+          path: backend/target/site/jacoco/index.html
 
       - name: Set up Node 20
         if: matrix.part == 'frontend'
@@ -69,6 +75,10 @@ jobs:
         working-directory: frontend
         run: |
           npm test -- --watch=false --browsers=ChromeHeadless
+      - name: Frontend typecheck
+        if: matrix.part == 'frontend'
+        working-directory: frontend
+        run: npm run typecheck
 
   build-and-push:
     name: Build and push Docker images
@@ -108,6 +118,14 @@ jobs:
           tags: |
             ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}
             ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.short_sha }}
+      - name: Scan backend image (Trivy)
+        uses: aquasecurity/trivy-action@v0.13.1
+        with:
+          image-ref: ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -118,6 +136,14 @@ jobs:
           tags: |
             ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}
             ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.short_sha }}
+      - name: Scan frontend image (Trivy)
+        uses: aquasecurity/trivy-action@v0.13.1
+        with:
+          image-ref: ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
 
       - name: Tag latest images (master only)
         if: github.ref == 'refs/heads/master'
