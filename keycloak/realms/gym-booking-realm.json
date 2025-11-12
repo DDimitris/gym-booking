@@ -30,6 +30,7 @@
         "http://localhost/*",
         "http://localhost/",
         "http://localhost/classes",
+        "https://localhost",
         "https://localhost/*",
         "https://localhost/",
         "https://localhost/classes"
@@ -56,7 +57,7 @@
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "pkce.enforced": "true",
-        "post.logout.redirect.uris": "http://localhost/*",
+        "post.logout.redirect.uris": "http://localhost http://localhost/ http://localhost/* https://localhost https://localhost/ https://localhost/*",
         "oauth2.device.authorization.grant.enabled": "false"
       },
       "protocol": "openid-connect",
