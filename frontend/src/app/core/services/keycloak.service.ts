@@ -36,7 +36,7 @@ export class KeycloakService {
   getToken(): string | null { return this.keycloak?.token || null; }
   async login(): Promise<void> { await this.keycloak?.login(); }
   async logout(): Promise<void> {
-    // Ensure trailing slash so it matches both https://localhost and https://localhost/ patterns
+  // Ensure trailing slash so it matches both https://HOST and https://HOST/ patterns
     const origin = window.location.origin.endsWith('/') ? window.location.origin : window.location.origin + '/';
     await this.keycloak?.logout({ redirectUri: origin });
   }
