@@ -74,6 +74,10 @@ services:
       - gym-booking-network
 
   backend:
+    # Single compose supports both local build and GHCR images:
+    # - Dev: use `docker compose up -d --build` to build from ./backend
+    # - Prod/images: set IMAGE_TAG and run `docker compose pull && docker compose up -d`
+    image: ${BACKEND_IMAGE_REPO:-ghcr.io/ddimitris/gym-booking-backend}:${IMAGE_TAG:-latest}
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -101,6 +105,10 @@ services:
       retries: 3
 
   frontend:
+    # Single compose supports both local build and GHCR images:
+    # - Dev: use `docker compose up -d --build` to build from ./frontend
+    # - Prod/images: set IMAGE_TAG and run `docker compose pull && docker compose up -d`
+    image: ${FRONTEND_IMAGE_REPO:-ghcr.io/ddimitris/gym-booking-frontend}:${IMAGE_TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile
