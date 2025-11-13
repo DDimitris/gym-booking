@@ -17,12 +17,13 @@ FROM nginx:1.24-alpine
 RUN apk add --no-cache wget
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx-https.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets from build stage
 COPY --from=build /app/dist/gym-booking-app/browser/ /usr/share/nginx/html/
 
 # Add healthcheck
+# Healthcheck (HTTP inside the container; external TLS handled by compose override)
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD wget -q --spider http://127.0.0.1:80/ || exit 1
 

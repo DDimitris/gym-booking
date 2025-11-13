@@ -33,7 +33,7 @@
         "profile",
         "email"
       ],
-      "rootUrl": "https://localhost",
+  "rootUrl": "https://localhost/",
       "baseUrl": "/",
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
@@ -44,7 +44,7 @@
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "pkce.enforced": "true",
-        "post.logout.redirect.uris": "https://localhost https://localhost/ https://localhost/*",
+        "post.logout.redirect.uris": "https://localhost/*",
         "oauth2.device.authorization.grant.enabled": "false"
       },
       "protocol": "openid-connect",
