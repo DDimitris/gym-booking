@@ -46,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder(
             @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:}") String jwkSetUri,
-            @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:http://keycloak:8080/realms/gym-booking}") String issuer) {
+            @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:http://keycloak:8080/auth/realms/gym-booking}") String issuer) {
         if (jwkSetUri != null && !jwkSetUri.isBlank()) {
             return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
         }

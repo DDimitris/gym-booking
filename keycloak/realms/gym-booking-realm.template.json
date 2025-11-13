@@ -18,13 +18,13 @@
       "enabled": true,
       "publicClient": true,
       "redirectUris": [
-        "https://localhost",
-        "https://localhost/",
-        "https://localhost/*",
-        "https://localhost/classes"
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}",
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}/",
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}/*",
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}/classes"
       ],
       "webOrigins": [
-        "https://localhost"
+        "${PUBLIC_SCHEME}://${PUBLIC_HOST}"
       ],
       "defaultClientScopes": [
         "web-origins",
@@ -33,7 +33,7 @@
         "profile",
         "email"
       ],
-  "rootUrl": "https://localhost/",
+  "rootUrl": "${PUBLIC_SCHEME}://${PUBLIC_HOST}/",
       "baseUrl": "/",
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
@@ -44,7 +44,7 @@
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "pkce.enforced": "true",
-        "post.logout.redirect.uris": "https://localhost/*",
+        "post.logout.redirect.uris": "${PUBLIC_SCHEME}://${PUBLIC_HOST}/*",
         "oauth2.device.authorization.grant.enabled": "false"
       },
       "protocol": "openid-connect",

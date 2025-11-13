@@ -1,3 +1,23 @@
+# Node/Angular
+node_modules/
+dist/
+
+# Java/Maven
+backend/target/
+
+# Env files
+.env
+.env.*
+
+# Certificates and private keys (keep folder but ignore contents)
+certs/*
+!certs/.gitkeep
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
 # OS
 .DS_Store
 Thumbs.db

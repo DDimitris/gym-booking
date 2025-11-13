@@ -1,8 +1,12 @@
 // Simple smoke script to validate auth and booking flows
 // Requires Node 18+ (global fetch available)
 
-const KC_TOKEN_URL = 'http://localhost:8180/realms/gym-booking/protocol/openid-connect/token';
-const API = 'http://localhost:8080/api';
+// Derive host/scheme from environment or default to localhost for ad-hoc runs.
+const HOST = process.env.PUBLIC_HOST || 'localhost';
+const SCHEME = process.env.PUBLIC_SCHEME || 'https';
+// Keycloak is proxied at /auth on the public host; token endpoint path fixed.
+const KC_TOKEN_URL = `${SCHEME}://${HOST}/auth/realms/gym-booking/protocol/openid-connect/token`;
+const API = `${SCHEME}://${HOST}/api`;
 
 async function getToken(username, password) {
   const body = new URLSearchParams({

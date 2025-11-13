@@ -35,7 +35,11 @@ export class KeycloakService {
   isAuthenticated(): boolean { return !!this.keycloak?.authenticated; }
   getToken(): string | null { return this.keycloak?.token || null; }
   async login(): Promise<void> { await this.keycloak?.login(); }
-  async logout(): Promise<void> { await this.keycloak?.logout({ redirectUri: window.location.origin }); }
+  async logout(): Promise<void> {
+  // Ensure trailing slash so it matches both https://HOST and https://HOST/ patterns
+    const origin = window.location.origin.endsWith('/') ? window.location.origin : window.location.origin + '/';
+    await this.keycloak?.logout({ redirectUri: origin });
+  }
   async updateToken(minValidity = 30): Promise<boolean> { return await this.keycloak?.updateToken(minValidity) || false; }
   async getProfile(): Promise<KeycloakProfile | undefined> { return this.keycloak ? await this.keycloak.loadUserProfile() : undefined; }
   getParsedToken(): KeycloakTokenParsed | undefined { return this.keycloak?.tokenParsed; }

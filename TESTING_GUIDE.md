@@ -59,7 +59,7 @@ The app includes 6 sample classes spread across the week:
 
 ### Step 1: Open the App
 ```
-http://localhost
+https://localhost
 ```
 
 ### Step 2: Login as Test User

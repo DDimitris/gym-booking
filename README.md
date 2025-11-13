@@ -49,7 +49,7 @@ Note on collaboration: This project is a cooperative work between the repository
 - Node.js 20+ (for local development)
 - Maven (for local development)
 
-## Quick Start
+## Quick Start (HTTPS-only)
 
 ### Running with Docker
 
@@ -59,16 +59,17 @@ Note on collaboration: This project is a cooperative work between the repository
    cd gym-booking
    ```
 
-2. Start the application using Docker Compose:
+2. Start the application using Docker Compose (HTTPS):
    ```bash
    docker compose up -d
    ```
 
 3. Access the applications:
-   - Frontend: http://localhost
-   - Keycloak Admin Console: http://localhost:8180 (realm import auto-applied)
-   - Backend API: http://localhost:8080
-   - Swagger UI: http://localhost:8080/swagger-ui.html
+   - Frontend: https://localhost (HTTP redirects to HTTPS)
+   - Keycloak Admin Console: https://localhost/auth/admin (realm import auto-applied)
+   - Backend API via proxy: https://localhost/api
+   - Direct backend (container-mapped): http://localhost:8080
+   - Swagger UI (direct backend): http://localhost:8080/swagger-ui.html
 
 ### Local Development Setup (optional)
 
@@ -94,7 +95,7 @@ Note on collaboration: This project is a cooperative work between the repository
 
 ### Keycloak Setup
 
-1. Access Keycloak Admin Console at http://localhost:8180
+1. Access Keycloak Admin Console at https://localhost/auth/admin
 2. Login with:
    - Username: admin
    - Password: admin
@@ -102,8 +103,8 @@ Note on collaboration: This project is a cooperative work between the repository
 4. Create client: 'gym-booking-client'
 5. Configure client:
    - Access Type: public
-   - Valid Redirect URIs: http://localhost/*
-   - Web Origins: *
+   - Valid Redirect URIs: https://localhost/*
+   - Web Origins: https://localhost
 
 ### Roles
 The canonical application roles are:
@@ -142,7 +143,7 @@ gym-booking/
 
 ## API Documentation
 
-The API documentation is available through Swagger UI at http://localhost:8080/swagger-ui.html when running the backend.
+The API documentation is available through Swagger UI at http://localhost:8080/swagger-ui.html when running the backend (direct container mapping). Via the HTTPS proxy, use the API routes under https://localhost/api.
 
 ## Available Endpoints
 
@@ -204,10 +205,10 @@ docker compose up -d
 ```
 
 Endpoints:
-- Frontend: http://localhost
-- Backend: http://localhost:8080
-- Keycloak: http://localhost:8180
-- Health: http://localhost:8080/actuator/health
+- Frontend: https://localhost
+- Backend (direct): http://localhost:8080
+- Keycloak Admin: https://localhost/auth/admin
+- Health (direct): http://localhost:8080/actuator/health
 
 ### Run from images (latest)
 
@@ -267,7 +268,7 @@ Flyway versioning: dev-only seeds are at very high versions (V1000+) to avoid co
 
 ## Security headers (frontend)
 
-`frontend/nginx.conf` includes:
+`frontend/nginx-https.conf` includes:
 - Content-Security-Policy (tighten for your domain if hosting under HTTPS)
 - HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
 - Aggressive static asset caching, no-cache for `index.html`
@@ -338,6 +339,12 @@ Backend:
 
 Frontend:
 - `API_URL`, `KEYCLOAK_URL`
+
+Compose-level (.env at repo root):
+- `PUBLIC_SCHEME`, `PUBLIC_HOST` (realm URLs and proxy base)
+- `KEYCLOAK_VERSION` (Keycloak image tag)
+- `CERTS_HOST_PATH` (host path to TLS certs mounted into nginx)
+- `KC_LOG_LEVEL` (Keycloak log verbosity)
 
 ## License
 
