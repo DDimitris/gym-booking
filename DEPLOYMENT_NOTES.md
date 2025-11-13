@@ -1,6 +1,6 @@
 ## Deployment Notes
 
-These notes explain how to run and deploy the gym-booking stack (Angular frontend, Spring Boot backend, Keycloak) with both HTTP and HTTPS, how to switch hosts/domains, manage certificates, and keep secrets out of git history.
+These notes explain how to run and deploy the gym-booking stack (Angular frontend, Spring Boot backend, Keycloak) over HTTPS-only, how to switch hosts/domains, manage certificates, and keep secrets out of git history.
 
 ### 1. Overview
 Services (frontend, backend, Keycloak, Postgres) are orchestrated via a single HTTPS-first `docker-compose.yml`. The frontend nginx serves the SPA and reverse-proxies `/api` (backend) and `/auth` (Keycloak) on the same origin to eliminate CORS issues. Port 80 redirects to 443.
@@ -8,21 +8,24 @@ Services (frontend, backend, Keycloak, Postgres) are orchestrated via a single H
 ### 2. Environment Variables (.env)
 Copy `.env.example` to `.env` at the repository root.
 
-Variables:
-- `PUBLIC_SCHEME` – `http` or `https` used to generate realm client redirect/logout URIs.
-- `PUBLIC_HOST` – Hostname (e.g. `localhost`, `dev.example.com`, IP) used similarly.
+Key variables (all read by docker compose):
+- `PUBLIC_SCHEME` – Should be `https` (stack is HTTPS-first)
+- `PUBLIC_HOST` – Hostname (e.g. `localhost`, `dev.example.com`)
+- `KEYCLOAK_VERSION` – Keycloak container tag (default 22.0.1)
+- `CERTS_HOST_PATH` – Host path that contains `fullchain.pem` and `privkey.pem` mounted into nginx
+- `KC_LOG_LEVEL` – Keycloak log level (e.g., DEBUG)
 
 Changing these and recreating the stack (down + up) re-renders `keycloak/realms/gym-booking-realm.json` from `gym-booking-realm.template.json` via the realm prep service.
 
 ### 3. Switching Between IP, localhost, and Domain
-1. Edit `.env` with desired `PUBLIC_HOST` and `PUBLIC_SCHEME`.
-2. If using HTTPS with a real domain, place valid cert/key into `certs/fullchain.pem` and `certs/privkey.pem`.
+1. Edit `.env` with desired `PUBLIC_HOST` and `PUBLIC_SCHEME=https`.
+2. If using a real domain, set `CERTS_HOST_PATH` to the folder that contains `fullchain.pem` and `privkey.pem` (e.g., `/etc/letsencrypt/live/your-domain/`). For local dev keep the default `./certs`.
 3. Run a full recreate so Keycloak imports the new realm with updated redirect URIs:
-   - `docker compose -f docker-compose.https.yml down -v`
-   - `docker compose -f docker-compose.https.yml up -d --build`
+   - `docker compose down -v`
+   - `docker compose up -d --build`
 
 ### 4. Certificates
-Self-signed dev certs live in `certs/` (ignored by git). Regenerate with provided scripts (see `scripts/`). For real domains use certificates from a trusted CA (e.g. Let's Encrypt) and replace the same file names.
+Self-signed dev certs live in `certs/` (ignored by git). Regenerate with provided scripts (see `scripts/`). For real domains use certificates from a trusted CA (e.g. Let's Encrypt) and set `CERTS_HOST_PATH` accordingly.
 
 Recommended permissions: restrict `privkey.pem` to owner read only.
 
@@ -40,8 +43,7 @@ Startup prep service runs `envsubst` to produce `gym-booking-realm.json` consume
 To force re-import after variable changes: remove Keycloak volume (compose down with `-v`).
 
 ### 7. Redirect & Logout URIs
-Client redirect URIs and post-logout URIs must match exactly (including trailing slash). The frontend logout code enforces a trailing slash to avoid `invalid_redirect_uri` errors.
-If you see a logout 400 again, capture the failing `redirect_uri` from Keycloak logs and add it to the template arrays.
+Client redirect URIs and post-logout URIs must match exactly (including trailing slash). Our realm template uses a wildcard `https://<host>/*` to simplify. If you still see a logout 400, capture the failing `redirect_uri` from Keycloak logs and adjust the realm template.
 
 ### 8. Backend Token Validation
 Backend expects issuer `.../auth/realms/gym-booking`. Ensure the compose and nginx keep `/auth` prefix. When switching domain or scheme, the issuer changes accordingly; restart backend after realm change.
@@ -90,4 +92,4 @@ All collaborators must re-clone or hard reset their local branches after this re
 - Introduce health check endpoint aggregation in frontend for diagnostics page.
 
 ---
-Last updated: 2025-11-12
+Last updated: 2025-11-13

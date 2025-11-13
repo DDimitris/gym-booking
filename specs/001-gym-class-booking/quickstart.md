@@ -2,7 +2,7 @@
 
 This quickstart shows a minimal local development flow using Docker Compose. It assumes Docker and Docker Compose are installed.
 
-1. Copy `.env.sample` to `.env` and fill required secrets (local dev values are acceptable for testing).
+1. Copy `.env.example` to `.env` and fill required values (local dev defaults are provided for testing).
 
 2. Build images (from project root):
 
@@ -16,10 +16,10 @@ docker compose build
 docker compose up --build
 ```
 
-4. Access services:
-- Keycloak: http://localhost:8080 (or configured port)
-- Frontend: http://localhost:4200 (or served by frontend container)
-- API: http://localhost:8081/api (example backend port)
+4. Access services (when using the Docker stack):
+- Frontend: https://localhost
+- Keycloak Admin: https://localhost/auth/admin
+- API (via nginx proxy): https://localhost/api
 
 5. Run unit tests for backend (example with Maven):
 
