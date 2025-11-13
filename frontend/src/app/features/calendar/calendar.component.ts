@@ -44,6 +44,7 @@ export class CalendarComponent implements OnInit {
   
   isAdmin = false;
   isInstructor = false;
+  isMember = false;
   private trainersMap: Map<number, string> = new Map();
 
   constructor(
@@ -55,10 +56,12 @@ export class CalendarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-  this.isAdmin = this.kc.isReady() && this.kc.isAuthenticated() && this.kc.getRoles().includes('ADMIN');
-  // Accept both role labels for instructor role compatibility
-  this.isInstructor = this.kc.isReady() && this.kc.isAuthenticated() && (this.kc.getRoles().includes('INSTRUCTOR') || this.kc.getRoles().includes('TRAINER'));
-    
+    const ready = this.kc.isReady() && this.kc.isAuthenticated();
+    const roles = ready ? this.kc.getRoles() : [];
+  this.isAdmin = ready && roles.includes('ADMIN');
+  this.isInstructor = ready && (roles.includes('INSTRUCTOR') || roles.includes('TRAINER'));
+  this.isMember = ready && (roles.includes('MEMBER') || roles.includes('ATHLETE'));
+
     this.loadData();
   }
 
@@ -68,12 +71,16 @@ export class CalendarComponent implements OnInit {
 
   private createCalendarOptions(): CalendarOptions {
     const mobile = this.isMobile();
+    // Universal mobile toolbar: hide month view entirely on small screens
+    const rightDesktop = 'dayGridMonth,timeGridWeek,timeGridDay';
+    const rightMobile = 'listWeek,timeGridWeek,timeGridDay';
+    const headerToolbar = mobile
+      ? { left: 'prev,next', center: 'title', right: rightMobile }
+      : { left: 'prev,next today', center: 'title', right: rightDesktop };
     return {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
       initialView: mobile ? 'listWeek' : 'timeGridWeek',
-      headerToolbar: mobile
-        ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
-        : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+      headerToolbar,
       editable: false,
       selectable: false,
       dayMaxEvents: true,

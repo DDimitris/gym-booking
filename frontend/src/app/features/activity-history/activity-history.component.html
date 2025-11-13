@@ -38,19 +38,9 @@
       </div>
     </section>
 
-    <!-- Member view toggle controls -->
-    <div *ngIf="!isInstructor" class="view-toggle">
-      <button class="btn-secondary" (click)="toggleCombined()">
-        {{
-          combinedView
-            ? "Split Upcoming/Past View"
-            : "Combined Chronological View"
-        }}
-      </button>
-    </div>
 
-    <!-- Member view: upcoming bookings (hidden when combined) -->
-    <section class="bookings-section" *ngIf="!isInstructor && !combinedView">
+  <!-- Member view: upcoming bookings -->
+  <section class="bookings-section" *ngIf="!isInstructor">
       <h2>Upcoming Classes ({{ upcomingBookings.length }})</h2>
 
       <div *ngIf="upcomingBookings.length === 0" class="empty-state">
@@ -130,69 +120,9 @@
       </div>
     </section>
 
-    <!-- Member view: past bookings (hidden when combined) -->
-    <section class="bookings-section" *ngIf="!isInstructor && !combinedView">
+  <!-- Member view: past bookings -->
+  <section class="bookings-section" *ngIf="!isInstructor">
       <h2>Past Classes ({{ pastBookings.length }})</h2>
-      <!-- Member view: combined chronological list -->
-      <section class="bookings-section" *ngIf="!isInstructor && combinedView">
-        <h2>All Bookings ({{ allBookingsChrono.length }})</h2>
-        <div *ngIf="allBookingsChrono.length === 0" class="empty-state">
-          No bookings yet.
-        </div>
-        <div class="bookings-grid">
-          <div
-            *ngFor="let booking of allBookingsChrono"
-            class="booking-card"
-            [class.past]="isPastClass(booking)"
-          >
-            <div class="booking-header">
-              <h3>{{ booking.gymClass?.name || "Unknown Class" }}</h3>
-              <span
-                class="badge"
-                [ngClass]="getStatusBadgeClass(booking.status)"
-              >
-                {{ getStatusLabel(booking.status) }}
-              </span>
-            </div>
-            <div class="booking-details">
-              <div class="detail-row">
-                <strong>Type:</strong> {{ booking.classTypeName || "N/A" }}
-              </div>
-              <div class="detail-row">
-                <strong>Start:</strong>
-                {{ booking.gymClass?.startTime | date : "medium" }}
-              </div>
-              <div class="detail-row">
-                <strong>End:</strong>
-                {{ booking.gymClass?.endTime | date : "medium" }}
-              </div>
-              <div class="detail-row">
-                <strong>Location:</strong>
-                {{ booking.gymClass?.location || "TBD" }}
-              </div>
-              <div class="detail-row">
-                <strong>Booked:</strong> {{ booking.bookedAt | date : "short" }}
-              </div>
-              <div class="detail-row" *ngIf="booking.completedAt">
-                <strong>Completed:</strong>
-                {{ booking.completedAt | date : "short" }}
-              </div>
-              <div class="detail-row" *ngIf="booking.cancelledAt">
-                <strong>Cancelled:</strong>
-                {{ booking.cancelledAt | date : "short" }}
-              </div>
-            </div>
-            <div
-              class="booking-actions"
-              *ngIf="canCancel(booking) && !isPastClass(booking)"
-            >
-              <button class="btn-danger" (click)="cancelBooking(booking)">
-                Cancel Booking
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <div *ngIf="pastBookings.length === 0" class="empty-state">
         No past classes yet.
