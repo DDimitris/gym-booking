@@ -67,7 +67,7 @@ async function adminCreateClass(token) {
     description: 'Smoke created class',
     capacity: 5,
     durationMinutes: 60,
-    instructorId: 2,
+    trainerId: 2,
     classTypeId: 3,
     startTime: fmt(start),
     endTime: fmt(end),

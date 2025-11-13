@@ -6,6 +6,7 @@ import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
 import { GymClassService } from '../../core/services/gym-class.service';
 import { ClassTypeService } from '../../core/services/class-type.service';
 import { BookingService } from '../../core/services/booking.service';
@@ -24,21 +25,7 @@ import type { User } from '../../core/models/user.model';
   styleUrls: ['./calendar.component.css']
 })
 export class CalendarComponent implements OnInit {
-  calendarOptions: CalendarOptions = {
-    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: 'timeGridWeek',
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
-    },
-    editable: false,
-    selectable: false,
-    dayMaxEvents: true,
-    weekends: true,
-    events: [],
-    eventClick: this.handleEventClick.bind(this)
-  };
+  calendarOptions: CalendarOptions = this.createCalendarOptions();
 
   showModal = false;
   modalMode: 'view' | 'book' = 'view';
@@ -73,6 +60,46 @@ export class CalendarComponent implements OnInit {
   this.isInstructor = this.kc.isReady() && this.kc.isAuthenticated() && (this.kc.getRoles().includes('INSTRUCTOR') || this.kc.getRoles().includes('TRAINER'));
     
     this.loadData();
+  }
+
+  private isMobile(): boolean {
+    return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  private createCalendarOptions(): CalendarOptions {
+    const mobile = this.isMobile();
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
+      initialView: mobile ? 'listWeek' : 'timeGridWeek',
+      headerToolbar: mobile
+        ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
+        : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+      editable: false,
+      selectable: false,
+      dayMaxEvents: true,
+      weekends: true,
+      expandRows: true,
+      contentHeight: 'auto',
+      events: [],
+      eventClick: this.handleEventClick.bind(this),
+      slotMinTime: '06:00:00',
+      slotMaxTime: '22:00:00',
+      nowIndicator: true,
+    };
+  }
+
+  // Adjust calendar layout on viewport resize
+  onResize = () => {
+    const options = this.createCalendarOptions();
+    this.calendarOptions = { ...options, events: (this.calendarOptions.events as any) || [] };
+  };
+
+  // Set up resize listener
+  ngAfterViewInit(): void {
+    window.addEventListener('resize', this.onResize);
+  }
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.onResize);
   }
 
   loadData(): void {

@@ -18,13 +18,13 @@
       "enabled": true,
       "publicClient": true,
       "redirectUris": [
-        "https://localhost",
-        "https://localhost/",
-        "https://localhost/*",
-        "https://localhost/classes"
+        "https://192.168.1.113",
+        "https://192.168.1.113/",
+        "https://192.168.1.113/*",
+        "https://192.168.1.113/classes"
       ],
       "webOrigins": [
-        "https://localhost"
+        "https://192.168.1.113"
       ],
       "defaultClientScopes": [
         "web-origins",
@@ -33,7 +33,7 @@
         "profile",
         "email"
       ],
-  "rootUrl": "https://localhost/",
+  "rootUrl": "https://192.168.1.113/",
       "baseUrl": "/",
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
@@ -44,7 +44,7 @@
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "pkce.enforced": "true",
-        "post.logout.redirect.uris": "https://localhost/*",
+        "post.logout.redirect.uris": "https://192.168.1.113/*",
         "oauth2.device.authorization.grant.enabled": "false"
       },
       "protocol": "openid-connect",

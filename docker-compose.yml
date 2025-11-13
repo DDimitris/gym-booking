@@ -50,7 +50,8 @@ services:
       - --health-enabled=true
       - --http-relative-path=/auth
     volumes:
-      - ./keycloak/realms:/opt/keycloak/data/import
+      # Mount only the processed realm file to avoid importing the unprocessed template
+      - ./keycloak/realms/gym-booking-realm.json:/opt/keycloak/data/import/gym-booking-realm.json:ro
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
       interval: 10s
