@@ -63,6 +63,11 @@ The Docker setup is the source of truth for env wiring; keep `.env` in sync with
 
 CI builds and pushes images to GHCR; the compose file can be driven by an `IMAGE_TAG` env var to select which build to deploy.
 
+## Branching & CI
+
+- Use feature branches (e.g. `feature/...`) and open pull requests into `master`.
+- Avoid pushing directly to `master`; let GitHub run the CI workflow on your PR and merge only when green.
+
 ## License
 
 This project is licensed under the MIT License. See `LICENSE`.

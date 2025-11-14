@@ -3,12 +3,10 @@ name: CI/CD
 on:
   push:
     branches:
-      - "**"
-      - master
+      - '**'
   pull_request:
     branches:
-      - "**"
-      - master
+      - '**'
 
 permissions:
   contents: read
@@ -73,7 +71,7 @@ jobs:
   build-and-push:
     name: Build and push Docker images
     needs: test
-  if: github.event_name == 'push'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
