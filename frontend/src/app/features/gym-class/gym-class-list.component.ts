@@ -89,13 +89,24 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .controls { margin-bottom: 8px; }
     .day-list { display: flex; flex-direction: column; gap: 8px; }
-    .class-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .class-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; gap: 8px; }
     .class-item:last-child { border-bottom: none; }
     .left { flex: 1; min-width: 0; }
     .title { font-weight: 600; }
     .desc { color: #555; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .middle { width: 140px; text-align: center; font-variant-numeric: tabular-nums; }
     .right { width: auto; min-width: 140px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+
+    /* Responsive alignment: avoid overlap on small screens */
+    @media (max-width: 720px) {
+      .class-item {
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .left { flex: 1 1 100%; }
+      .middle { flex: 0 0 auto; width: auto; order: 2; }
+      .right { flex: 1 1 100%; order: 3; justify-content: flex-start; }
+    }
   `]
 })
 export class GymClassListComponent implements OnInit {

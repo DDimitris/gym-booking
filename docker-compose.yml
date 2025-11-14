@@ -50,7 +50,8 @@ services:
       - --health-enabled=true
       - --http-relative-path=/auth
     volumes:
-      - ./keycloak/realms:/opt/keycloak/data/import
+      # Mount only the processed realm file to avoid importing the unprocessed template
+      - ./keycloak/realms/gym-booking-realm.json:/opt/keycloak/data/import/gym-booking-realm.json:ro
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
       interval: 10s
@@ -74,6 +75,10 @@ services:
       - gym-booking-network
 
   backend:
+    # Single compose supports both local build and GHCR images:
+    # - Dev: use `docker compose up -d --build` to build from ./backend
+    # - Prod/images: set IMAGE_TAG and run `docker compose pull && docker compose up -d`
+    image: ${BACKEND_IMAGE_REPO:-ghcr.io/ddimitris/gym-booking-backend}:${IMAGE_TAG:-latest}
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -101,6 +106,10 @@ services:
       retries: 3
 
   frontend:
+    # Single compose supports both local build and GHCR images:
+    # - Dev: use `docker compose up -d --build` to build from ./frontend
+    # - Prod/images: set IMAGE_TAG and run `docker compose pull && docker compose up -d`
+    image: ${FRONTEND_IMAGE_REPO:-ghcr.io/ddimitris/gym-booking-frontend}:${IMAGE_TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile

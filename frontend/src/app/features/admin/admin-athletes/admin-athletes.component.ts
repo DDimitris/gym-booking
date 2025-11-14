@@ -15,8 +15,9 @@ import { User, UserRole } from '../../../core/models/user.model';
 })
 export class AdminAthletesComponent implements OnInit {
   members: User[] = [];
-  filteredMembers: User[] = [];
   trainers: User[] = [];
+  filteredMembers: User[] = [];
+  filteredTrainers: User[] = [];
   searchTerm = '';
   isLoading = true;
   
@@ -40,62 +41,43 @@ export class AdminAthletesComponent implements OnInit {
       return;
     }
     
-    this.loadMembers();
-    this.loadTrainers();
+    this.loadAllUsers();
   }
-
-  loadMembers(): void {
+  loadAllUsers(): void {
     this.isLoading = true;
-    this.adminService.getAllMembers().subscribe({
-      next: (members) => {
-        this.members = members;
-        this.filteredMembers = members;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading members:', err);
-        alert('Failed to load members. Please try again.');
-        this.isLoading = false;
-      }
+    // Parallel calls; merge results
+    Promise.all([
+      this.adminService.getAllMembers().toPromise(),
+      this.adminService.getTrainers().toPromise()
+    ]).then(([members, trainers]) => {
+      this.members = members || [];
+      this.trainers = trainers || [];
+      this.filteredMembers = [...this.members].sort((a,b) => a.name.localeCompare(b.name));
+      this.filteredTrainers = [...this.trainers].sort((a,b) => a.name.localeCompare(b.name));
+      this.isLoading = false;
+    }).catch(err => {
+      console.error('Error loading users:', err);
+      alert('Failed to load users. Please try again.');
+      this.isLoading = false;
     });
   }
 
   onSearchChange(): void {
     const term = this.searchTerm.trim().toLowerCase();
-    if (term.length >= 2) {
-      // Prefer server-side search when possible
-      this.adminService.searchUsers(term).subscribe({
-        next: (users) => {
-          // Filter to members (exclude trainers/admins) for this view
-          this.filteredMembers = users.filter(u => u.role === 'MEMBER');
-        },
-        error: (err) => {
-          console.error('Server search failed, falling back to client filter', err);
-          this.filteredMembers = this.members.filter(member =>
-            member.name.toLowerCase().includes(term) ||
-            member.email.toLowerCase().includes(term)
-          );
-        }
-      });
-    } else {
-      // Short terms: client-side filter
-      this.filteredMembers = this.members.filter(member =>
-        member.name.toLowerCase().includes(term) ||
-        member.email.toLowerCase().includes(term)
-      );
+    if (!term) {
+      this.filteredMembers = [...this.members];
+      this.filteredTrainers = [...this.trainers];
+      return;
     }
+    this.filteredMembers = this.members.filter(u =>
+      u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
+    );
+    this.filteredTrainers = this.trainers.filter(u =>
+      u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
+    );
   }
 
-  loadTrainers(): void {
-    this.adminService.getTrainers().subscribe({
-      next: (trainers) => {
-        this.trainers = trainers;
-      },
-      error: (err) => {
-        console.error('Error loading trainers:', err);
-      }
-    });
-  }
+  // Removed separate trainers load; consolidated in loadAllUsers
 
   openBaseCostModal(member: User): void {
     this.selectedMember = member;
@@ -131,7 +113,7 @@ export class AdminAthletesComponent implements OnInit {
       this.adminService.setBaseCost(this.selectedMember.id, this.inputValue).subscribe({
         next: () => {
           alert(`Base cost set to €${this.inputValue} for ${this.selectedMember!.name}`);
-          this.loadMembers();
+          this.loadAllUsers();
           this.closeModal();
         },
         error: (err) => {
@@ -143,7 +125,7 @@ export class AdminAthletesComponent implements OnInit {
       this.adminService.assignBonusDays(this.selectedMember.id, this.inputValue).subscribe({
         next: () => {
           alert(`Assigned ${this.inputValue} bonus days to ${this.selectedMember!.name}`);
-          this.loadMembers();
+          this.loadAllUsers();
           this.closeModal();
         },
         error: (err) => {
@@ -155,8 +137,7 @@ export class AdminAthletesComponent implements OnInit {
       this.adminService.promoteToTrainer(this.selectedMember.id).subscribe({
         next: () => {
           alert(`${this.selectedMember!.name} has been promoted to Trainer! They will see the Management page (Classes & Class Types) on their next login.`);
-          this.loadMembers();
-          this.loadTrainers();
+          this.loadAllUsers();
           this.closeModal();
         },
         error: (err) => {
@@ -176,8 +157,7 @@ export class AdminAthletesComponent implements OnInit {
     this.adminService.deleteUser(user.id).subscribe({
       next: () => {
         alert('User deleted');
-        this.loadMembers();
-        this.loadTrainers();
+        this.loadAllUsers();
       },
       error: (err) => {
         console.error('Error deleting user:', err);

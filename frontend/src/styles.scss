@@ -73,6 +73,17 @@ body:not(.light) .mat-mdc-text-field-wrapper { background: var(--color-surface-2
 body:not(.light) input.mat-mdc-input-element, body:not(.light) textarea.mat-mdc-input-element { color: var(--color-text); }
 body:not(.light) .mat-mdc-select-value { color: var(--color-text); }
 
+/* Tabs & navigation readability in dark mode */
+body:not(.light) .mat-mdc-tab-group, 
+body:not(.light) .mat-mdc-tab-body-wrapper { background: var(--color-surface); }
+body:not(.light) .mdc-tab__text-label { color: var(--color-text) !important; opacity: 1 !important; }
+body:not(.light) .mat-mdc-tab .mdc-tab-indicator__content--underline { border-color: var(--color-primary) !important; }
+
+/* Menus, snackbars, and chips */
+body:not(.light) .mat-mdc-menu-panel { background: var(--color-surface); color: var(--color-text); }
+body:not(.light) .mat-mdc-snack-bar-container { background: var(--color-surface-2); color: var(--color-text); }
+body:not(.light) .mat-mdc-chip { background: var(--color-surface-2); color: var(--color-text); }
+
 /* Tables */
 .mat-mdc-table { background: var(--color-surface); }
 .mat-mdc-header-row { background: #0b1430; }

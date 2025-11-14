@@ -14,7 +14,7 @@
 .page-header h1 {
   font-size: 2rem;
   margin: 0;
-  color: #333;
+    color: var(--color-text);
 }
 
 .header-actions {
@@ -51,16 +51,19 @@
 .empty-state {
   text-align: center;
   padding: 4rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  color: #666;
+    background: var(--color-surface);
+    border-radius: 8px;
+    color: var(--color-text-muted);
 }
 
 .athletes-table-container {
   overflow-x: auto;
-  background: white;
+    background: var(--color-surface);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    border: 1px solid var(--color-border);
+  margin-bottom: 16px;
+  padding: 8px 8px 12px;
 }
 
 .athletes-table {
@@ -69,24 +72,48 @@
 }
 
 .athletes-table thead {
-  background: #f8f9fa;
+    background: var(--color-surface-2);
 }
 
 .athletes-table th {
   text-align: left;
   padding: 1rem;
   font-weight: 600;
-  color: #555;
-  border-bottom: 2px solid #dee2e6;
+    color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
 }
 
 .athletes-table td {
   padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
 }
 
 .athletes-table tbody tr:hover {
-  background: #f8f9fa;
+    background: var(--color-surface-2);
+}
+
+/* Zebra stripes for readability */
+.athletes-table tbody tr:nth-child(even) {
+  background: rgba(255,255,255,0.02);
+}
+
+/* Mobile-friendly table: stack rows into cards */
+@media (max-width: 768px) {
+  .athletes-table thead { display: none; }
+  .athletes-table, .athletes-table tbody, .athletes-table tr, .athletes-table td { display: block; width: 100%; }
+  .athletes-table tr { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 10px; padding: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+  .athletes-table td { border-bottom: 0; padding: 8px 6px; display: flex; justify-content: space-between; align-items: center; }
+  .athletes-table td::before { content: attr(data-label); font-weight: 600; color: var(--color-text-muted); margin-right: 8px; }
+  /* Card title (name cell) */
+  .athletes-table td.name-cell { display: block; padding: 4px 6px 10px; font-weight: 600; font-size: 1.05rem; letter-spacing: .3px; }
+  .athletes-table td.name-cell::before { display: none; }
+  /* Action cell tweaks */
+  .athletes-table td.action-cell { padding-top: 4px; }
+  .athletes-table td.action-cell::before { align-self: flex-start; margin-bottom: 6px; }
+  .athletes-table td.action-cell .action-buttons { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-start; width: 100%; }
+  .athletes-table td.action-cell .btn-small { margin: 0; }
+  .action-buttons { justify-content: flex-start; }
 }
 
 .role-badge,
@@ -99,33 +126,33 @@
 }
 
 .role-athlete {
-  background: #e3f2fd;
-  color: #1976d2;
+    background: rgba(37,99,235,0.18);
+    color: #3b82f6;
 }
 
 .role-instructor {
-  background: #f3e5f5;
-  color: #7b1fa2;
+    background: rgba(124,58,237,0.18);
+    color: #a855f7;
 }
 
 .role-admin {
-  background: #fce4ec;
-  color: #c2185b;
+    background: rgba(220,38,38,0.18);
+    color: #ef4444;
 }
 
 .status-active {
-  background: #e8f5e9;
-  color: #388e3c;
+    background: rgba(16,185,129,0.18);
+    color: #10b981;
 }
 
 .status-suspended {
-  background: #fff3e0;
-  color: #f57c00;
+    background: rgba(234,179,8,0.22);
+    color: #eab308;
 }
 
 .status-deleted {
-  background: #ffebee;
-  color: #d32f2f;
+    background: rgba(239,68,68,0.20);
+    color: #ef4444;
 }
 
 .action-buttons {
@@ -146,54 +173,50 @@
 }
 
 .btn-primary {
-  background: #007bff;
-  color: white;
+    background: var(--color-primary);
+    color: #fff;
 }
 
 .btn-primary:hover {
-  background: #0056b3;
+    background: var(--color-primary-700);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s;
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-border);
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
+    background: var(--color-surface);
 }
 
 .btn-success {
-  background: #28a745;
-  color: white;
+    background: #10b981;
+    color: #fff;
 }
 
 .btn-success:hover {
-  background: #218838;
+    background: #059669;
 }
 
 .btn-info {
-  background: #17a2b8;
-  color: white;
+    background: #0ea5e9;
+    color: #fff;
 }
 
 .btn-info:hover {
-  background: #138496;
+    background: #0284c7;
 }
 
 .btn-warning {
-  background: #ffc107;
-  color: #333;
+    background: #f59e0b;
+    color: #fff;
 }
 
 .btn-warning:hover {
-  background: #e0a800;
+    background: #d97706;
 }
 
 /* Modal Styles */
@@ -211,11 +234,12 @@
 }
 
 .modal-content {
-  background: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .modal-header {
@@ -227,9 +251,9 @@
 }
 
 .modal-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #333;
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--color-text);
 }
 
 .btn-close {
@@ -263,18 +287,20 @@
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #333;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 .form-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    border-radius: 4px;
+    font-size: 1rem;
 }
 
 .form-input:focus {
@@ -291,10 +317,10 @@
 }
 
 .confirm-message {
-  padding: 1rem;
-  background: #fff3cd;
-  border-left: 4px solid #ffc107;
-  border-radius: 4px;
+    padding: 1rem;
+    background: rgba(245,158,11,0.15);
+    border-left: 4px solid #f59e0b;
+    border-radius: 4px;
 }
 
 .modal-footer {

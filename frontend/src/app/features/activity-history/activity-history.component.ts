@@ -31,7 +31,7 @@ export class ActivityHistoryComponent implements OnInit {
   isLoading = true;
   isInstructor = false;
   // UI state for member combined view
-  combinedView = false;
+  // Removed combined chronological view feature
 
   constructor(
     private bookingService: BookingService,
@@ -199,9 +199,7 @@ export class ActivityHistoryComponent implements OnInit {
     });
   }
 
-  toggleCombined(): void {
-    this.combinedView = !this.combinedView;
-  }
+  // toggleCombined removed along with combined view
 
   // For instructor view convenience
   get upcomingClasses(): GymClass[] {
