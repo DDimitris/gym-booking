@@ -23,12 +23,22 @@
 
   <div *ngIf="isLoading" class="loading">Loading users...</div>
 
-  <div *ngIf="!isLoading && filteredMembers.length === 0 && filteredTrainers.length === 0" class="empty-state">
+  <div
+    *ngIf="
+      !isLoading &&
+      filteredMembers.length === 0 &&
+      filteredTrainers.length === 0
+    "
+    class="empty-state"
+  >
     <p *ngIf="searchTerm">No users found matching "{{ searchTerm }}"</p>
     <p *ngIf="!searchTerm">No users found.</p>
   </div>
 
-  <div *ngIf="!isLoading && filteredMembers.length > 0" class="athletes-table-container">
+  <div
+    *ngIf="!isLoading && filteredMembers.length > 0"
+    class="athletes-table-container"
+  >
     <h2>Members</h2>
     <table class="athletes-table">
       <thead>
@@ -46,17 +56,62 @@
         <tr *ngFor="let u of filteredMembers">
           <td class="name-cell" [attr.data-label]="'Name'">{{ u.name }}</td>
           <td [attr.data-label]="'Email'">{{ u.email }}</td>
-          <td [attr.data-label]="'Role'"><span class="role-badge" [ngClass]="'role-' + u.role.toLowerCase()">{{ u.role }}</span></td>
+          <td [attr.data-label]="'Role'">
+            <span
+              class="role-badge"
+              [ngClass]="'role-' + u.role.toLowerCase()"
+              >{{ u.role }}</span
+            >
+          </td>
           <td [attr.data-label]="'Base Cost'">€{{ u.baseCost || 0 }}</td>
           <td [attr.data-label]="'Bonus Days'">{{ u.bonusDays || 0 }}</td>
-          <td [attr.data-label]="'Status'"><span class="status-badge" [ngClass]="'status-' + (u.status || 'ACTIVE').toLowerCase()">{{ u.status || 'ACTIVE' }}</span></td>
+          <td [attr.data-label]="'Status'">
+            <span
+              class="status-badge"
+              [ngClass]="'status-' + (u.status || 'ACTIVE').toLowerCase()"
+              >{{ u.status || "ACTIVE" }}</span
+            >
+          </td>
           <td class="action-cell" [attr.data-label]="'Actions'">
             <div class="action-buttons">
-              <button *ngIf="u.role === 'MEMBER'" class="btn-small btn-primary" (click)="openBaseCostModal(u)" title="Set Base Cost">💲 Set Cost</button>
-              <button *ngIf="u.role === 'MEMBER'" class="btn-small btn-success" (click)="openBonusDaysModal(u)" title="Assign Bonus Days">🎁 Bonus</button>
-              <button class="btn-small btn-info" (click)="viewBilling(u)" title="View Billing">📊 Billing</button>
-              <button *ngIf="u.role === 'MEMBER'" class="btn-small btn-warning" (click)="openPromoteModal(u)" title="Promote to Trainer">⬆️ Promote</button>
-              <button class="btn-small btn-danger" (click)="deleteUser(u)" title="Delete User">🗑️ Delete</button>
+              <button
+                *ngIf="u.role === 'MEMBER'"
+                class="btn-small btn-primary"
+                (click)="openBaseCostModal(u)"
+                title="Set Base Cost"
+              >
+                💲 Set Cost
+              </button>
+              <button
+                *ngIf="u.role === 'MEMBER'"
+                class="btn-small btn-success"
+                (click)="openBonusDaysModal(u)"
+                title="Assign Bonus Days"
+              >
+                🎁 Bonus
+              </button>
+              <button
+                class="btn-small btn-info"
+                (click)="viewBilling(u)"
+                title="View Billing"
+              >
+                📊 Billing
+              </button>
+              <button
+                *ngIf="u.role === 'MEMBER'"
+                class="btn-small btn-warning"
+                (click)="openPromoteModal(u)"
+                title="Promote to Trainer"
+              >
+                ⬆️ Promote
+              </button>
+              <button
+                class="btn-small btn-danger"
+                (click)="deleteUser(u)"
+                title="Delete User"
+              >
+                🗑️ Delete
+              </button>
             </div>
           </td>
         </tr>
@@ -64,7 +119,10 @@
     </table>
   </div>
 
-  <div *ngIf="!isLoading && filteredTrainers.length > 0" class="athletes-table-container">
+  <div
+    *ngIf="!isLoading && filteredTrainers.length > 0"
+    class="athletes-table-container"
+  >
     <h2>Trainers</h2>
     <table class="athletes-table">
       <thead>
@@ -80,11 +138,25 @@
         <tr *ngFor="let t of filteredTrainers">
           <td class="name-cell" [attr.data-label]="'Name'">{{ t.name }}</td>
           <td [attr.data-label]="'Email'">{{ t.email }}</td>
-          <td [attr.data-label]="'Role'"><span class="role-badge role-trainer">TRAINER</span></td>
-          <td [attr.data-label]="'Status'"><span class="status-badge" [ngClass]="'status-' + (t.status || 'ACTIVE').toLowerCase()">{{ t.status || 'ACTIVE' }}</span></td>
+          <td [attr.data-label]="'Role'">
+            <span class="role-badge role-trainer">TRAINER</span>
+          </td>
+          <td [attr.data-label]="'Status'">
+            <span
+              class="status-badge"
+              [ngClass]="'status-' + (t.status || 'ACTIVE').toLowerCase()"
+              >{{ t.status || "ACTIVE" }}</span
+            >
+          </td>
           <td class="action-cell" [attr.data-label]="'Actions'">
             <div class="action-buttons">
-              <button class="btn-small btn-danger" (click)="deleteUser(t)" title="Delete User">🗑️ Delete</button>
+              <button
+                class="btn-small btn-danger"
+                (click)="deleteUser(t)"
+                title="Delete User"
+              >
+                🗑️ Delete
+              </button>
             </div>
           </td>
         </tr>

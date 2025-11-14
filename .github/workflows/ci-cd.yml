@@ -3,12 +3,10 @@ name: CI/CD
 on:
   push:
     branches:
-      - "**"
-      - master
+      - '**'
   pull_request:
     branches:
-      - "**"
-      - master
+      - '**'
 
 permissions:
   contents: read
@@ -124,3 +122,58 @@ jobs:
         run: |
           docker buildx imagetools create -t ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:latest ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-backend:${{ steps.meta.outputs.version }}
           docker buildx imagetools create -t ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:latest ghcr.io/${{ steps.meta.outputs.owner_lc }}/gym-booking-frontend:${{ steps.meta.outputs.version }}
+
+  deploy-branch:
+    name: Deploy branch image to test host
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+    steps:
+      - name: Compute image tag
+        id: meta
+        run: |
+          VERSION=${{ github.run_number }}
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          echo "tag=${VERSION}-${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: SSH deploy to test host
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -e
+            cd /home/dimitris/gym-booking
+            git checkout .
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
+            export IMAGE_TAG=${{ steps.meta.outputs.tag }}
+            docker compose pull
+            docker compose down -v
+            docker compose up -d
+
+  deploy-master:
+    name: Deploy latest image to production host
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: SSH deploy latest to production host
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -e
+            cd /home/dimitris/gym-booking
+            git checkout .
+            git fetch origin
+            git checkout master
+            git reset --hard origin/master
+            export IMAGE_TAG=latest
+            docker compose pull
+            docker compose down -v
+            docker compose up -d

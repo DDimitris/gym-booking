@@ -38,9 +38,8 @@
       </div>
     </section>
 
-
-  <!-- Member view: upcoming bookings -->
-  <section class="bookings-section" *ngIf="!isInstructor">
+    <!-- Member view: upcoming bookings -->
+    <section class="bookings-section" *ngIf="!isInstructor">
       <h2>Upcoming Classes ({{ upcomingBookings.length }})</h2>
 
       <div *ngIf="upcomingBookings.length === 0" class="empty-state">
@@ -120,8 +119,8 @@
       </div>
     </section>
 
-  <!-- Member view: past bookings -->
-  <section class="bookings-section" *ngIf="!isInstructor">
+    <!-- Member view: past bookings -->
+    <section class="bookings-section" *ngIf="!isInstructor">
       <h2>Past Classes ({{ pastBookings.length }})</h2>
 
       <div *ngIf="pastBookings.length === 0" class="empty-state">

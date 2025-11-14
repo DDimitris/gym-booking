@@ -53,11 +53,12 @@ services:
       # Mount only the processed realm file to avoid importing the unprocessed template
       - ./keycloak/realms/gym-booking-realm.json:/opt/keycloak/data/import/gym-booking-realm.json:ro
     healthcheck:
+      # Simple TCP check with extended window (~8 minutes total)
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 42   # 42 * 10s = 420s after start_period
+      start_period: 60s
     networks:
       - gym-booking-network
 
