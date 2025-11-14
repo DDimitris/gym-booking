@@ -145,6 +145,10 @@ jobs:
           script: |
             set -e
             cd /home/dimitris/gym-booking
+            git checkout .
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
             export IMAGE_TAG=${{ steps.meta.outputs.tag }}
             docker compose pull
             docker compose down -v
@@ -165,6 +169,10 @@ jobs:
           script: |
             set -e
             cd /home/dimitris/gym-booking
+            git checkout .
+            git fetch origin
+            git checkout master
+            git reset --hard origin/master
             export IMAGE_TAG=latest
             docker compose pull
             docker compose down -v
