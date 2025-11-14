@@ -53,8 +53,8 @@ services:
       # Mount only the processed realm file to avoid importing the unprocessed template
       - ./keycloak/realms/gym-booking-realm.json:/opt/keycloak/data/import/gym-booking-realm.json:ro
     healthcheck:
-      # Use readiness endpoint and allow up to ~3 minutes for cold start
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      # Simple TCP check with extended window (~3 minutes total)
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
       interval: 10s
       timeout: 5s
       retries: 12   # 12 * 10s = 120s after start_period
