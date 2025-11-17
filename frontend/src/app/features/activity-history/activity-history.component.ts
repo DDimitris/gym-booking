@@ -9,6 +9,7 @@ import { GymClass } from '../../core/models/gym-class.model';
 import { ClassType } from '../../core/models/class-type.model';
 import { UserService } from '../../core/services/user.service';
 import { forkJoin } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface BookingWithDetails extends Booking {
   gymClass?: GymClass;
@@ -18,7 +19,7 @@ interface BookingWithDetails extends Booking {
 @Component({
   selector: 'app-activity-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './activity-history.component.html',
   styleUrls: ['./activity-history.component.css']
 })
@@ -38,7 +39,8 @@ export class ActivityHistoryComponent implements OnInit {
     private gymClassService: GymClassService,
     private classTypeService: ClassTypeService,
     private kc: KeycloakService,
-    private userService: UserService
+    private userService: UserService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {

@@ -13,32 +13,33 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { addMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ScheduleDialogComponent } from './schedule-dialog.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-schedule-list',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [CommonModule, SharedModule, TranslateModule],
   template: `
     <div class="container">
       <div class="header">
-        <h1>Class Schedule</h1>
+        <h1>{{ 'schedule.list.title' | translate }}</h1>
         <button mat-raised-button color="primary" (click)="openCreateDialog()">
-          Schedule Class
+          {{ 'schedule.list.actions.openDialog' | translate }}
         </button>
       </div>
 
       <form [formGroup]="filterForm" class="filters">
         <mat-form-field>
-          <mat-label>Month</mat-label>
+          <mat-label>{{ 'schedule.list.filters.month' | translate }}</mat-label>
           <input matInput [matDatepicker]="monthPicker" formControlName="month">
           <mat-datepicker-toggle matSuffix [for]="monthPicker"></mat-datepicker-toggle>
           <mat-datepicker #monthPicker startView="month"></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field>
-          <mat-label>Class</mat-label>
+          <mat-label>{{ 'schedule.list.filters.class' | translate }}</mat-label>
           <mat-select formControlName="classId">
-            <mat-option [value]="null">All Classes</mat-option>
+            <mat-option [value]="null">{{ 'schedule.list.filters.allClasses' | translate }}</mat-option>
             <mat-option *ngFor="let class of gymClasses" [value]="class.id">
               {{class.name}}
             </mat-option>
@@ -48,37 +49,37 @@ import { ScheduleDialogComponent } from './schedule-dialog.component';
 
       <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
         <ng-container matColumnDef="class">
-          <th mat-header-cell *matHeaderCellDef> Class </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'schedule.list.table.class' | translate }} </th>
           <td mat-cell *matCellDef="let schedule">
             {{getClassName(schedule.gymClassId)}}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="startTime">
-          <th mat-header-cell *matHeaderCellDef> Start Time </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'schedule.list.table.startTime' | translate }} </th>
           <td mat-cell *matCellDef="let schedule">
             {{schedule.startTime | date:'medium'}}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="endTime">
-          <th mat-header-cell *matHeaderCellDef> End Time </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'schedule.list.table.endTime' | translate }} </th>
           <td mat-cell *matCellDef="let schedule">
             {{schedule.endTime | date:'shortTime'}}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'schedule.list.table.status' | translate }} </th>
           <td mat-cell *matCellDef="let schedule">
             <span [class.cancelled]="schedule.isCancelled">
-              {{schedule.isCancelled ? 'Cancelled' : 'Active'}}
+              {{ schedule.isCancelled ? ('schedule.list.table.statusCancelled' | translate) : ('schedule.list.table.statusActive' | translate) }}
             </span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'schedule.list.table.actions' | translate }} </th>
           <td mat-cell *matCellDef="let schedule">
             <button mat-icon-button color="warn" 
                     (click)="cancelSchedule(schedule.id)"
@@ -136,7 +137,8 @@ export class ScheduleListComponent implements OnInit {
     private gymClassService: GymClassService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private translate: TranslateService
   ) {
     this.filterForm = this.fb.group({
       month: [new Date()],
@@ -154,12 +156,18 @@ export class ScheduleListComponent implements OnInit {
         this.scheduleService.createSchedule(result).subscribe({
           next: () => {
             this.loadSchedules();
-            this.snackBar.open('Schedule created successfully', 'Close', {
+            this.snackBar.open(
+              this.translate.instant('schedule.list.messages.created'),
+              this.translate.instant('common.close'),
+              {
               duration: 3000
             });
           },
           error: (error) => {
-            this.snackBar.open('Error creating schedule', 'Close', {
+            this.snackBar.open(
+              this.translate.instant('schedule.list.errors.create'),
+              this.translate.instant('common.close'),
+              {
               duration: 3000
             });
           }
@@ -186,7 +194,10 @@ export class ScheduleListComponent implements OnInit {
         this.gymClasses = classes;
       },
       error: (error) => {
-        this.snackBar.open('Error loading classes', 'Close', {
+        this.snackBar.open(
+          this.translate.instant('schedule.list.errors.loadClasses'),
+          this.translate.instant('common.close'),
+          {
           duration: 3000
         });
       }
@@ -203,7 +214,10 @@ export class ScheduleListComponent implements OnInit {
           this.dataSource.data = schedules;
         },
         error: (error) => {
-          this.snackBar.open('Error loading schedules', 'Close', {
+          this.snackBar.open(
+            this.translate.instant('schedule.list.errors.loadSchedules'),
+            this.translate.instant('common.close'),
+            {
             duration: 3000
           });
         }
@@ -214,7 +228,10 @@ export class ScheduleListComponent implements OnInit {
           this.dataSource.data = schedules;
         },
         error: (error) => {
-          this.snackBar.open('Error loading schedules', 'Close', {
+          this.snackBar.open(
+            this.translate.instant('schedule.list.errors.loadSchedules'),
+            this.translate.instant('common.close'),
+            {
             duration: 3000
           });
         }
@@ -223,16 +240,22 @@ export class ScheduleListComponent implements OnInit {
   }
 
   cancelSchedule(id: number): void {
-    if (confirm('Are you sure you want to cancel this class?')) {
+    if (confirm(this.translate.instant('schedule.list.confirm.cancel'))) {
       this.scheduleService.cancelSchedule(id).subscribe({
         next: () => {
           this.loadSchedules();
-          this.snackBar.open('Class cancelled successfully', 'Close', {
+          this.snackBar.open(
+            this.translate.instant('schedule.list.messages.cancelled'),
+            this.translate.instant('common.close'),
+            {
             duration: 3000
           });
         },
         error: (error) => {
-          this.snackBar.open('Error cancelling class', 'Close', {
+          this.snackBar.open(
+            this.translate.instant('schedule.list.errors.cancel'),
+            this.translate.instant('common.close'),
+            {
             duration: 3000
           });
         }

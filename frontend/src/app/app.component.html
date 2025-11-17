@@ -6,7 +6,7 @@
         (click)="kc.isAuthenticated() ? null : kcLogin()"
       >
         <div class="logo">🏋️</div>
-        <span class="brand-text">Gym Booking</span>
+        <span class="brand-text">{{ 'common.appTitle' | translate }}</span>
       </div>
       <button
         class="menu-toggle"
@@ -21,16 +21,16 @@
         *ngIf="kc.isReady() && kc.isAuthenticated()"
         [class.open]="mobileMenuOpen"
       >
-        <a routerLink="/classes" routerLinkActive="active">Classes</a>
+        <a routerLink="/classes" routerLinkActive="active">{{ 'nav.calendar' | translate }}</a>
         <a *ngIf="showHistory" routerLink="/history" routerLinkActive="active"
-          >My History</a
+          >{{ 'nav.history' | translate }}</a
         >
-        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+        <a routerLink="/profile" routerLinkActive="active">{{ 'nav.profile' | translate }}</a>
         <a
           *ngIf="showManagement"
           routerLink="/admin/management"
           routerLinkActive="active"
-          >Management</a
+          >{{ 'nav.admin' | translate }}</a
         >
       </nav>
       <div class="user-actions" *ngIf="kc.isReady()">
@@ -40,7 +40,24 @@
             <span class="uname">{{ displayName }}</span>
             <span class="role" *ngIf="roleLabel">{{ roleLabel }}</span>
           </div>
-          <button class="btn ghost" (click)="logout()">Logout</button>
+          <div class="lang-switcher" aria-label="Language selector">
+            <button
+              class="btn ghost lang"
+              [class.active]="currentLang === 'en'"
+              (click)="setLang('en')"
+            >
+              EN
+            </button>
+            <span class="lang-separator">|</span>
+            <button
+              class="btn ghost lang"
+              [class.active]="currentLang === 'el'"
+              (click)="setLang('el')"
+            >
+              ΕΛ
+            </button>
+          </div>
+          <button class="btn ghost" (click)="logout()">{{ 'nav.logout' | translate }}</button>
           <button
             class="btn ghost toggle"
             (click)="toggleTheme()"
@@ -50,7 +67,24 @@
           </button>
         </ng-container>
         <ng-template #guest>
-          <button class="btn primary" (click)="kcLogin()">Login</button>
+          <div class="lang-switcher" aria-label="Language selector">
+            <button
+              class="btn ghost lang"
+              [class.active]="currentLang === 'en'"
+              (click)="setLang('en')"
+            >
+              EN
+            </button>
+            <span class="lang-separator">|</span>
+            <button
+              class="btn ghost lang"
+              [class.active]="currentLang === 'el'"
+              (click)="setLang('el')"
+            >
+              ΕΛ
+            </button>
+          </div>
+          <button class="btn primary" (click)="kcLogin()">{{ 'header.quickLogin' | translate }}</button>
           <button
             class="btn ghost toggle"
             (click)="toggleTheme()"

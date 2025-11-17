@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
 import { KeycloakService } from '../../../core/services/keycloak.service';
 import { User, UserRole } from '../../../core/models/user.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-admin-athletes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './admin-athletes.component.html',
   styleUrls: ['./admin-athletes.component.css']
 })
@@ -30,7 +31,8 @@ export class AdminAthletesComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private kc: KeycloakService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +59,7 @@ export class AdminAthletesComponent implements OnInit {
       this.isLoading = false;
     }).catch(err => {
       console.error('Error loading users:', err);
-      alert('Failed to load users. Please try again.');
+      alert(this.translate.instant('adminAthletes.errors.loadUsers'));
       this.isLoading = false;
     });
   }
@@ -112,37 +114,57 @@ export class AdminAthletesComponent implements OnInit {
     if (this.modalMode === 'baseCost') {
       this.adminService.setBaseCost(this.selectedMember.id, this.inputValue).subscribe({
         next: () => {
-          alert(`Base cost set to €${this.inputValue} for ${this.selectedMember!.name}`);
+          alert(
+            this.translate.instant('adminAthletes.messages.baseCostSet', {
+              value: this.inputValue,
+              name: this.selectedMember!.name
+            })
+          );
           this.loadAllUsers();
           this.closeModal();
         },
         error: (err) => {
           console.error('Error setting base cost:', err);
-          alert('Failed to set base cost. Please try again.');
+          alert(
+            this.translate.instant('adminAthletes.errors.setBaseCost')
+          );
         }
       });
     } else if (this.modalMode === 'bonusDays') {
       this.adminService.assignBonusDays(this.selectedMember.id, this.inputValue).subscribe({
         next: () => {
-          alert(`Assigned ${this.inputValue} bonus days to ${this.selectedMember!.name}`);
+          alert(
+            this.translate.instant('adminAthletes.messages.bonusAssigned', {
+              value: this.inputValue,
+              name: this.selectedMember!.name
+            })
+          );
           this.loadAllUsers();
           this.closeModal();
         },
         error: (err) => {
           console.error('Error assigning bonus days:', err);
-          alert('Failed to assign bonus days. Please try again.');
+          alert(
+            this.translate.instant('adminAthletes.errors.assignBonus')
+          );
         }
       });
     } else if (this.modalMode === 'promote') {
       this.adminService.promoteToTrainer(this.selectedMember.id).subscribe({
         next: () => {
-          alert(`${this.selectedMember!.name} has been promoted to Trainer! They will see the Management page (Classes & Class Types) on their next login.`);
+          alert(
+            this.translate.instant('adminAthletes.messages.promoted', {
+              name: this.selectedMember!.name
+            })
+          );
           this.loadAllUsers();
           this.closeModal();
         },
         error: (err) => {
           console.error('Error promoting member:', err);
-          alert('Failed to promote member. Please try again.');
+          alert(
+            this.translate.instant('adminAthletes.errors.promote')
+          );
         }
       });
     }
@@ -153,24 +175,41 @@ export class AdminAthletesComponent implements OnInit {
   }
 
   deleteUser(user: User): void {
-    if (!confirm(`Are you sure you want to delete ${user.name} (${user.email})?`)) return;
+    if (
+      !confirm(
+        this.translate.instant('adminAthletes.confirm.delete', {
+          name: user.name,
+          email: user.email
+        })
+      )
+    )
+      return;
     this.adminService.deleteUser(user.id).subscribe({
       next: () => {
-        alert('User deleted');
+        alert(this.translate.instant('adminAthletes.messages.deleted'));
         this.loadAllUsers();
       },
       error: (err) => {
         console.error('Error deleting user:', err);
-        const msg = err?.error || err?.error?.message || 'Failed to delete user.';
-        alert(typeof msg === 'string' ? msg : 'Failed to delete user.');
+        const fallback = this.translate.instant(
+          'adminAthletes.errors.delete'
+        );
+        const msg = err?.error || err?.error?.message || fallback;
+        alert(typeof msg === 'string' ? msg : fallback);
       }
     });
   }
 
   get modalTitle(): string {
-    if (this.modalMode === 'baseCost') return 'Set Base Cost';
-    if (this.modalMode === 'bonusDays') return 'Assign Bonus Days';
-    if (this.modalMode === 'promote') return 'Promote to Trainer';
+    if (this.modalMode === 'baseCost') {
+      return this.translate.instant('adminAthletes.modal.titles.baseCost');
+    }
+    if (this.modalMode === 'bonusDays') {
+      return this.translate.instant('adminAthletes.modal.titles.bonusDays');
+    }
+    if (this.modalMode === 'promote') {
+      return this.translate.instant('adminAthletes.modal.titles.promote');
+    }
     return '';
   }
 }

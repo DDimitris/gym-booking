@@ -12,36 +12,45 @@ import { AdminCreateClassDialogComponent } from '../admin-create-class-dialog/ad
 import { AdminCreateClassTypeDialogComponent } from '../admin-create-class-type-dialog/admin-create-class-type-dialog.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { KeycloakService } from '../../../core/services/keycloak.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-management',
   standalone: true,
-  imports: [CommonModule, SharedModule, AdminAthletesComponent, GymClassListComponent],
+  imports: [CommonModule, SharedModule, AdminAthletesComponent, GymClassListComponent, TranslateModule],
   template: `
     <div class="management-container">
       <div class="header">
-        <h1>Management</h1>
+        <h1>{{ 'adminManagement.title' | translate }}</h1>
         <div class="actions">
-          <button mat-raised-button color="primary" (click)="openCreateClassDialog()">Create Class</button>
-          <button mat-stroked-button color="accent" (click)="openCreateClassTypeDialog()">Create Class Type</button>
+          <button mat-raised-button color="primary" (click)="openCreateClassDialog()">
+            {{ 'adminManagement.actions.createClass' | translate }}
+          </button>
+          <button mat-stroked-button color="accent" (click)="openCreateClassTypeDialog()">
+            {{ 'adminManagement.actions.createClassType' | translate }}
+          </button>
         </div>
       </div>
 
       <mat-tab-group>
-        <mat-tab label="Athletes" *ngIf="isAdmin">
+        <mat-tab [label]="'adminManagement.tabs.athletes' | translate" *ngIf="isAdmin">
           <app-admin-athletes></app-admin-athletes>
         </mat-tab>
-        <mat-tab label="Classes">
+        <mat-tab [label]="'adminManagement.tabs.classes' | translate">
           <app-gym-class-list></app-gym-class-list>
         </mat-tab>
-        <mat-tab label="Class Types">
+        <mat-tab [label]="'adminManagement.tabs.classTypes' | translate">
           <div class="type-list">
             <div class="filters">
-              <mat-slide-toggle [(ngModel)]="showInactive" (change)="applyTypeFilter()">Show inactive</mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="showInactive" (change)="applyTypeFilter()">
+                {{ 'adminManagement.classTypes.filters.showInactive' | translate }}
+              </mat-slide-toggle>
             </div>
             <table mat-table [dataSource]="displayedTypes" class="mat-elevation-z8">
               <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'adminManagement.classTypes.table.name' | translate }}
+                </th>
                 <td mat-cell *matCellDef="let t">
                   <ng-container *ngIf="editingId === t.id; else viewName">
                     <mat-form-field appearance="outline">
@@ -50,12 +59,16 @@ import { KeycloakService } from '../../../core/services/keycloak.service';
                   </ng-container>
                   <ng-template #viewName>
                     <span [class.inactive]="!t.isActive">{{ t.name }}</span>
-                    <mat-chip color="warn" selected *ngIf="!t.isActive" class="chip">Inactive</mat-chip>
+                    <mat-chip color="warn" selected *ngIf="!t.isActive" class="chip">
+                      {{ 'adminManagement.classTypes.badges.inactive' | translate }}
+                    </mat-chip>
                   </ng-template>
                 </td>
               </ng-container>
               <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef> Description </th>
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'adminManagement.classTypes.table.description' | translate }}
+                </th>
                 <td mat-cell *matCellDef="let t">
                   <ng-container *ngIf="editingId === t.id; else viewDesc">
                     <mat-form-field appearance="outline">
@@ -66,17 +79,25 @@ import { KeycloakService } from '../../../core/services/keycloak.service';
                 </td>
               </ng-container>
               <ng-container matColumnDef="active">
-                <th mat-header-cell *matHeaderCellDef> Active </th>
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'adminManagement.classTypes.table.active' | translate }}
+                </th>
                 <td mat-cell *matCellDef="let t">
                   <mat-slide-toggle [checked]="t.isActive" (change)="confirmToggle(t, $event.checked)"></mat-slide-toggle>
                 </td>
               </ng-container>
               <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'adminManagement.classTypes.table.actions' | translate }}
+                </th>
                 <td mat-cell *matCellDef="let t">
                   <ng-container *ngIf="editingId === t.id; else editButtons">
-                    <button mat-button color="primary" (click)="saveEdit(t)">Save</button>
-                    <button mat-button (click)="cancelEdit()">Cancel</button>
+                    <button mat-button color="primary" (click)="saveEdit(t)">
+                      {{ 'common.save' | translate }}
+                    </button>
+                    <button mat-button (click)="cancelEdit()">
+                      {{ 'common.cancel' | translate }}
+                    </button>
                   </ng-container>
                   <ng-template #editButtons>
                     <button mat-icon-button color="primary" (click)="startEdit(t)">
@@ -114,7 +135,7 @@ export class ManagementComponent {
   showInactive = false;
   @ViewChild(GymClassListComponent) classesList?: GymClassListComponent;
 
-  constructor(private router: Router, private classTypeService: ClassTypeService, private dialog: MatDialog, private snackBar: MatSnackBar, private kc: KeycloakService) {
+  constructor(private router: Router, private classTypeService: ClassTypeService, private dialog: MatDialog, private snackBar: MatSnackBar, private kc: KeycloakService, private translate: TranslateService) {
     this.loadTypes();
   }
 
@@ -141,7 +162,11 @@ export class ManagementComponent {
   loadTypes(): void {
     this.classTypeService.getAllClassTypes().subscribe({
       next: (types) => { this.classTypes = types; this.applyTypeFilter(); },
-      error: () => { this.classTypes = []; this.applyTypeFilter(); this.snackBar.open('Failed to load class types', 'Close', { duration: 2500 }); }
+      error: () => {
+        this.classTypes = [];
+        this.applyTypeFilter();
+        this.snackBar.open(this.translate.instant('adminManagement.classTypes.errors.load'), this.translate.instant('common.close'), { duration: 2500 });
+      }
     });
   }
 
@@ -177,7 +202,10 @@ export class ManagementComponent {
     if (t.isActive && !checked) {
       const ref = this.dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
         width: '380px',
-        data: { title: 'Deactivate class type', message: 'Existing and future classes will still reference this type. Continue?' }
+        data: {
+          title: this.translate.instant('adminManagement.classTypes.confirm.deactivateTitle'),
+          message: this.translate.instant('adminManagement.classTypes.confirm.deactivateMessage')
+        }
       });
       ref.afterClosed().subscribe(result => {
         if (result) this.toggleActive(t, checked); else this.loadTypes();
@@ -197,8 +225,9 @@ export class ManagementComponent {
       error: (err) => {
         t.isActive = previous; // revert
         this.applyTypeFilter();
-        const msg = err?.error?.message || 'Failed to update class type';
-        this.snackBar.open(msg, 'Close', { duration: 2500 });
+        const fallback = this.translate.instant('adminManagement.classTypes.errors.update');
+        const msg = err?.error?.message || fallback;
+        this.snackBar.open(msg, this.translate.instant('common.close'), { duration: 2500 });
       }
     });
   }
@@ -206,7 +235,10 @@ export class ManagementComponent {
   confirmDelete(t: ClassType): void {
     const ref = this.dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
       width: '360px',
-      data: { title: 'Delete class type', message: `Delete "${t.name}"? This cannot be undone.` }
+      data: {
+        title: this.translate.instant('adminManagement.classTypes.confirm.deleteTitle'),
+        message: this.translate.instant('adminManagement.classTypes.confirm.deleteMessage', { name: t.name })
+      }
     });
     ref.afterClosed().subscribe(result => {
       if (result) {
@@ -219,8 +251,9 @@ export class ManagementComponent {
           next: () => this.loadTypes(),
           error: (err) => {
             this.classTypes = prev; this.applyTypeFilter();
-            const msg = err?.error?.message || 'Failed to delete class type';
-            this.snackBar.open(msg, 'Close', { duration: 3000 });
+            const fallback = this.translate.instant('adminManagement.classTypes.errors.delete');
+            const msg = err?.error?.message || fallback;
+            this.snackBar.open(msg, this.translate.instant('common.close'), { duration: 3000 });
           }
         });
       }

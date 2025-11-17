@@ -9,50 +9,51 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { GymClass } from '../../core/models/gym-class.model';
 import { GymClassService } from '../../core/services/gym-class.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-schedule-dialog',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [CommonModule, SharedModule, TranslateModule],
   template: `
-    <h2 mat-dialog-title>Schedule Class</h2>
+    <h2 mat-dialog-title>{{ 'schedule.dialog.title' | translate }}</h2>
     <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()">
       <mat-dialog-content>
         <mat-form-field appearance="outline">
-          <mat-label>Class</mat-label>
+          <mat-label>{{ 'schedule.dialog.fields.class' | translate }}</mat-label>
           <mat-select formControlName="gymClassId" required>
             <mat-option *ngFor="let class of gymClasses" [value]="class.id">
               {{class.name}}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="scheduleForm.get('gymClassId')?.hasError('required')">
-            Class is required
+            {{ 'schedule.dialog.errors.classRequired' | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Start Time</mat-label>
+          <mat-label>{{ 'schedule.dialog.fields.startDate' | translate }}</mat-label>
           <input matInput [matDatepicker]="datePicker" formControlName="startDate" required>
           <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
           <mat-datepicker #datePicker></mat-datepicker>
           <mat-error *ngIf="scheduleForm.get('startDate')?.hasError('required')">
-            Date is required
+            {{ 'schedule.dialog.errors.dateRequired' | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Time</mat-label>
+          <mat-label>{{ 'schedule.dialog.fields.startTime' | translate }}</mat-label>
           <input matInput type="time" formControlName="startTime" required>
           <mat-error *ngIf="scheduleForm.get('startTime')?.hasError('required')">
-            Time is required
+            {{ 'schedule.dialog.errors.timeRequired' | translate }}
           </mat-error>
         </mat-form-field>
       </mat-dialog-content>
 
       <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button mat-dialog-close>{{ 'schedule.dialog.actions.cancel' | translate }}</button>
         <button mat-raised-button color="primary" type="submit" [disabled]="scheduleForm.invalid">
-          Schedule
+          {{ 'schedule.dialog.actions.submit' | translate }}
         </button>
       </mat-dialog-actions>
     </form>
@@ -71,7 +72,8 @@ export class ScheduleDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ScheduleDialogComponent>,
-    private gymClassService: GymClassService
+    private gymClassService: GymClassService,
+    private translate: TranslateService
   ) {
     this.scheduleForm = this.fb.group({
       gymClassId: ['', Validators.required],

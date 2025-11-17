@@ -1,5 +1,5 @@
 <div class="profile-container" *ngIf="me as user">
-  <h1>My Profile</h1>
+  <h1>{{ 'profile.title' | translate }}</h1>
 
   <div class="notice" *ngIf="message" [ngClass]="messageType">
     {{ message }}
@@ -10,7 +10,7 @@
     <div class="card identity-card">
       <div class="identity-header">
         <div class="identity-initials">
-          {{ user.name?.charAt(0) || 'U' }}
+          {{ user.name.charAt(0) || 'U' }}
         </div>
         <div class="identity-text">
           <div class="identity-name">{{ user.name }}</div>
@@ -25,43 +25,36 @@
       </div>
     </div>
 
-    <!-- Member-specific billing summary -->
+  <!-- Member-specific billing summary -->
     <div class="card" *ngIf="isMember">
-      <h2>Membership & Billing</h2>
+      <h2>{{ 'profile.membership.title' | translate }}</h2>
       <div class="billing-row">
-        <span>Base cost per class</span>
+        <span>{{ 'profile.membership.baseCost' | translate }}</span>
         <strong>{{ user.baseCost != null ? ('$' + user.baseCost) : '—' }}</strong>
       </div>
       <div class="billing-row">
-        <span>Bonus days remaining</span>
+        <span>{{ 'profile.membership.bonusDays' | translate }}</span>
         <strong>{{ user.bonusDays != null ? user.bonusDays : '—' }}</strong>
       </div>
       <div class="billing-row">
-        <span>Total owed</span>
+        <span>{{ 'profile.membership.totalOwed' | translate }}</span>
         <strong>{{ totalOwed === null ? '—' : ('$' + totalOwed) }}</strong>
       </div>
       <p class="hint">
-        Total owed includes completed classes and late cancellations (within 12 hours of start),
-        excluding any classes cancelled by the gym.
+        {{ 'profile.membership.hint' | translate }}
       </p>
     </div>
 
     <!-- Trainer-specific info -->
     <div class="card" *ngIf="isTrainer">
-      <h2>Trainer Overview</h2>
-      <p>
-        As a trainer, you can manage classes and view your schedule from the
-        <strong>Classes</strong> and <strong>Calendar</strong> sections.
-      </p>
+      <h2>{{ 'profile.trainer.title' | translate }}</h2>
+      <p [innerHTML]="'profile.trainer.description' | translate"></p>
     </div>
 
     <!-- Admin-specific info -->
     <div class="card" *ngIf="isAdmin">
-      <h2>Admin Overview</h2>
-      <p>
-        As an admin, you can manage members, trainers, classes, and billing from the
-        <strong>Admin</strong> area.
-      </p>
+      <h2>{{ 'profile.admin.title' | translate }}</h2>
+      <p [innerHTML]="'profile.admin.description' | translate"></p>
     </div>
   </div>
 </div>
