@@ -11,10 +11,13 @@ export interface BillingEvent {
 export interface BillingEventSummary {
   id: number;
   bookingId?: number;
+  className?: string;
+  instructorName?: string;
   amount: number;
   reason: string;
   eventDate: string;
   settled: boolean;
+  settlementType?: 'NONE' | 'PAYMENT' | 'BONUS';
 }
 
 export interface BillingReport {

@@ -163,4 +163,25 @@ export class AdminBillingComponent implements OnInit {
       error: (err) => { console.error('Failed to settle events', err); alert('Failed to mark as paid.'); }
     });
   }
+
+  settleSingleAsPayment(eventId: number): void {
+    this.adminService.settleBillingEventAsPayment(eventId).subscribe({
+      next: () => this.loadReports(),
+      error: (err) => {
+        console.error('Failed to mark event as paid', err);
+        alert('Failed to mark event as paid.');
+      }
+    });
+  }
+
+  settleSingleAsBonus(eventId: number): void {
+    this.adminService.settleBillingEventAsBonus(eventId).subscribe({
+      next: () => this.loadReports(),
+      error: (err) => {
+        console.error('Failed to settle event via bonus', err);
+        const message = err?.error || 'Failed to settle event via bonus.';
+        alert(message);
+      }
+    });
+  }
 }

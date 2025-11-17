@@ -53,13 +53,18 @@
       </div>
     </div>
 
+    <p class="admin-hint">
+      Select individual events to mark them as paid or use bonus days, or use the bulk action
+      to mark multiple selected events as paid at once.
+    </p>
+
     <div class="bulk-actions" *ngIf="reports.length > 0">
       <button
-        class="btn-success"
+        class="btn-secondary"
         (click)="markSelectedAsPaid()"
         [disabled]="selectedEventIds.size === 0"
       >
-        Mark Paid ({{ selectedEventIds.size }})
+        Mark selected as paid ({{ selectedEventIds.size }})
       </button>
     </div>
 
@@ -99,10 +104,12 @@
                   />
                 </th>
                 <th>Date</th>
-                <th>Booking ID</th>
+                <th>Class / Instructor</th>
                 <th>Reason</th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th>Settlement</th>
+                <th style="min-width: 180px">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -121,7 +128,16 @@
                   />
                 </td>
                 <td>{{ event.eventDate | date : "short" }}</td>
-                <td>#{{ event.bookingId }}</td>
+                <td>
+                  <div class="event-context">
+                    <div class="event-class-name">
+                      {{ event.className || 'Unknown class' }}
+                    </div>
+                    <div class="event-instructor" *ngIf="event.instructorName">
+                      Instructor: {{ event.instructorName }}
+                    </div>
+                  </div>
+                </td>
                 <td>{{ event.reason }}</td>
                 <td>€{{ event.amount.toFixed(2) }}</td>
                 <td>
@@ -132,9 +148,52 @@
                     {{ event.settled ? "Settled" : "Pending" }}
                   </span>
                 </td>
+                <td>
+                  <span
+                    class="settlement-badge"
+                    [ngClass]="{
+                      'settlement-none': !event.settlementType || event.settlementType === 'NONE',
+                      'settlement-payment': event.settlementType === 'PAYMENT',
+                      'settlement-bonus': event.settlementType === 'BONUS'
+                    }"
+                  >
+                    {{
+                      !event.settlementType || event.settlementType === 'NONE'
+                        ? 'Unassigned'
+                        : event.settlementType === 'PAYMENT'
+                        ? 'Payment'
+                        : 'Bonus day'
+                    }}
+                  </span>
+                </td>
+                <td>
+                  <div class="event-actions">
+                    <button
+                      class="btn-xs btn-primary"
+                      [disabled]="event.settled"
+                      (click)="settleSingleAsPayment(event.id)"
+                      title="Settle this charge via normal payment"
+                    >
+                      Mark Paid
+                    </button>
+                    <button
+                      class="btn-xs btn-bonus"
+                      [disabled]="event.settled || report.bonusDays <= 0"
+                      (click)="settleSingleAsBonus(event.id)"
+                      title="Use one bonus day to settle this charge"
+                    >
+                      Use Bonus Day
+                    </button>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
+          <div class="bonus-info" *ngIf="report.bonusDays > 0">
+            Bonus days available for this member:
+            <strong>{{ report.bonusDays }}</strong>
+            <span class="bonus-hint">(one bonus day settles one charge)</span>
+          </div>
         </div>
       </div>
     </div>

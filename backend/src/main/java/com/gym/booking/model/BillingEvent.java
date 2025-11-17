@@ -8,6 +8,12 @@ import java.time.LocalDateTime;
 @Table(name = "billing_events")
 public class BillingEvent extends BaseEntity {
 
+    public enum SettlementType {
+        NONE,
+        PAYMENT,
+        BONUS
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -27,6 +33,10 @@ public class BillingEvent extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean settled = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "settlement_type", length = 20)
+    private SettlementType settlementType = SettlementType.NONE;
 
     // Getters and Setters
     public User getUser() {
@@ -79,5 +89,13 @@ public class BillingEvent extends BaseEntity {
 
     public void setSettled(Boolean settled) {
         this.settled = settled;
+    }
+
+    public SettlementType getSettlementType() {
+        return settlementType;
+    }
+
+    public void setSettlementType(SettlementType settlementType) {
+        this.settlementType = settlementType;
     }
 }

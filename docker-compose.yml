@@ -52,6 +52,8 @@ services:
     volumes:
       # Mount only the processed realm file to avoid importing the unprocessed template
       - ./keycloak/realms/gym-booking-realm.json:/opt/keycloak/data/import/gym-booking-realm.json:ro
+      # Persist Keycloak configuration and state
+      - keycloak_data:/opt/keycloak/data
     healthcheck:
       # Simple TCP check with extended window (~8 minutes total)
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
@@ -144,3 +146,4 @@ networks:
 
 volumes:
   postgres_data:
+  keycloak_data:

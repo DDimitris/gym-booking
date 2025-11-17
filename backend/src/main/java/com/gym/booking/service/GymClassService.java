@@ -1,9 +1,10 @@
 package com.gym.booking.service;
 
+import com.gym.booking.exception.ResourceNotFoundException;
 import com.gym.booking.model.GymClass;
 import com.gym.booking.model.User;
 import com.gym.booking.repository.GymClassRepository;
-import com.gym.booking.exception.ResourceNotFoundException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +15,13 @@ import java.util.List;
 public class GymClassService {
     private final GymClassRepository gymClassRepository;
     private final UserService userService;
+    private final BookingService bookingService;
 
-    public GymClassService(GymClassRepository gymClassRepository, UserService userService) {
+    public GymClassService(GymClassRepository gymClassRepository, UserService userService,
+        @Lazy BookingService bookingService) {
         this.gymClassRepository = gymClassRepository;
         this.userService = userService;
+        this.bookingService = bookingService;
     }
 
     public GymClass createGymClass(@NonNull GymClass gymClass, @NonNull Long trainerId) {
@@ -45,9 +49,25 @@ public class GymClassService {
     }
 
     public void deleteGymClass(@NonNull Long id) {
-        gymClassRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Gym class not found with id: " + id));
-        gymClassRepository.deleteById(id);
+                GymClass gymClass = gymClassRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Gym class not found with id: " + id));
+
+                // If the class has no attendees at all, we can safely hard-delete it.
+                // This avoids cluttering the schedule/history with unused classes.
+                long bookedCount = bookingService.countActiveBookingsForClass(gymClass);
+                if (bookedCount == 0) {
+                        gymClassRepository.delete(gymClass);
+                        return;
+                }
+
+                // When an admin deletes/cancels a class that has attendees, mark the instance as cancelled and
+                // mark all associated bookings as cancelled by gym, without creating billing events.
+                gymClass.setStatus(GymClass.ClassStatus.CANCELLED);
+                gymClass.setIsCancelled(true);
+                gymClassRepository.save(gymClass);
+
+                // Cancel all active bookings for this class as CANCELLED_BY_GYM (no billing)
+                bookingService.cancelBookingsByGymForClass(id);
     }
 
     public List<GymClass> findAll() {

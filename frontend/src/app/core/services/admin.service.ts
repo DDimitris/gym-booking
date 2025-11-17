@@ -59,6 +59,14 @@ export class AdminService {
     return this.http.post<void>(`${this.apiUrl}/billing/settle`, eventIds);
   }
 
+  settleBillingEventAsPayment(eventId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/billing/events/${eventId}/settle/payment`, {});
+  }
+
+  settleBillingEventAsBonus(eventId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/billing/events/${eventId}/settle/bonus`, {});
+  }
+
   // Instructors
   getTrainers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/trainers`);
