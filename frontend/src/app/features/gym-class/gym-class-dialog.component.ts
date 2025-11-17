@@ -50,6 +50,26 @@ import { User } from '../../core/models/user.model';
           </mat-error>
         </mat-form-field>
 
+        <div class="datetime-row">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="datePicker" formControlName="date" required>
+            <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+            <mat-datepicker #datePicker></mat-datepicker>
+            <mat-error *ngIf="classForm.get('date')?.hasError('required')">
+              Date is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Start Time</mat-label>
+            <input matInput type="time" formControlName="startTime" required>
+            <mat-error *ngIf="classForm.get('startTime')?.hasError('required')">
+              Start time is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
         <mat-form-field appearance="outline">
           <mat-label>Trainer</mat-label>
           <mat-select formControlName="trainerId" required>
@@ -80,6 +100,17 @@ import { User } from '../../core/models/user.model';
     textarea {
       resize: vertical;
     }
+
+    .datetime-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .date-field,
+    .time-field {
+      flex: 1 1 150px;
+    }
   `]
 })
 export class GymClassDialogComponent {
@@ -97,13 +128,28 @@ export class GymClassDialogComponent {
       description: [''],
       capacity: ['', [Validators.required, Validators.min(1)]],
       durationMinutes: ['', [Validators.required, Validators.min(15)]],
-  trainerId: ['', Validators.required]
+      trainerId: ['', Validators.required],
+  date: ['', Validators.required], // stores a Date object from MatDatepicker
+      startTime: ['', Validators.required]
     });
 
     if (data) {
+      // Pre-populate date and start time from existing startTime/endTime
+      const start = data.startTime ? new Date(data.startTime) : null;
+      const isoDate = start
+        ? `${start.getFullYear()}-${(start.getMonth() + 1).toString().padStart(2, '0')}-${start.getDate()
+            .toString()
+            .padStart(2, '0')}`
+        : '';
+      const isoTime = start
+        ? `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')}`
+        : '';
+
       this.classForm.patchValue({
         ...data,
-        trainerId: (data as any).trainerId ?? (data as any).instructorId
+        trainerId: (data as any).trainerId ?? (data as any).instructorId,
+  date: start ?? isoDate,
+        startTime: isoTime
       });
     }
 
@@ -122,10 +168,36 @@ export class GymClassDialogComponent {
     if (this.classForm.valid) {
       // Map to backend DTO (trainerId expected; include legacy instructorId for safety during transition)
       const value = this.classForm.value;
+
+      // Combine date and startTime into ISO startTime; derive endTime from durationMinutes
+      // MatDatepicker gives a Date object; fall back to string if needed
+      const dateControl: any = value.date;
+      let date: string;
+      if (dateControl instanceof Date) {
+        const y = dateControl.getFullYear();
+        const m = (dateControl.getMonth() + 1).toString().padStart(2, '0');
+        const d = dateControl.getDate().toString().padStart(2, '0');
+        date = `${y}-${m}-${d}`;
+      } else {
+        date = dateControl as string; // fallback: assume already in YYYY-MM-DD
+      }
+      const startTime: string = value.startTime; // HH:mm
+      const durationMinutes: number = Number(value.durationMinutes) || 0;
+
+      const startDateTime = new Date(`${date}T${startTime}:00`);
+      const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60000);
+
+      const toIso = (d: Date) => d.toISOString();
+
       this.dialogRef.close({
-        ...value,
+        name: value.name,
+        description: value.description,
+        capacity: value.capacity,
+        durationMinutes: durationMinutes,
         trainerId: value.trainerId,
-        instructorId: value.trainerId // transitional field
+        instructorId: value.trainerId, // transitional field
+        startTime: toIso(startDateTime),
+        endTime: toIso(endDateTime)
       });
     }
   }

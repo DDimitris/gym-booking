@@ -11,6 +11,43 @@ Production-ready class scheduling and booking system built with Spring Boot (Jav
 - **Auth**: Keycloak, reverse-proxied under `/auth` on the same HTTPS origin.
 - **Infra**: Single `docker-compose.yml` orchestrates Postgres, Keycloak, backend, and frontend behind HTTPS.
 
+### Billing & admin workflows
+
+- **Billing events & settlement types**
+   - Same-day or late cancellations can generate billing events for athletes.
+   - Each billing event carries a **settlement type**:
+      - `NONE` – pending/unsettled.
+      - `PAYMENT` – settled by normal payment.
+      - `BONUS` – settled by consuming a bonus day from the athlete.
+   - The backend exposes admin endpoints to:
+      - List per-athlete and global billing reports.
+      - Settle individual events explicitly as payment or bonus.
+      - Perform bulk "mark selected as paid" operations as payments.
+
+- **Admin billing UI**
+   - Admins can see, per athlete:
+      - Outstanding charges and historical billing events.
+      - The **class name** and **instructor** associated with each charge.
+      - Current settlement state (Unassigned, Payment, Bonus day).
+   - From the billing screen, admins can:
+      - Mark one or more events as paid.
+      - Settle a single event using a bonus day (when the athlete has bonus days available).
+      - Get a quick view of remaining bonus days.
+
+- **Bonus days**
+   - Bonus days act as pre-paid class credits.
+   - When an admin settles a billing event as `BONUS`, the athlete's bonus day count is decremented and the event is marked as settled.
+
+### Class scheduling & editing
+
+- Classes are stored with `startTime` and `endTime` timestamps.
+- Capacity is enforced per class instance; bookings respect maximum capacity.
+- Admins and instructors can create and edit classes via a dialog that includes:
+   - Class metadata (name, description, duration, trainer, capacity).
+   - A **date picker** for the class date.
+   - A separate time input for the start time.
+- On save, the UI combines the selected date and start time and computes an `endTime` based on the duration, ensuring that editing a class does not reset its date/time.
+
 ## Usage
 
 ### Run the full stack with Docker (recommended)
