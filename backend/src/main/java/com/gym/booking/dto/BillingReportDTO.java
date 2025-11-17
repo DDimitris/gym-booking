@@ -14,10 +14,14 @@ public class BillingReportDTO {
 
     public static class BillingEventSummary {
         private Long id;
+        private Long bookingId;
+        private String className;
+        private String instructorName;
         private BigDecimal amount;
         private String reason;
         private LocalDateTime eventDate;
         private Boolean settled;
+        private com.gym.booking.model.BillingEvent.SettlementType settlementType;
 
         // Getters and Setters
         public Long getId() {
@@ -26,6 +30,30 @@ public class BillingReportDTO {
 
         public void setId(Long id) {
             this.id = id;
+        }
+
+        public Long getBookingId() {
+            return bookingId;
+        }
+
+        public void setBookingId(Long bookingId) {
+            this.bookingId = bookingId;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+
+        public void setClassName(String className) {
+            this.className = className;
+        }
+
+        public String getInstructorName() {
+            return instructorName;
+        }
+
+        public void setInstructorName(String instructorName) {
+            this.instructorName = instructorName;
         }
 
         public BigDecimal getAmount() {
@@ -58,6 +86,14 @@ public class BillingReportDTO {
 
         public void setSettled(Boolean settled) {
             this.settled = settled;
+        }
+
+        public com.gym.booking.model.BillingEvent.SettlementType getSettlementType() {
+            return settlementType;
+        }
+
+        public void setSettlementType(com.gym.booking.model.BillingEvent.SettlementType settlementType) {
+            this.settlementType = settlementType;
         }
     }
 

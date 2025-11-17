@@ -228,7 +228,7 @@ export class CalendarComponent implements OnInit {
     this.bookingService.createBooking(this.selectedClass.id).subscribe({
       next: () => {
         console.log('Booking successful');
-        this.showToast('Successfully booked! Remember: cancellations within 24 hours may be charged.', 'success');
+        this.showToast('Successfully booked! Remember: cancellations within 12 hours may be charged.', 'success');
         this.closeModal();
         this.loadData(); // Refresh data
       },

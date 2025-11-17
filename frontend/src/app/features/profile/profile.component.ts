@@ -3,13 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
 
+type UserRole = 'ADMIN' | 'TRAINER' | 'MEMBER';
+type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+
 interface UserMe {
   id: number;
   name: string;
   email: string;
   avatarUrl?: string | null;
-  baseCost?: number;
-  bonusDays?: number;
+  baseCost?: number | null;
+  bonusDays?: number | null;
+  role: UserRole;
+  status?: UserStatus | null;
 }
 
 @Component({
@@ -22,8 +27,8 @@ interface UserMe {
 export class ProfileComponent implements OnInit {
   me: UserMe | null = null;
   totalOwed: number | null = null;
-  message: string | null = null;
-  messageType: 'success' | 'error' | 'info' = 'info';
+  message: string | null = null; // Keeping message for informational purposes
+  messageType: 'success' | 'error' | 'info' = 'info'; // Keeping messageType for informational purposes
 
   constructor(private userService: UserService) {}
 
@@ -42,11 +47,17 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  save(): void {
-    if (!this.me) return;
-    this.userService.updateMe({ name: this.me.name, avatarUrl: this.me.avatarUrl }).subscribe({
-      next: (updated: UserMe) => { this.me = { ...this.me!, ...updated }; this.messageType = 'success'; this.message = 'Saved'; },
-      error: () => { this.messageType = 'error'; this.message = 'Save failed'; }
-    });
+  // Profile page is read-only for now; no save/edit actions.
+
+  get isMember(): boolean {
+    return this.me?.role === 'MEMBER';
+  }
+
+  get isTrainer(): boolean {
+    return this.me?.role === 'TRAINER';
+  }
+
+  get isAdmin(): boolean {
+    return this.me?.role === 'ADMIN';
   }
 }

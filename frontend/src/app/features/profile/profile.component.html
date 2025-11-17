@@ -6,35 +6,62 @@
   </div>
 
   <div class="profile-grid">
-    <div class="avatar-block">
-      <img
-        *ngIf="user.avatarUrl; else noAvatar"
-        [src]="user.avatarUrl"
-        alt="Avatar"
-        class="avatar"
-      />
-      <ng-template #noAvatar>
-        <div class="avatar placeholder">No Avatar</div>
-      </ng-template>
-      <label>Avatar URL</label>
-      <input type="url" [(ngModel)]="user.avatarUrl" />
+    <!-- Read-only identity card, no avatar editing -->
+    <div class="card identity-card">
+      <div class="identity-header">
+        <div class="identity-initials">
+          {{ user.name?.charAt(0) || 'U' }}
+        </div>
+        <div class="identity-text">
+          <div class="identity-name">{{ user.name }}</div>
+          <div class="identity-email">{{ user.email }}</div>
+        </div>
+      </div>
+      <div class="role-status">
+        <span class="badge role">{{ user.role }}</span>
+        <span class="badge status" [ngClass]="user.status?.toLowerCase() || 'active'">
+          {{ user.status || 'ACTIVE' }}
+        </span>
+      </div>
     </div>
 
-    <div class="info-block">
-      <label>Name</label>
-      <input type="text" [(ngModel)]="user.name" />
-
-      <label>Email</label>
-      <input type="email" [ngModel]="user.email" disabled />
-
-      <div class="billing">
-        <strong>Total Owed:</strong>
-        <span>{{ totalOwed === null ? "—" : "$" + totalOwed }}</span>
+    <!-- Member-specific billing summary -->
+    <div class="card" *ngIf="isMember">
+      <h2>Membership & Billing</h2>
+      <div class="billing-row">
+        <span>Base cost per class</span>
+        <strong>{{ user.baseCost != null ? ('$' + user.baseCost) : '—' }}</strong>
       </div>
-
-      <div class="actions">
-        <button class="btn-primary" (click)="save()">Save</button>
+      <div class="billing-row">
+        <span>Bonus days remaining</span>
+        <strong>{{ user.bonusDays != null ? user.bonusDays : '—' }}</strong>
       </div>
+      <div class="billing-row">
+        <span>Total owed</span>
+        <strong>{{ totalOwed === null ? '—' : ('$' + totalOwed) }}</strong>
+      </div>
+      <p class="hint">
+        Total owed includes completed classes and late cancellations (within 12 hours of start),
+        excluding any classes cancelled by the gym.
+      </p>
+    </div>
+
+    <!-- Trainer-specific info -->
+    <div class="card" *ngIf="isTrainer">
+      <h2>Trainer Overview</h2>
+      <p>
+        As a trainer, you can manage classes and view your schedule from the
+        <strong>Classes</strong> and <strong>Calendar</strong> sections.
+      </p>
+    </div>
+
+    <!-- Admin-specific info -->
+    <div class="card" *ngIf="isAdmin">
+      <h2>Admin Overview</h2>
+      <p>
+        As an admin, you can manage members, trainers, classes, and billing from the
+        <strong>Admin</strong> area.
+      </p>
     </div>
   </div>
 </div>

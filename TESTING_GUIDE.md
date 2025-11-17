@@ -7,7 +7,7 @@ Three pre-configured test users with distinct roles and color-coded badges:
 
 | Username | Password | Role | Badge Color | Permissions |
 |----------|----------|------|-------------|-------------|
-| `admin` | `admin` | ADMIN | 🔴 Red | Full access - Create, Edit, Delete all classes |
+| `admin` | `admin` | ADMIN | 🔴 Red | Full access - Create, Edit, Delete all classes, manage billing |
 | `trainer` | `trainer` | TRAINER | 🔵 Blue | Create classes, Edit own classes |
 | `member` | `member` | MEMBER | 🟢 Green | View classes, Book classes |
 
@@ -23,7 +23,7 @@ Three pre-configured test users with distinct roles and color-coded badges:
 - **Color-coded**: Classes color-coded by trainer
 - **Responsive**: Works on all screen sizes
 
-### 4. **Role-Based Class Management**
+### 4. **Role-Based Class Management & Billing**
 
 #### **For ADMIN (admin/admin)**
 - ✅ Create new classes
@@ -31,6 +31,9 @@ Three pre-configured test users with distinct roles and color-coded badges:
 - ✅ Delete ANY class
 - ✅ View all classes
 - ✅ Book classes
+- ✅ View per-athlete billing reports
+- ✅ Mark billing events as paid (single and bulk)
+- ✅ Settle individual billing events using bonus days (when available)
 
 #### **For TRAINER (trainer/trainer)**
 - ✅ Create new classes
@@ -46,7 +49,7 @@ Three pre-configured test users with distinct roles and color-coded badges:
 - ✅ View all classes
 - ✅ Book classes (button visible)
 
-### 5. **Mock Data**
+### 5. **Mock Data & Real Billing**
 The app includes 6 sample classes spread across the week:
 - Morning Yoga (Today 9:00 AM)
 - Evening Spin (Today 6:00 PM)
@@ -77,14 +80,31 @@ https://localhost
 2. Fill in the form:
    - Class Name: e.g., "HIIT Training"
    - Description: e.g., "High intensity interval training"
-   - Date & Time: Pick a date/time
-   - Duration: e.g., 45 minutes
+   - Date: Use the **date picker** to choose the class date
+   - Start Time: e.g., `18:00`
+   - Duration: e.g., 45 minutes (end time is computed automatically)
    - Trainer: Your name or any trainer
    - Capacity: e.g., 15
 3. Click "Save"
 4. The class appears on the calendar
-5. Click the new class → Click "Edit" → Modify → Save
-6. Click the class → Click "Delete" → Confirm
+5. Click the new class → Click "Edit" → Modify date/time via the date picker and time field → Save
+6. Verify that the updated date/time is reflected correctly on the calendar
+7. Click the class → Click "Delete" → Confirm
+
+### Step 4b: Test Admin Billing & Settlement (login as `admin`)
+1. Navigate to the **Admin / Billing** page.
+2. For each athlete, review:
+   - Their outstanding billing events.
+   - The class name and instructor shown for each event.
+   - The settlement badge (Unassigned, Payment, Bonus day).
+3. Select multiple pending events and use the **"Mark selected as paid"** action to settle them as payments.
+4. For a single event, use:
+   - **"Mark Paid"** to settle as a standard payment, or
+   - **"Use Bonus Day"** to settle via bonus days (if the athlete has bonus days available).
+5. Confirm that:
+   - The settlement badge updates to **Payment** or **Bonus day**.
+   - Bonus days decrease when settling via bonus.
+   - Totals in the per-athlete summary update accordingly.
 
 ### Step 5: Test Trainer Features (login as `trainer`)
 1. Create a new class (trainer can create)

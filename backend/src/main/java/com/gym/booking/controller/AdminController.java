@@ -140,6 +140,22 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/billing/events/{eventId}/settle/payment")
+    public ResponseEntity<?> settleBillingEventAsPayment(@PathVariable("eventId") Long eventId) {
+        billingService.settleAsPayment(eventId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/billing/events/{eventId}/settle/bonus")
+    public ResponseEntity<?> settleBillingEventAsBonus(@PathVariable("eventId") Long eventId) {
+        try {
+            billingService.settleAsBonus(eventId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping("/trainers")
     public ResponseEntity<List<UserDTO>> getAllTrainers() {
         List<User> trainers = userService.findAllTrainers();
@@ -193,10 +209,20 @@ public class AdminController {
     private BillingReportDTO.BillingEventSummary convertBillingEventToSimpleDTO(BillingEvent event) {
         BillingReportDTO.BillingEventSummary summary = new BillingReportDTO.BillingEventSummary();
         summary.setId(event.getId());
+        if (event.getBooking() != null) {
+            summary.setBookingId(event.getBooking().getId());
+            if (event.getBooking().getClassInstance() != null) {
+                summary.setClassName(event.getBooking().getClassInstance().getName());
+                if (event.getBooking().getClassInstance().getTrainer() != null) {
+                    summary.setInstructorName(event.getBooking().getClassInstance().getTrainer().getName());
+                }
+            }
+        }
         summary.setAmount(event.getAmount());
         summary.setReason(event.getReason());
         summary.setEventDate(event.getEventDate());
         summary.setSettled(event.isSettled());
+        summary.setSettlementType(event.getSettlementType());
         return summary;
     }
 }

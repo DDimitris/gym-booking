@@ -86,7 +86,7 @@ public class BookingService {
         booking.setCancelledAt(LocalDateTime.now());
         bookingRepository.save(booking);
 
-        // Create billing event if same-day cancellation
+        // Create billing event if same-day cancellation (user-initiated only)
         billingService.createCancellationCharge(booking);
     }
 
@@ -111,6 +111,40 @@ public class BookingService {
         }
         GymClass classInstance = gymClassService.findById(classInstanceId);
         return bookingRepository.findByClassInstance(classInstance);
+    }
+
+    /**
+     * Admin/gym-initiated cancellation of a class instance.
+     *
+     * Marks all active bookings for the class as CANCELLED_BY_GYM without
+     * creating any billing events. This is used when an admin cancels or
+     * deletes a class; members must never be charged for these cancellations.
+     */
+    public void cancelBookingsByGymForClass(Long classInstanceId) {
+        if (classInstanceId == null) {
+            return;
+        }
+        GymClass classInstance = gymClassService.findById(classInstanceId);
+        List<Booking> bookings = bookingRepository.findByClassInstance(classInstance);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Booking booking : bookings) {
+            if (booking.getStatus() == Booking.BookingStatus.BOOKED) {
+                booking.setStatus(Booking.BookingStatus.CANCELLED_BY_GYM);
+                booking.setCancelledAt(now);
+                bookingRepository.save(booking);
+            }
+        }
+    }
+
+    /**
+     * Count all active (BOOKED) bookings for a given class instance.
+     */
+    public long countActiveBookingsForClass(GymClass classInstance) {
+        if (classInstance == null) {
+            return 0L;
+        }
+        return bookingRepository.countByClassInstanceAndStatus(classInstance, Booking.BookingStatus.BOOKED);
     }
 
     public long countBookedByClassInstance(Long classInstanceId) {

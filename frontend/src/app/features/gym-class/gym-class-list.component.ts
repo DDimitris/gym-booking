@@ -255,16 +255,16 @@ export class GymClassListComponent implements OnInit {
   }
 
   deleteClass(id: number): void {
-    if (confirm('Are you sure you want to delete this class?')) {
+    if (confirm('Are you sure you want to cancel this class? All existing bookings will be marked as cancelled by the gym and no charges will apply.')) {
       this.gymClassService.deleteGymClass(id).subscribe({
         next: () => {
           this.loadClasses();
-          this.snackBar.open('Class deleted successfully', 'Close', {
+          this.snackBar.open('Class cancelled by administrator', 'Close', {
             duration: 3000
           });
         },
         error: (error) => {
-          this.snackBar.open('Error deleting class', 'Close', {
+          this.snackBar.open('Error cancelling class', 'Close', {
             duration: 3000
           });
         }

@@ -18,8 +18,8 @@ public class BillingService {
     private final BillingEventRepository billingEventRepository;
     private final UserService userService;
 
-    // Same-day cancellation threshold (24 hours before class start)
-    private static final long SAME_DAY_THRESHOLD_HOURS = 24;
+    // Same-day cancellation threshold (12 hours before class start)
+    private static final long SAME_DAY_THRESHOLD_HOURS = 12;
 
     public BillingService(BillingEventRepository billingEventRepository,
             UserService userService) {
@@ -29,7 +29,7 @@ public class BillingService {
 
     /**
      * Calculate and create billing event for same-day cancellation.
-     * Charges apply if cancelled within 24 hours of class start time.
+     * Charges apply if cancelled within SAME_DAY_THRESHOLD_HOURS of class start time.
      */
     public BillingEvent createCancellationCharge(Booking booking) {
         LocalDateTime classStartTime = booking.getClassInstance().getStartTime();
@@ -53,6 +53,7 @@ public class BillingService {
             event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
             event.setEventDate(LocalDateTime.now());
             event.setSettled(false);
+            event.setSettlementType(BillingEvent.SettlementType.NONE);
 
             return billingEventRepository.save(event);
         }
@@ -100,6 +101,9 @@ public class BillingService {
         BillingEvent event = billingEventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Billing event not found"));
         event.setSettled(true);
+        if (event.getSettlementType() == null || event.getSettlementType() == BillingEvent.SettlementType.NONE) {
+            event.setSettlementType(BillingEvent.SettlementType.PAYMENT);
+        }
         billingEventRepository.save(event);
     }
 
@@ -112,5 +116,42 @@ public class BillingService {
         for (Long id : eventIds) {
             markAsSettled(id);
         }
+    }
+
+    /**
+     * Settle a billing event explicitly as a normal payment.
+     */
+    public void settleAsPayment(Long eventId) {
+        BillingEvent event = billingEventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Billing event not found"));
+        event.setSettled(true);
+        event.setSettlementType(BillingEvent.SettlementType.PAYMENT);
+        billingEventRepository.save(event);
+    }
+
+    /**
+     * Settle a billing event using one bonus day for the associated user.
+     * Assumes 1 bonus day = settlement for 1 billing event.
+     */
+    public void settleAsBonus(Long eventId) {
+        BillingEvent event = billingEventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Billing event not found"));
+        User user = event.getUser();
+        if (user == null) {
+            throw new RuntimeException("Billing event has no associated user");
+        }
+
+        Integer bonusDays = user.getBonusDays();
+        if (bonusDays == null || bonusDays <= 0) {
+            throw new RuntimeException("User has no bonus days available");
+        }
+
+        user.setBonusDays(bonusDays - 1);
+        // Persist user bonus day change
+        userService.createUser(user);
+
+        event.setSettled(true);
+        event.setSettlementType(BillingEvent.SettlementType.BONUS);
+        billingEventRepository.save(event);
     }
 }

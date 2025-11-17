@@ -116,18 +116,20 @@ export class ActivityHistoryComponent implements OnInit {
     
     let confirmMessage = `Are you sure you want to cancel "${booking.gymClass.name}"?`;
     
-    if (hoursUntilClass < 24) {
-      confirmMessage += `\n\n⚠️ Warning: This is a same-day cancellation (less than 24 hours before class). You will be charged the base cost.`;
+    // Mirror backend SAME_DAY_THRESHOLD_HOURS = 12
+    if (hoursUntilClass < 12) {
+      confirmMessage += `\n\n⚠️ Warning: This is a same-day cancellation (less than 12 hours before class). You will be charged the base cost.`;
     }
     
     if (!confirm(confirmMessage)) return;
     
     this.bookingService.cancelBooking(booking.id).subscribe({
       next: () => {
-        if (hoursUntilClass < 24) {
+        // Keep client messaging aligned with 12-hour backend rule
+        if (hoursUntilClass < 12) {
           console.log('Booking cancelled: same-day cancellation charge applied.');
           this.messageType = 'info';
-          this.message = 'Booking cancelled (same-day charge applies).';
+          this.message = 'Booking cancelled (same-day charge applies: cancelled within 12 hours of class).';
         } else {
           console.log('Booking cancelled without charge.');
           this.messageType = 'success';

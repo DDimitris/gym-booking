@@ -115,6 +115,9 @@ public class UserController {
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole());
         dto.setAvatarUrl(user.getAvatarUrl());
+        dto.setBaseCost(user.getBaseCost());
+        dto.setBonusDays(user.getBonusDays());
+        dto.setStatus(user.getStatus());
         return dto;
     }
 
