@@ -48,10 +48,21 @@ public class GymClass extends BaseEntity {
     @Column
     private Boolean isCancelled = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "kind", nullable = false, length = 32)
+    private ClassKind kind = ClassKind.GROUP;
+
     public enum ClassStatus {
         SCHEDULED,
         CANCELLED,
         COMPLETED
+    }
+
+    public enum ClassKind {
+        GROUP,
+        SMALL_GROUP,
+        PERSONAL,
+        OPEN_GYM
     }
 
     // Derived field: name comes from ClassType

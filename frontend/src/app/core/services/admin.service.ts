@@ -34,6 +34,15 @@ export class AdminService {
     return this.http.post<User>(`${this.apiUrl}/members/${userId}/promote-to-trainer`, {});
   }
 
+  setMemberBaseCosts(userId: number, costs: {
+    groupBaseCost?: number;
+    smallGroupBaseCost?: number;
+    personalBaseCost?: number;
+    openGymBaseCost?: number;
+  }): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/members/${userId}/base-costs`, costs);
+  }
+
   // Billing Reports
   getMemberReport(userId: number, startDate?: string, endDate?: string): Observable<BillingReport> {
     let params = new HttpParams();

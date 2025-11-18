@@ -40,6 +40,10 @@
             <strong>{{ "calendar.modal.labels.type" | translate }}</strong>
             {{ classTypeName }}
           </div>
+          <div class="detail-row" *ngIf="selectedClass?.kind">
+            <strong>{{ "calendar.modal.labels.kind" | translate }}</strong>
+            {{ kindLabel(selectedClass!.kind) | translate }}
+          </div>
           <div class="detail-row">
             <strong>{{
               "calendar.modal.labels.description" | translate

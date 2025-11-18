@@ -5,7 +5,7 @@ import { GymClassService } from '../../core/services/gym-class.service';
 import { ClassTypeService } from '../../core/services/class-type.service';
 import { KeycloakService } from '../../core/services/keycloak.service';
 import { Booking, BookingStatus } from '../../core/models/booking.model';
-import { GymClass } from '../../core/models/gym-class.model';
+import { GymClass, ClassKind } from '../../core/models/gym-class.model';
 import { ClassType } from '../../core/models/class-type.model';
 import { UserService } from '../../core/services/user.service';
 import { forkJoin } from 'rxjs';
@@ -219,5 +219,24 @@ export class ActivityHistoryComponent implements OnInit {
     if (!classTypeId) return 'N/A';
     const ct = this.classTypes.find(x => x.id === classTypeId);
     return ct?.name || 'N/A';
+  }
+
+  kindLabel(kind: ClassKind | string | undefined | null): string {
+    switch (kind) {
+      case ClassKind.GROUP:
+      case 'GROUP':
+        return 'gymClasses.kinds.group';
+      case ClassKind.SMALL_GROUP:
+      case 'SMALL_GROUP':
+        return 'gymClasses.kinds.smallGroup';
+      case ClassKind.PERSONAL:
+      case 'PERSONAL':
+        return 'gymClasses.kinds.personal';
+      case ClassKind.OPEN_GYM:
+      case 'OPEN_GYM':
+        return 'gymClasses.kinds.openGym';
+      default:
+        return '';
+    }
   }
 }

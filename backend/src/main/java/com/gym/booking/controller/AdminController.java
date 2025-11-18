@@ -49,6 +49,66 @@ public class AdminController {
         return ResponseEntity.ok(convertToDTO(updated));
     }
 
+    public static class MemberBaseCostsDTO {
+        private BigDecimal groupBaseCost;
+        private BigDecimal smallGroupBaseCost;
+        private BigDecimal personalBaseCost;
+        private BigDecimal openGymBaseCost;
+
+        public BigDecimal getGroupBaseCost() {
+            return groupBaseCost;
+        }
+
+        public void setGroupBaseCost(BigDecimal groupBaseCost) {
+            this.groupBaseCost = groupBaseCost;
+        }
+
+        public BigDecimal getSmallGroupBaseCost() {
+            return smallGroupBaseCost;
+        }
+
+        public void setSmallGroupBaseCost(BigDecimal smallGroupBaseCost) {
+            this.smallGroupBaseCost = smallGroupBaseCost;
+        }
+
+        public BigDecimal getPersonalBaseCost() {
+            return personalBaseCost;
+        }
+
+        public void setPersonalBaseCost(BigDecimal personalBaseCost) {
+            this.personalBaseCost = personalBaseCost;
+        }
+
+        public BigDecimal getOpenGymBaseCost() {
+            return openGymBaseCost;
+        }
+
+        public void setOpenGymBaseCost(BigDecimal openGymBaseCost) {
+            this.openGymBaseCost = openGymBaseCost;
+        }
+    }
+
+    @PostMapping("/members/{userId}/base-costs")
+    public ResponseEntity<UserDTO> setMemberBaseCosts(
+            @PathVariable("userId") long userId,
+            @RequestBody MemberBaseCostsDTO costs) {
+        User user = userService.findById(userId);
+        if (costs.getGroupBaseCost() != null) {
+            user.setGroupBaseCost(costs.getGroupBaseCost());
+        }
+        if (costs.getSmallGroupBaseCost() != null) {
+            user.setSmallGroupBaseCost(costs.getSmallGroupBaseCost());
+        }
+        if (costs.getPersonalBaseCost() != null) {
+            user.setPersonalBaseCost(costs.getPersonalBaseCost());
+        }
+        if (costs.getOpenGymBaseCost() != null) {
+            user.setOpenGymBaseCost(costs.getOpenGymBaseCost());
+        }
+        User updated = userService.createUser(user);
+        return ResponseEntity.ok(convertToDTO(updated));
+    }
+
     @PostMapping("/members/{userId}/bonus-days")
     public ResponseEntity<UserDTO> setMemberBonusDays(
             @PathVariable("userId") long userId,
@@ -201,6 +261,10 @@ public class AdminController {
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole());
         dto.setBaseCost(user.getBaseCost());
+        dto.setGroupBaseCost(user.getGroupBaseCost());
+        dto.setSmallGroupBaseCost(user.getSmallGroupBaseCost());
+        dto.setPersonalBaseCost(user.getPersonalBaseCost());
+        dto.setOpenGymBaseCost(user.getOpenGymBaseCost());
         dto.setBonusDays(user.getBonusDays());
         dto.setStatus(user.getStatus());
         return dto;

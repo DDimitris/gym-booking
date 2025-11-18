@@ -103,6 +103,7 @@
     "modal": {
       "labels": {
         "type": "Type:",
+        "kind": "Kind:",
         "description": "Description:",
         "start": "Start:",
         "end": "End:",
@@ -131,6 +132,7 @@
       "refreshTooltip": "Reload users from server",
       "setCost": "Set Cost",
       "setCostTooltip": "Set base cost per class",
+      "setKindCostsTooltip": "Set base costs per class kind",
       "bonus": "Bonus",
       "bonusTooltip": "Assign bonus days",
       "billing": "Billing",
@@ -164,6 +166,7 @@
     "modal": {
       "titles": {
         "baseCost": "Set Base Cost",
+        "kindCosts": "Set Costs per Class Kind",
         "bonusDays": "Assign Bonus Days",
         "promote": "Promote Member"
       },
@@ -172,6 +175,10 @@
       "baseCost": {
         "label": "Base Cost per Class (€):",
         "hint": "This is the amount charged for same-day cancellations."
+      },
+      "kindCosts": {
+        "label": "Base cost per class kind (€):",
+        "hint": "These amounts are used to calculate charges based on the kind of class (group, small group, personal, open gym). Leave 0 to fall back to the default base cost."
       },
       "bonusDays": {
         "label": "Bonus Days:",
@@ -197,7 +204,7 @@
       "all": "All Billing Reports"
     },
     "actions": {
-  "backToMembers": "Back to Members",
+      "backToMembers": "Back to Members",
       "exportCsv": "Export CSV",
       "markPaid": "Mark Paid",
       "useBonus": "Use Bonus Day",
@@ -302,6 +309,7 @@
         "startTime": "Start Time",
         "trainer": "Trainer",
         "classType": "Class Type",
+        "kind": "Class Kind",
         "location": "Location"
       },
       "errors": {
@@ -319,6 +327,12 @@
         "create": "Create",
         "update": "Update"
       }
+    },
+    "kinds": {
+      "group": "Group",
+      "smallGroup": "Small group",
+      "personal": "Personal",
+      "openGym": "Open gym"
     },
     "adminDialog": {
       "fields": {

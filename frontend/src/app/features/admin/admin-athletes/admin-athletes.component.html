@@ -108,6 +108,16 @@
               </button>
               <button
                 *ngIf="u.role === 'MEMBER'"
+                class="btn-small btn-primary"
+                (click)="openKindCostsModal(u)"
+                [title]="
+                  'adminAthletes.actions.setKindCostsTooltip' | translate
+                "
+              >
+                💲{{ "gymClasses.dialog.fields.kind" | translate }}
+              </button>
+              <button
+                *ngIf="u.role === 'MEMBER'"
                 class="btn-small btn-success"
                 (click)="openBonusDaysModal(u)"
                 [title]="'adminAthletes.actions.bonusTooltip' | translate"
@@ -228,6 +238,57 @@
             <small>
               {{ "adminAthletes.modal.baseCost.hint" | translate }}
             </small>
+          </div>
+          <div
+            *ngIf="modalMode === 'kindCosts'"
+            class="form-group kind-costs-grid"
+          >
+            <label>{{
+              "adminAthletes.modal.kindCosts.label" | translate
+            }}</label>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.group" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.groupBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.smallGroup" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.smallGroupBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.personal" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.personalBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.openGym" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.openGymBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <small>{{
+              "adminAthletes.modal.kindCosts.hint" | translate
+            }}</small>
           </div>
           <div *ngIf="modalMode === 'bonusDays'" class="form-group">
             <label>{{

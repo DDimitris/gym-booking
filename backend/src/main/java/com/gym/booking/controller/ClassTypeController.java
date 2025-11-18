@@ -49,8 +49,8 @@ public class ClassTypeController {
                 return ResponseEntity.status(403).build();
             }
         }
-    ClassType classType = convertToEntity(classTypeDTO);
-    ClassType savedClassType = classTypeService.createClassType(Objects.requireNonNull(classType));
+        ClassType classType = convertToEntity(classTypeDTO);
+        ClassType savedClassType = classTypeService.createClassType(Objects.requireNonNull(classType));
         return ResponseEntity.ok(convertToDTO(savedClassType));
     }
 

@@ -2,6 +2,7 @@ package com.gym.booking.service;
 
 import com.gym.booking.model.Booking;
 import com.gym.booking.model.BillingEvent;
+import com.gym.booking.model.GymClass;
 import com.gym.booking.model.User;
 import com.gym.booking.repository.BillingEventRepository;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,23 @@ public class BillingService {
         this.userService = userService;
     }
 
+    private BigDecimal resolveBaseCostForClass(User user, GymClass gymClass) {
+        if (gymClass == null || gymClass.getKind() == null) {
+            return user.getBaseCost() != null ? user.getBaseCost() : BigDecimal.ZERO;
+        }
+
+        return switch (gymClass.getKind()) {
+            case GROUP -> user.getGroupBaseCost();
+            case SMALL_GROUP -> user.getSmallGroupBaseCost();
+            case PERSONAL -> user.getPersonalBaseCost();
+            case OPEN_GYM -> user.getOpenGymBaseCost();
+        };
+    }
+
     /**
      * Calculate and create billing event for same-day cancellation.
-     * Charges apply if cancelled within SAME_DAY_THRESHOLD_HOURS of class start time.
+     * Charges apply if cancelled within SAME_DAY_THRESHOLD_HOURS of class start
+     * time.
      */
     public BillingEvent createCancellationCharge(Booking booking) {
         LocalDateTime classStartTime = booking.getClassInstance().getStartTime();
@@ -42,9 +57,10 @@ public class BillingService {
         // Only charge if cancelled within same-day threshold
         if (hoursUntilClass < SAME_DAY_THRESHOLD_HOURS) {
             User user = booking.getUser();
-            BigDecimal chargeAmount = user.getBaseCost() != null
-                    ? user.getBaseCost()
-                    : BigDecimal.ZERO;
+            BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
+            if (chargeAmount == null) {
+                chargeAmount = BigDecimal.ZERO;
+            }
 
             BillingEvent event = new BillingEvent();
             event.setUser(user);
