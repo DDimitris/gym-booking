@@ -116,6 +116,10 @@ public class UserController {
         dto.setRole(user.getRole());
         dto.setAvatarUrl(user.getAvatarUrl());
         dto.setBaseCost(user.getBaseCost());
+        dto.setGroupBaseCost(user.getGroupBaseCost());
+        dto.setSmallGroupBaseCost(user.getSmallGroupBaseCost());
+        dto.setPersonalBaseCost(user.getPersonalBaseCost());
+        dto.setOpenGymBaseCost(user.getOpenGymBaseCost());
         dto.setBonusDays(user.getBonusDays());
         dto.setStatus(user.getStatus());
         return dto;

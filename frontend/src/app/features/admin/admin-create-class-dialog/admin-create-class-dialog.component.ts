@@ -10,6 +10,7 @@ import { KeycloakService } from '../../../core/services/keycloak.service';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
 import { ClassType } from '../../../core/models/class-type.model';
+import { ClassKind } from '../../../core/models/gym-class.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -31,6 +32,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           <mat-label>{{ 'gymClasses.dialog.fields.classType' | translate }}</mat-label>
           <mat-select [(ngModel)]="classTypeId" name="classTypeId" required (selectionChange)="onClassTypeChange()">
             <mat-option *ngFor="let t of classTypes" [value]="t.id">{{ t.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'gymClasses.dialog.fields.kind' | translate }}</mat-label>
+          <mat-select [(ngModel)]="kind" name="kind" required>
+            <mat-option [value]="ClassKind.GROUP">Group</mat-option>
+            <mat-option [value]="ClassKind.SMALL_GROUP">Small group</mat-option>
+            <mat-option [value]="ClassKind.PERSONAL">Personal</mat-option>
+            <mat-option [value]="ClassKind.OPEN_GYM">Open gym</mat-option>
           </mat-select>
         </mat-form-field>
 
@@ -156,6 +167,7 @@ export class AdminCreateClassDialogComponent {
   durationMinutes = 60;
   trainerId: number | null = null;
   classTypeId: number | null = null;
+  kind: ClassKind = ClassKind.GROUP;
   startDateObj: Date | null = null;
   startHour: number | null = null;
   startMinute: number | null = 0;
@@ -179,6 +191,8 @@ export class AdminCreateClassDialogComponent {
 
   trainerLocked = false;
 
+  readonly ClassKind = ClassKind;
+
   constructor(
     private dialogRef: MatDialogRef<AdminCreateClassDialogComponent>,
     private adminService: AdminService,
@@ -192,7 +206,7 @@ export class AdminCreateClassDialogComponent {
   }
 
   get canSubmit(): boolean {
-    const baseOk = !!(this.trainerId && this.classTypeId && this.name && this.startDateObj && this.startHour !== null && this.startMinute !== null && this.capacity > 0 && this.durationMinutes >= 15);
+    const baseOk = !!(this.trainerId && this.classTypeId && this.name && this.startDateObj && this.startHour !== null && this.startMinute !== null && this.capacity > 0 && this.durationMinutes >= 15 && this.kind);
     if (!this.recurring) return baseOk;
     return baseOk && this.selectedDays.length > 0 && this.repeatWeeks >= 1;
   }
@@ -296,6 +310,7 @@ export class AdminCreateClassDialogComponent {
       trainerId: this.trainerId,
       instructorId: this.trainerId,
       classTypeId: this.classTypeId,
+      kind: this.kind,
       startTime: this.formatLocalDateTime(start),
       endTime: endIso,
       location: this.location

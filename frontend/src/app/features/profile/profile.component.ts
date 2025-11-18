@@ -12,8 +12,11 @@ interface UserMe {
   name: string;
   email: string;
   avatarUrl?: string | null;
-  baseCost?: number | null;
   bonusDays?: number | null;
+  groupBaseCost?: number | null;
+  smallGroupBaseCost?: number | null;
+  personalBaseCost?: number | null;
+  openGymBaseCost?: number | null;
   role: UserRole;
   status?: UserStatus | null;
 }

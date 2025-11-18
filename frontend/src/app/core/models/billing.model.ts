@@ -13,6 +13,7 @@ export interface BillingEventSummary {
   bookingId?: number;
   className?: string;
   instructorName?: string;
+  classKind?: string;
   amount: number;
   reason: string;
   eventDate: string;
@@ -23,7 +24,6 @@ export interface BillingEventSummary {
 export interface BillingReport {
   userId: number;
   userName: string;
-  baseCost: number;
   bonusDays: number;
   totalOwed: number;
   events: BillingEventSummary[];

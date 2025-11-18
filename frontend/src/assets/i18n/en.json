@@ -38,6 +38,7 @@
     },
     "labels": {
       "type": "Type:",
+      "kind": "Kind:",
       "start": "Start:",
       "end": "End:",
       "location": "Location:",
@@ -103,6 +104,7 @@
     "modal": {
       "labels": {
         "type": "Type:",
+        "kind": "Kind:",
         "description": "Description:",
         "start": "Start:",
         "end": "End:",
@@ -129,8 +131,7 @@
       "viewAllBilling": "View All Billing",
       "refresh": "Refresh",
       "refreshTooltip": "Reload users from server",
-      "setCost": "Set Cost",
-      "setCostTooltip": "Set base cost per class",
+      "setKindCostsTooltip": "Set base costs per class kind",
       "bonus": "Bonus",
       "bonusTooltip": "Assign bonus days",
       "billing": "Billing",
@@ -156,22 +157,21 @@
       "name": "Name",
       "email": "Email",
       "role": "Role",
-      "baseCost": "Base Cost",
       "bonusDays": "Bonus Days",
       "status": "Status",
       "actions": "Actions"
     },
     "modal": {
       "titles": {
-        "baseCost": "Set Base Cost",
+        "kindCosts": "Set Costs per Class Kind",
         "bonusDays": "Assign Bonus Days",
         "promote": "Promote Member"
       },
       "memberLabel": "Member:",
       "emailLabel": "Email:",
-      "baseCost": {
-        "label": "Base Cost per Class (€):",
-        "hint": "This is the amount charged for same-day cancellations."
+      "kindCosts": {
+        "label": "Base cost per class kind (€):",
+        "hint": "These amounts are used to calculate charges based on the kind of class (group, small group, personal, open gym). Leave 0 to fall back to the default base cost."
       },
       "bonusDays": {
         "label": "Bonus Days:",
@@ -197,7 +197,7 @@
       "all": "All Billing Reports"
     },
     "actions": {
-  "backToMembers": "Back to Members",
+      "backToMembers": "Back to Members",
       "exportCsv": "Export CSV",
       "markPaid": "Mark Paid",
       "useBonus": "Use Bonus Day",
@@ -221,7 +221,6 @@
       "markSelectedPaid": "Mark selected as paid ({{count}})"
     },
     "report": {
-      "baseCost": "Base Cost:",
       "bonusDays": "Bonus Days:",
       "totalOwed": "Total Owed",
       "noEvents": "No billing events in this period."
@@ -302,6 +301,7 @@
         "startTime": "Start Time",
         "trainer": "Trainer",
         "classType": "Class Type",
+        "kind": "Class Kind",
         "location": "Location"
       },
       "errors": {
@@ -319,6 +319,12 @@
         "create": "Create",
         "update": "Update"
       }
+    },
+    "kinds": {
+      "group": "Group",
+      "smallGroup": "Small group",
+      "personal": "Personal",
+      "openGym": "Open gym"
     },
     "adminDialog": {
       "fields": {

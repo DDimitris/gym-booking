@@ -24,9 +24,15 @@ export class AdminAthletesComponent implements OnInit {
   
   // Modal state
   showModal = false;
-  modalMode: 'baseCost' | 'bonusDays' | 'promote' | null = null;
+  modalMode: 'kindCosts' | 'bonusDays' | 'promote' | null = null;
   selectedMember: User | null = null;
   inputValue = 0;
+  kindCosts = {
+    groupBaseCost: 0,
+    smallGroupBaseCost: 0,
+    personalBaseCost: 0,
+    openGymBaseCost: 0
+  };
 
   constructor(
     private adminService: AdminService,
@@ -81,10 +87,15 @@ export class AdminAthletesComponent implements OnInit {
 
   // Removed separate trainers load; consolidated in loadAllUsers
 
-  openBaseCostModal(member: User): void {
+  openKindCostsModal(member: User): void {
     this.selectedMember = member;
-    this.inputValue = member.baseCost || 0;
-    this.modalMode = 'baseCost';
+    this.kindCosts = {
+      groupBaseCost: (member as any).groupBaseCost || 0,
+      smallGroupBaseCost: (member as any).smallGroupBaseCost || 0,
+      personalBaseCost: (member as any).personalBaseCost || 0,
+      openGymBaseCost: (member as any).openGymBaseCost || 0
+    };
+    this.modalMode = 'kindCosts';
     this.showModal = true;
   }
 
@@ -106,17 +117,22 @@ export class AdminAthletesComponent implements OnInit {
     this.modalMode = null;
     this.selectedMember = null;
     this.inputValue = 0;
+    this.kindCosts = {
+      groupBaseCost: 0,
+      smallGroupBaseCost: 0,
+      personalBaseCost: 0,
+      openGymBaseCost: 0
+    };
   }
 
   saveChanges(): void {
     if (!this.selectedMember) return;
 
-    if (this.modalMode === 'baseCost') {
-      this.adminService.setBaseCost(this.selectedMember.id, this.inputValue).subscribe({
+    if (this.modalMode === 'kindCosts') {
+      this.adminService.setMemberBaseCosts(this.selectedMember.id, this.kindCosts).subscribe({
         next: () => {
           alert(
-            this.translate.instant('adminAthletes.messages.baseCostSet', {
-              value: this.inputValue,
+            this.translate.instant('adminAthletes.messages.kindCostsSet', {
               name: this.selectedMember!.name
             })
           );
@@ -124,9 +140,9 @@ export class AdminAthletesComponent implements OnInit {
           this.closeModal();
         },
         error: (err) => {
-          console.error('Error setting base cost:', err);
+          console.error('Error setting kind base costs:', err);
           alert(
-            this.translate.instant('adminAthletes.errors.setBaseCost')
+            this.translate.instant('adminAthletes.errors.setKindCosts')
           );
         }
       });
@@ -201,8 +217,8 @@ export class AdminAthletesComponent implements OnInit {
   }
 
   get modalTitle(): string {
-    if (this.modalMode === 'baseCost') {
-      return this.translate.instant('adminAthletes.modal.titles.baseCost');
+    if (this.modalMode === 'kindCosts') {
+      return this.translate.instant('adminAthletes.modal.titles.kindCosts');
     }
     if (this.modalMode === 'bonusDays') {
       return this.translate.instant('adminAthletes.modal.titles.bonusDays');

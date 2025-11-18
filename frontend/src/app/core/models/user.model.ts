@@ -3,8 +3,11 @@ export interface User {
     name: string;
     email: string;
     role: UserRole;
-    baseCost?: number;
     bonusDays?: number;
+    groupBaseCost?: number;
+    smallGroupBaseCost?: number;
+    personalBaseCost?: number;
+    openGymBaseCost?: number;
     status?: UserStatus;
 }
 

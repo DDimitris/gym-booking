@@ -56,7 +56,7 @@
           <th>{{ "adminAthletes.table.name" | translate }}</th>
           <th>{{ "adminAthletes.table.email" | translate }}</th>
           <th>{{ "adminAthletes.table.role" | translate }}</th>
-          <th>{{ "adminAthletes.table.baseCost" | translate }}</th>
+          <!-- Removed legacy single base cost column; costs are now per kind only -->
           <th>{{ "adminAthletes.table.bonusDays" | translate }}</th>
           <th>{{ "adminAthletes.table.status" | translate }}</th>
           <th>{{ "adminAthletes.table.actions" | translate }}</th>
@@ -80,9 +80,7 @@
               >{{ u.role }}</span
             >
           </td>
-          <td [attr.data-label]="'adminAthletes.table.baseCost' | translate">
-            €{{ u.baseCost || 0 }}
-          </td>
+          <!-- base cost cell removed; per-kind costs managed via separate dialog -->
           <td [attr.data-label]="'adminAthletes.table.bonusDays' | translate">
             {{ u.bonusDays || 0 }}
           </td>
@@ -101,10 +99,12 @@
               <button
                 *ngIf="u.role === 'MEMBER'"
                 class="btn-small btn-primary"
-                (click)="openBaseCostModal(u)"
-                [title]="'adminAthletes.actions.setCostTooltip' | translate"
+                (click)="openKindCostsModal(u)"
+                [title]="
+                  'adminAthletes.actions.setKindCostsTooltip' | translate
+                "
               >
-                💲 {{ "adminAthletes.actions.setCost" | translate }}
+                💲{{ "gymClasses.dialog.fields.kind" | translate }}
               </button>
               <button
                 *ngIf="u.role === 'MEMBER'"
@@ -214,20 +214,57 @@
             <strong>{{ "adminAthletes.modal.emailLabel" | translate }}</strong>
             {{ selectedMember.email }}
           </p>
-          <div *ngIf="modalMode === 'baseCost'" class="form-group">
+          <!-- Legacy base cost modal content removed; costs are managed per kind -->
+          <div
+            *ngIf="modalMode === 'kindCosts'"
+            class="form-group kind-costs-grid"
+          >
             <label>{{
-              "adminAthletes.modal.baseCost.label" | translate
+              "adminAthletes.modal.kindCosts.label" | translate
             }}</label>
-            <input
-              type="number"
-              [(ngModel)]="inputValue"
-              min="0"
-              step="0.01"
-              class="form-input"
-            />
-            <small>
-              {{ "adminAthletes.modal.baseCost.hint" | translate }}
-            </small>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.group" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.groupBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.smallGroup" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.smallGroupBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.personal" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.personalBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <div class="kind-cost-row">
+              <span>{{ "gymClasses.kinds.openGym" | translate }}</span>
+              <input
+                type="number"
+                [(ngModel)]="kindCosts.openGymBaseCost"
+                min="0"
+                step="0.01"
+                class="form-input"
+              />
+            </div>
+            <small>{{
+              "adminAthletes.modal.kindCosts.hint" | translate
+            }}</small>
           </div>
           <div *ngIf="modalMode === 'bonusDays'" class="form-group">
             <label>{{
