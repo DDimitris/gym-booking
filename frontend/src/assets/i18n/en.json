@@ -1,0 +1,468 @@
+{
+  "common": {
+    "appTitle": "Gym Booking System",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "activity": {
+    "title": {
+      "member": "Your Activity",
+      "instructor": "Classes You Teach"
+    },
+    "loading": "Loading activity...",
+    "upcoming": {
+      "instructor": {
+        "title": "Upcoming Classes (Instructor)",
+        "empty": "You have no upcoming classes as an instructor."
+      },
+      "member": {
+        "title": "Upcoming Bookings",
+        "empty": "You have no upcoming bookings."
+      }
+    },
+    "past": {
+      "instructor": {
+        "title": "Past Classes (Instructor)",
+        "empty": "You have not taught any classes yet."
+      },
+      "member": {
+        "title": "Past Bookings",
+        "empty": "You have no past bookings yet."
+      }
+    },
+    "labels": {
+      "type": "Type:",
+      "start": "Start:",
+      "end": "End:",
+      "location": "Location:",
+      "capacity": "Capacity:",
+      "booked": "Booked:",
+      "date": "Date:",
+      "completed": "Completed:",
+      "cancelled": "Cancelled:"
+    },
+    "values": {
+      "na": "—",
+      "tbd": "TBD"
+    },
+    "status": {
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "cancelBooking": "Cancel booking"
+    },
+    "unknownClass": "Unknown class"
+  },
+  "profile": {
+    "title": "My Profile",
+    "membership": {
+      "title": "Membership & Billing",
+      "baseCost": "Base cost per class",
+      "bonusDays": "Bonus days remaining",
+      "totalOwed": "Total owed",
+      "hint": "Total owed includes completed classes and late cancellations (within 12 hours of start), excluding any classes cancelled by the gym."
+    },
+    "trainer": {
+      "title": "Trainer Overview",
+      "description": "As a trainer, you can manage classes and view your schedule from the Classes and Calendar sections."
+    },
+    "admin": {
+      "title": "Admin Overview",
+      "description": "As an admin, you can manage members, trainers, classes, and billing from the Admin area."
+    }
+  },
+  "calendar": {
+    "title": "Gym Classes Calendar",
+    "filter": {
+      "classType": {
+        "label": "Filter by Class Type:",
+        "all": "All Classes"
+      }
+    },
+    "values": {
+      "na": "N/A",
+      "minutes": "minutes"
+    },
+    "messages": {
+      "loginRequired": "Please login to book a class.",
+      "staffCannotBook": "Admins and instructors cannot book classes for themselves.",
+      "bookingSuccess": "Booking created successfully!",
+      "alreadyBooked": "You have already booked this class."
+    },
+    "errors": {
+      "loadData": "Failed to load calendar data.",
+      "bookingFailed": "Failed to book class. Please try again."
+    },
+    "modal": {
+      "labels": {
+        "type": "Type:",
+        "description": "Description:",
+        "start": "Start:",
+        "end": "End:",
+        "duration": "Duration:",
+        "location": "Location:",
+        "trainer": "Trainer:",
+        "availableSpots": "Available Spots:",
+        "status": "Status:"
+      },
+      "full": "This class is currently full",
+      "cancellation": {
+        "title": "Cancellation Policy:",
+        "text": "Cancellations within 12 hours of class time will be charged the base cost. Classes canceled by the gym/administrator are never charged."
+      },
+      "actions": {
+        "close": "Close",
+        "book": "Book Class"
+      }
+    }
+  },
+  "adminAthletes": {
+    "title": "Member Management",
+    "actions": {
+      "viewAllBilling": "View All Billing",
+      "refresh": "Refresh",
+      "refreshTooltip": "Reload users from server",
+      "setCost": "Set Cost",
+      "setCostTooltip": "Set base cost per class",
+      "bonus": "Bonus",
+      "bonusTooltip": "Assign bonus days",
+      "billing": "Billing",
+      "billingTooltip": "Open billing report for this member",
+      "promote": "Promote",
+      "promoteTooltip": "Promote member to trainer",
+      "delete": "Delete",
+      "deleteTooltip": "Delete user"
+    },
+    "search": {
+      "placeholder": "Search by name or email..."
+    },
+    "loading": "Loading users...",
+    "empty": {
+      "withSearch": "No users found matching \"{{term}}\"",
+      "noSearch": "No users found."
+    },
+    "sections": {
+      "members": "Members",
+      "trainers": "Trainers"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "baseCost": "Base Cost",
+      "bonusDays": "Bonus Days",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "modal": {
+      "titles": {
+        "baseCost": "Set Base Cost",
+        "bonusDays": "Assign Bonus Days",
+        "promote": "Promote Member"
+      },
+      "memberLabel": "Member:",
+      "emailLabel": "Email:",
+      "baseCost": {
+        "label": "Base Cost per Class (€):",
+        "hint": "This is the amount charged for same-day cancellations."
+      },
+      "bonusDays": {
+        "label": "Bonus Days:",
+        "hint": "Number of free classes without cancellation charges."
+      },
+      "promote": {
+        "confirm": "Are you sure you want to promote {{name}} to Trainer?",
+        "hint": "This will allow them to create and manage gym classes."
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "promote": "Promote"
+      }
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete this user? This action cannot be undone."
+    }
+  },
+  "adminBilling": {
+    "title": {
+      "member": "Member Billing Report",
+      "all": "All Billing Reports"
+    },
+    "actions": {
+  "backToMembers": "Back to Members",
+      "exportCsv": "Export CSV",
+      "markPaid": "Mark Paid",
+      "useBonus": "Use Bonus Day",
+      "settlePaymentTooltip": "Settle this charge via normal payment",
+      "settleBonusTooltip": "Use one bonus day to settle this charge"
+    },
+    "filters": {
+      "startDate": "Start Date:",
+      "endDate": "End Date:",
+      "apply": "Apply Filter"
+    },
+    "loading": "Loading billing reports...",
+    "empty": "No billing data found for the selected date range.",
+    "summary": {
+      "totalMembers": "Total Members",
+      "totalEvents": "Total Events",
+      "totalOwed": "Total Amount Owed"
+    },
+    "hint": "Select individual events to mark them as paid or use bonus days, or use the bulk action to mark multiple selected events as paid at once.",
+    "bulk": {
+      "markSelectedPaid": "Mark selected as paid ({{count}})"
+    },
+    "report": {
+      "baseCost": "Base Cost:",
+      "bonusDays": "Bonus Days:",
+      "totalOwed": "Total Owed",
+      "noEvents": "No billing events in this period."
+    },
+    "table": {
+      "date": "Date",
+      "classInstructor": "Class / Instructor",
+      "reason": "Reason",
+      "amount": "Amount",
+      "status": "Status",
+      "settlement": "Settlement",
+      "actions": "Actions",
+      "instructorLabel": "Instructor:"
+    },
+    "values": {
+      "unknownClass": "Unknown class"
+    },
+    "status": {
+      "settled": "Settled",
+      "pending": "Pending"
+    },
+    "settlement": {
+      "none": "Unassigned",
+      "payment": "Payment",
+      "bonus": "Bonus day"
+    },
+    "bonus": {
+      "info": "Bonus days available for this member:",
+      "hint": "(one bonus day settles one charge)"
+    }
+  },
+  "gymClasses": {
+    "list": {
+      "title": "Gym Classes",
+      "searchLabel": "Search Classes",
+      "searchPlaceholder": "Ex. Yoga",
+      "showPast": "Show past",
+      "daySummary": "{{count}} class(es)",
+      "tooltips": {
+        "viewAttendees": "View attendees",
+        "bookForUser": "Book for user"
+      },
+      "errors": {
+        "loadClasses": "Error loading classes",
+        "loadAttendees": "Failed to load attendees",
+        "loadMembers": "Failed to load members",
+        "createBooking": "Failed to create booking",
+        "createClass": "Error creating class",
+        "updateClass": "Error updating class",
+        "cancelClass": "Error cancelling class"
+      },
+      "messages": {
+        "bookingCreated": "Booking created for member",
+        "classCreated": "Class created successfully",
+        "classUpdated": "Class updated successfully",
+        "classCancelled": "Class cancelled by administrator"
+      },
+      "confirm": {
+        "cancelClass": "Are you sure you want to cancel this class? All existing bookings will be marked as cancelled by the gym and no charges will apply."
+      },
+      "prompts": {
+        "noMembers": "No members available to book for.",
+        "selectMemberTitle": "Select member ID to book for class \"{{name}}\"",
+        "invalidMemberId": "Invalid member ID.",
+        "attendeesTitle": "Attendees for {{name}}",
+        "noAttendees": "No attendees yet for {{name}}."
+      }
+    },
+    "dialog": {
+      "titleCreate": "Create Gym Class",
+      "titleEdit": "Edit Gym Class",
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "capacity": "Capacity",
+        "durationMinutes": "Duration (minutes)",
+        "date": "Date",
+        "startTime": "Start Time",
+        "trainer": "Trainer",
+        "classType": "Class Type",
+        "location": "Location"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "capacityRequired": "Capacity is required",
+        "capacityMin": "Capacity must be at least 1",
+        "durationRequired": "Duration is required",
+        "durationMin": "Duration must be at least 15 minutes",
+        "dateRequired": "Date is required",
+        "startTimeRequired": "Start time is required",
+        "trainerRequired": "Trainer is required"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "create": "Create",
+        "update": "Update"
+      }
+    },
+    "adminDialog": {
+      "fields": {
+        "classType": "Class Type",
+        "hour": "Hour (24h)",
+        "minute": "Minute"
+      },
+      "recurring": {
+        "label": "Recurring",
+        "daysOfWeek": "Days of week:",
+        "weeksToRepeat": "Weeks to repeat",
+        "preview": "Will create {{count}} total instance(s)."
+      },
+      "weekdays": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "messages": {
+        "recurringSuccess": "Created {{created}} class(es)",
+        "recurringPartial": "Created {{created}}/{{total}}, {{failed}} failed"
+      }
+    }
+  },
+  "adminManagement": {
+    "title": "Management",
+    "actions": {
+      "createClass": "Create Class",
+      "createClassType": "Create Class Type"
+    },
+    "tabs": {
+      "athletes": "Athletes",
+      "classes": "Classes",
+      "classTypes": "Class Types"
+    },
+    "classTypes": {
+      "filters": {
+        "showInactive": "Show inactive"
+      },
+      "table": {
+        "name": "Name",
+        "description": "Description",
+        "active": "Active",
+        "actions": "Actions"
+      },
+      "badges": {
+        "inactive": "Inactive"
+      },
+      "confirm": {
+        "deactivateTitle": "Deactivate class type",
+        "deactivateMessage": "Existing and future classes will still reference this type. Continue?",
+        "deleteTitle": "Delete class type",
+        "deleteMessage": "Delete \"{{name}}\"? This cannot be undone."
+      },
+      "errors": {
+        "load": "Failed to load class types",
+        "update": "Failed to update class type",
+        "delete": "Failed to delete class type"
+      }
+    },
+    "classTypeDialog": {
+      "title": "Create Class Type",
+      "fields": {
+        "trainer": "Trainer",
+        "name": "Name",
+        "description": "Description"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "createFailed": "Failed to create class type"
+      },
+      "messages": {
+        "created": "Class type created successfully"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "create": "Create"
+      }
+    }
+  },
+  "schedule": {
+    "list": {
+      "title": "Class Schedule",
+      "actions": {
+        "openDialog": "Schedule Class"
+      },
+      "filters": {
+        "month": "Month",
+        "class": "Class",
+        "allClasses": "All Classes"
+      },
+      "table": {
+        "class": "Class",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "status": "Status",
+        "actions": "Actions",
+        "statusActive": "Active",
+        "statusCancelled": "Cancelled"
+      },
+      "errors": {
+        "loadClasses": "Error loading classes",
+        "loadSchedules": "Error loading schedules",
+        "create": "Error creating schedule",
+        "cancel": "Error cancelling class"
+      },
+      "messages": {
+        "created": "Schedule created successfully",
+        "cancelled": "Class cancelled successfully"
+      },
+      "confirm": {
+        "cancel": "Are you sure you want to cancel this class?"
+      }
+    },
+    "dialog": {
+      "title": "Schedule Class",
+      "fields": {
+        "class": "Class",
+        "startDate": "Start Time",
+        "startTime": "Time"
+      },
+      "errors": {
+        "classRequired": "Class is required",
+        "dateRequired": "Date is required",
+        "timeRequired": "Time is required"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "submit": "Schedule"
+      }
+    }
+  },
+  "nav": {
+    "calendar": "Classes",
+    "history": "History",
+    "profile": "Profile",
+    "admin": "Admin",
+    "logout": "Logout"
+  },
+  "header": {
+    "quickLogin": "Quick login"
+  }
+}

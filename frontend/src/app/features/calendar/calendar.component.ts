@@ -15,12 +15,13 @@ import { GymClass } from '../../core/models/gym-class.model';
 import { ClassType } from '../../core/models/class-type.model';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../../core/services/user.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import type { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, FullCalendarModule],
+  imports: [CommonModule, FormsModule, FullCalendarModule, TranslateModule],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
 })
@@ -52,7 +53,8 @@ export class CalendarComponent implements OnInit {
     private classTypeService: ClassTypeService,
     private bookingService: BookingService,
     private kc: KeycloakService,
-    private users: UserService
+    private users: UserService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -126,7 +128,7 @@ export class CalendarComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading data:', err);
-        alert('Failed to load calendar data. Please refresh the page.');
+        alert(this.translate.instant('calendar.errors.loadData'));
       }
     });
   }
@@ -215,27 +217,39 @@ export class CalendarComponent implements OnInit {
     if (!this.selectedClass) return;
     if (!(this.kc.isReady() && this.kc.isAuthenticated())) {
       console.warn('Booking attempted while unauthenticated');
-      this.showToast('Please log in to book a class.', 'info');
+      this.showToast(
+        this.translate.instant('calendar.messages.loginRequired'),
+        'info'
+      );
       return;
     }
     // Prevent self booking for admin/instructor roles
     if (this.isAdmin || this.isInstructor) {
       // Redundant guard (button hidden) but keep server-side safety feedback
-      this.showToast('Staff cannot self-book. Use Management to book for an athlete.', 'error');
+      this.showToast(
+        this.translate.instant('calendar.messages.staffCannotBook'),
+        'error'
+      );
       return;
     }
 
     this.bookingService.createBooking(this.selectedClass.id).subscribe({
       next: () => {
         console.log('Booking successful');
-        this.showToast('Successfully booked! Remember: cancellations within 12 hours may be charged.', 'success');
+        this.showToast(
+          this.translate.instant('calendar.messages.bookingSuccess'),
+          'success'
+        );
         this.closeModal();
         this.loadData(); // Refresh data
       },
       error: (err) => {
         console.error('Error booking class:', err);
-        const message = err.error?.message || 'Failed to book class. The class may be full or you may already be registered.';
-        this.showToast(message, 'error');
+        const raw = err.error?.message || err.error;
+        const key = raw === 'BOOKING_ALREADY_EXISTS'
+          ? 'calendar.messages.alreadyBooked'
+          : 'calendar.errors.bookingFailed';
+        this.showToast(this.translate.instant(key), 'error');
       }
     });
   }

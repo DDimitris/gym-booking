@@ -5,11 +5,12 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { KeycloakService } from './core/services/keycloak.service';
 import { UserService } from './core/services/user.service';
 import { environment } from '../environments/environment';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslateModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -20,8 +21,13 @@ export class AppComponent implements OnInit {
   currentYear = new Date().getFullYear();
   mobileMenuOpen = false;
   theme: 'dark' | 'light' = 'dark';
+  currentLang: 'en' | 'el' = 'en';
 
-  constructor(public kc: KeycloakService, private users: UserService) {}
+  constructor(
+    public kc: KeycloakService,
+    private users: UserService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     // Best-effort backend role fetch to drive UI visibility after promotions
@@ -34,6 +40,11 @@ export class AppComponent implements OnInit {
     // Theme preference
     const pref = (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
     this.applyTheme(pref);
+
+    // Language preference
+    const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'en';
+    this.currentLang = storedLang;
+    this.translate.use(storedLang);
   }
 
   async logout() {
@@ -92,6 +103,15 @@ export class AppComponent implements OnInit {
 
   toggleTheme(): void {
     this.applyTheme(this.theme === 'dark' ? 'light' : 'dark');
+  }
+
+  setLang(lang: 'en' | 'el'): void {
+    if (this.currentLang === lang) {
+      return;
+    }
+    this.currentLang = lang;
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
   }
 
   private applyTheme(next: 'dark' | 'light'): void {

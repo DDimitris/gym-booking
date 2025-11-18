@@ -6,87 +6,100 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GymClass } from '../../core/models/gym-class.model';
 import { UserService } from '../../core/services/user.service';
 import { User } from '../../core/models/user.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-gym-class-dialog',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [CommonModule, SharedModule, TranslateModule],
   template: `
-    <h2 mat-dialog-title>{{data ? 'Edit' : 'Create'}} Gym Class</h2>
+    <h2 mat-dialog-title>
+      {{
+        data
+          ? ('gymClasses.dialog.titleEdit' | translate)
+          : ('gymClasses.dialog.titleCreate' | translate)
+      }}
+    </h2>
     <form [formGroup]="classForm" (ngSubmit)="onSubmit()">
       <mat-dialog-content>
         <mat-form-field appearance="outline">
-          <mat-label>Name</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.name' | translate }}</mat-label>
           <input matInput formControlName="name" required>
           <mat-error *ngIf="classForm.get('name')?.hasError('required')">
-            Name is required
+            {{ 'gymClasses.dialog.errors.nameRequired' | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.description' | translate }}</mat-label>
           <textarea matInput formControlName="description" rows="3"></textarea>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Capacity</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.capacity' | translate }}</mat-label>
           <input matInput type="number" formControlName="capacity" required>
           <mat-error *ngIf="classForm.get('capacity')?.hasError('required')">
-            Capacity is required
+            {{ 'gymClasses.dialog.errors.capacityRequired' | translate }}
           </mat-error>
           <mat-error *ngIf="classForm.get('capacity')?.hasError('min')">
-            Capacity must be at least 1
+            {{ 'gymClasses.dialog.errors.capacityMin' | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Duration (minutes)</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.durationMinutes' | translate }}</mat-label>
           <input matInput type="number" formControlName="durationMinutes" required>
           <mat-error *ngIf="classForm.get('durationMinutes')?.hasError('required')">
-            Duration is required
+            {{ 'gymClasses.dialog.errors.durationRequired' | translate }}
           </mat-error>
           <mat-error *ngIf="classForm.get('durationMinutes')?.hasError('min')">
-            Duration must be at least 15 minutes
+            {{ 'gymClasses.dialog.errors.durationMin' | translate }}
           </mat-error>
         </mat-form-field>
 
         <div class="datetime-row">
           <mat-form-field appearance="outline" class="date-field">
-            <mat-label>Date</mat-label>
+            <mat-label>{{ 'gymClasses.dialog.fields.date' | translate }}</mat-label>
             <input matInput [matDatepicker]="datePicker" formControlName="date" required>
             <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
             <mat-datepicker #datePicker></mat-datepicker>
             <mat-error *ngIf="classForm.get('date')?.hasError('required')">
-              Date is required
+              {{ 'gymClasses.dialog.errors.dateRequired' | translate }}
             </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="time-field">
-            <mat-label>Start Time</mat-label>
+            <mat-label>{{ 'gymClasses.dialog.fields.startTime' | translate }}</mat-label>
             <input matInput type="time" formControlName="startTime" required>
             <mat-error *ngIf="classForm.get('startTime')?.hasError('required')">
-              Start time is required
+              {{ 'gymClasses.dialog.errors.startTimeRequired' | translate }}
             </mat-error>
           </mat-form-field>
         </div>
 
         <mat-form-field appearance="outline">
-          <mat-label>Trainer</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.trainer' | translate }}</mat-label>
           <mat-select formControlName="trainerId" required>
             <mat-option *ngFor="let trainer of trainers" [value]="trainer.id">
               {{trainer.name}}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="classForm.get('trainerId')?.hasError('required')">
-            Trainer is required
+            {{ 'gymClasses.dialog.errors.trainerRequired' | translate }}
           </mat-error>
         </mat-form-field>
       </mat-dialog-content>
 
       <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button mat-dialog-close>
+          {{ 'gymClasses.dialog.actions.cancel' | translate }}
+        </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="classForm.invalid">
-          {{data ? 'Update' : 'Create'}}
+          {{
+            data
+              ? ('gymClasses.dialog.actions.update' | translate)
+              : ('gymClasses.dialog.actions.create' | translate)
+          }}
         </button>
       </mat-dialog-actions>
     </form>
@@ -121,6 +134,7 @@ export class GymClassDialogComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<GymClassDialogComponent>,
     private userService: UserService,
+    private translate: TranslateService,
     @Inject(MAT_DIALOG_DATA) public data: GymClass | null
   ) {
     this.classForm = this.fb.group({

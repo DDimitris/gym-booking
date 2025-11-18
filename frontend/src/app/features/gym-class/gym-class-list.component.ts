@@ -11,24 +11,33 @@ import { KeycloakService } from '../../core/services/keycloak.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-gym-class-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule],
+  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule],
   template: `
     <div class="container">
       <div class="header">
-        <h1>Gym Classes</h1>
+        <h1>{{ 'gymClasses.list.title' | translate }}</h1>
       </div>
 
       <mat-form-field>
-        <mat-label>Search Classes</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Yoga" #input>
+        <mat-label>{{ 'gymClasses.list.searchLabel' | translate }}</mat-label>
+        <input
+          matInput
+          (keyup)="applyFilter($event)"
+          [placeholder]="'gymClasses.list.searchPlaceholder' | translate"
+          #input
+        />
       </mat-form-field>
 
       <div class="controls">
-        <mat-slide-toggle [(ngModel)]="showPast" (change)="computeGroups()">Show past</mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="showPast" (change)="computeGroups()">
+          {{ 'gymClasses.list.showPast' | translate }}
+        </mat-slide-toggle>
       </div>
 
       <mat-accordion multi>
@@ -38,7 +47,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               {{ group.date | date:'EEE, dd MMM yyyy' }}
             </mat-panel-title>
             <mat-panel-description>
-              {{ group.items.length }} class(es)
+              {{ 'gymClasses.list.daySummary' | translate:{ count: group.items.length } }}
             </mat-panel-description>
           </mat-expansion-panel-header>
 
@@ -58,10 +67,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                 <button mat-icon-button color="warn" (click)="deleteClass(c.id)" *ngIf="canManage()">
                   <mat-icon>delete</mat-icon>
                 </button>
-                <button mat-icon-button (click)="openAttendees(c)" matTooltip="View attendees">
+                <button mat-icon-button (click)="openAttendees(c)" [matTooltip]="'gymClasses.list.tooltips.viewAttendees' | translate">
                   <mat-icon>group</mat-icon>
                 </button>
-                <button mat-icon-button (click)="openBookForDialog(c)" *ngIf="canBookForOthers()" matTooltip="Book for user">
+                <button
+                  mat-icon-button
+                  (click)="openBookForDialog(c)"
+                  *ngIf="canBookForOthers()"
+                  [matTooltip]="'gymClasses.list.tooltips.bookForUser' | translate"
+                >
                   <mat-icon>person_add</mat-icon>
                 </button>
               </div>
@@ -121,7 +135,8 @@ export class GymClassListComponent implements OnInit {
     private userService: UserService,
     private kc: KeycloakService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -136,9 +151,13 @@ export class GymClassListComponent implements OnInit {
         this.computeGroups();
       },
       error: (error) => {
-        this.snackBar.open('Error loading classes', 'Close', {
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.errors.loadClasses'),
+          this.translate.instant('common.close'),
+          {
           duration: 3000
-        });
+          }
+        );
       }
     });
   }
@@ -156,10 +175,16 @@ export class GymClassListComponent implements OnInit {
     this.bookingService.getClassBookings(gymClass.id).subscribe({
       next: (bookings) => {
         const list = bookings.map(b => `${b.userName || ('User#'+b.userId)}`).join('\n');
-        alert(list ? `Attendees for ${gymClass.name}:\n\n${list}` : `No attendees yet for ${gymClass.name}.`);
+        const title = this.translate.instant('gymClasses.list.prompts.attendeesTitle', { name: gymClass.name });
+        const noAttendees = this.translate.instant('gymClasses.list.prompts.noAttendees', { name: gymClass.name });
+        alert(list ? `${title}:\n\n${list}` : noAttendees);
       },
       error: () => {
-        this.snackBar.open('Failed to load attendees', 'Close', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.errors.loadAttendees'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
       }
     });
   }
@@ -169,29 +194,42 @@ export class GymClassListComponent implements OnInit {
     this.userService.getAllMembers().subscribe({
       next: (members) => {
         if (!members.length) {
-          alert('No members available to book for.');
+          alert(this.translate.instant('gymClasses.list.prompts.noMembers'));
           return;
         }
         const options = members.map(a => `${a.id}: ${a.name || a.email || ('User#'+a.id)}`).join('\n');
-        const input = prompt(`Select member ID to book for class "${gymClass.name}":\n\n${options}`);
+        const promptTitle = this.translate.instant('gymClasses.list.prompts.selectMemberTitle', { name: gymClass.name });
+        const input = prompt(`${promptTitle}:\n\n${options}`);
         if (!input) return;
         const chosenId = parseInt(input, 10);
         if (!members.some(a => a.id === chosenId)) {
-          alert('Invalid member ID.');
+          alert(this.translate.instant('gymClasses.list.prompts.invalidMemberId'));
           return;
         }
         this.bookingService.createBookingForUser(gymClass.id, chosenId).subscribe({
           next: () => {
-            this.snackBar.open('Booking created for member', 'Close', { duration: 3000 });
+            this.snackBar.open(
+              this.translate.instant('gymClasses.list.messages.bookingCreated'),
+              this.translate.instant('common.close'),
+              { duration: 3000 }
+            );
           },
           error: (err) => {
             console.error(err);
-            this.snackBar.open('Failed to create booking', 'Close', { duration: 3000 });
+            this.snackBar.open(
+              this.translate.instant('gymClasses.list.errors.createBooking'),
+              this.translate.instant('common.close'),
+              { duration: 3000 }
+            );
           }
         });
       },
       error: () => {
-        this.snackBar.open('Failed to load members', 'Close', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.errors.loadMembers'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
       }
     });
   }
@@ -215,14 +253,18 @@ export class GymClassListComponent implements OnInit {
         this.gymClassService.createGymClass(result).subscribe({
           next: () => {
             this.loadClasses();
-            this.snackBar.open('Class created successfully', 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open(
+              this.translate.instant('gymClasses.list.messages.classCreated'),
+              this.translate.instant('common.close'),
+              { duration: 3000 }
+            );
           },
           error: (error) => {
-            this.snackBar.open('Error creating class', 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open(
+              this.translate.instant('gymClasses.list.errors.createClass'),
+              this.translate.instant('common.close'),
+              { duration: 3000 }
+            );
           }
         });
       }
@@ -240,14 +282,18 @@ export class GymClassListComponent implements OnInit {
         this.gymClassService.updateGymClass(gymClass.id, result).subscribe({
           next: () => {
             this.loadClasses();
-            this.snackBar.open('Class updated successfully', 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open(
+              this.translate.instant('gymClasses.list.messages.classUpdated'),
+              this.translate.instant('common.close'),
+              { duration: 3000 }
+            );
           },
           error: (error) => {
-            this.snackBar.open('Error updating class', 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open(
+              this.translate.instant('gymClasses.list.errors.updateClass'),
+              this.translate.instant('common.close'),
+              { duration: 3000 }
+            );
           }
         });
       }
@@ -255,18 +301,22 @@ export class GymClassListComponent implements OnInit {
   }
 
   deleteClass(id: number): void {
-    if (confirm('Are you sure you want to cancel this class? All existing bookings will be marked as cancelled by the gym and no charges will apply.')) {
+    if (confirm(this.translate.instant('gymClasses.list.confirm.cancelClass'))) {
       this.gymClassService.deleteGymClass(id).subscribe({
         next: () => {
           this.loadClasses();
-          this.snackBar.open('Class cancelled by administrator', 'Close', {
-            duration: 3000
-          });
+          this.snackBar.open(
+            this.translate.instant('gymClasses.list.messages.classCancelled'),
+            this.translate.instant('common.close'),
+            { duration: 3000 }
+          );
         },
         error: (error) => {
-          this.snackBar.open('Error cancelling class', 'Close', {
-            duration: 3000
-          });
+          this.snackBar.open(
+            this.translate.instant('gymClasses.list.errors.cancelClass'),
+            this.translate.instant('common.close'),
+            { duration: 3000 }
+          );
         }
       });
     }

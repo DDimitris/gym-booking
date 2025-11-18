@@ -1,9 +1,9 @@
 <div class="admin-athletes-container">
   <div class="page-header">
-    <h1>Member Management</h1>
+    <h1>{{ "adminAthletes.title" | translate }}</h1>
     <div class="header-actions">
       <button class="btn-secondary" routerLink="/admin/billing">
-        View All Billing
+        {{ "adminAthletes.actions.viewAllBilling" | translate }}
       </button>
     </div>
   </div>
@@ -13,15 +13,21 @@
       type="text"
       [(ngModel)]="searchTerm"
       (ngModelChange)="onSearchChange()"
-      placeholder="Search by name or email..."
+      [placeholder]="'adminAthletes.search.placeholder' | translate"
       class="search-input"
     />
-    <button class="btn-secondary" (click)="loadAllUsers()" title="Refresh list">
-      🔄 Refresh
+    <button
+      class="btn-secondary"
+      (click)="loadAllUsers()"
+      [title]="'adminAthletes.actions.refreshTooltip' | translate"
+    >
+      🔄 {{ "adminAthletes.actions.refresh" | translate }}
     </button>
   </div>
 
-  <div *ngIf="isLoading" class="loading">Loading users...</div>
+  <div *ngIf="isLoading" class="loading">
+    {{ "adminAthletes.loading" | translate }}
+  </div>
 
   <div
     *ngIf="
@@ -31,86 +37,104 @@
     "
     class="empty-state"
   >
-    <p *ngIf="searchTerm">No users found matching "{{ searchTerm }}"</p>
-    <p *ngIf="!searchTerm">No users found.</p>
+    <p *ngIf="searchTerm">
+      {{ "adminAthletes.empty.withSearch" | translate : { term: searchTerm } }}
+    </p>
+    <p *ngIf="!searchTerm">
+      {{ "adminAthletes.empty.noSearch" | translate }}
+    </p>
   </div>
 
   <div
     *ngIf="!isLoading && filteredMembers.length > 0"
     class="athletes-table-container"
   >
-    <h2>Members</h2>
+    <h2>{{ "adminAthletes.sections.members" | translate }}</h2>
     <table class="athletes-table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Base Cost</th>
-          <th>Bonus Days</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{{ "adminAthletes.table.name" | translate }}</th>
+          <th>{{ "adminAthletes.table.email" | translate }}</th>
+          <th>{{ "adminAthletes.table.role" | translate }}</th>
+          <th>{{ "adminAthletes.table.baseCost" | translate }}</th>
+          <th>{{ "adminAthletes.table.bonusDays" | translate }}</th>
+          <th>{{ "adminAthletes.table.status" | translate }}</th>
+          <th>{{ "adminAthletes.table.actions" | translate }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let u of filteredMembers">
-          <td class="name-cell" [attr.data-label]="'Name'">{{ u.name }}</td>
-          <td [attr.data-label]="'Email'">{{ u.email }}</td>
-          <td [attr.data-label]="'Role'">
+          <td
+            class="name-cell"
+            [attr.data-label]="'adminAthletes.table.name' | translate"
+          >
+            {{ u.name }}
+          </td>
+          <td [attr.data-label]="'adminAthletes.table.email' | translate">
+            {{ u.email }}
+          </td>
+          <td [attr.data-label]="'adminAthletes.table.role' | translate">
             <span
               class="role-badge"
               [ngClass]="'role-' + u.role.toLowerCase()"
               >{{ u.role }}</span
             >
           </td>
-          <td [attr.data-label]="'Base Cost'">€{{ u.baseCost || 0 }}</td>
-          <td [attr.data-label]="'Bonus Days'">{{ u.bonusDays || 0 }}</td>
-          <td [attr.data-label]="'Status'">
+          <td [attr.data-label]="'adminAthletes.table.baseCost' | translate">
+            €{{ u.baseCost || 0 }}
+          </td>
+          <td [attr.data-label]="'adminAthletes.table.bonusDays' | translate">
+            {{ u.bonusDays || 0 }}
+          </td>
+          <td [attr.data-label]="'adminAthletes.table.status' | translate">
             <span
               class="status-badge"
               [ngClass]="'status-' + (u.status || 'ACTIVE').toLowerCase()"
               >{{ u.status || "ACTIVE" }}</span
             >
           </td>
-          <td class="action-cell" [attr.data-label]="'Actions'">
+          <td
+            class="action-cell"
+            [attr.data-label]="'adminAthletes.table.actions' | translate"
+          >
             <div class="action-buttons">
               <button
                 *ngIf="u.role === 'MEMBER'"
                 class="btn-small btn-primary"
                 (click)="openBaseCostModal(u)"
-                title="Set Base Cost"
+                [title]="'adminAthletes.actions.setCostTooltip' | translate"
               >
-                💲 Set Cost
+                💲 {{ "adminAthletes.actions.setCost" | translate }}
               </button>
               <button
                 *ngIf="u.role === 'MEMBER'"
                 class="btn-small btn-success"
                 (click)="openBonusDaysModal(u)"
-                title="Assign Bonus Days"
+                [title]="'adminAthletes.actions.bonusTooltip' | translate"
               >
-                🎁 Bonus
+                🎁 {{ "adminAthletes.actions.bonus" | translate }}
               </button>
               <button
                 class="btn-small btn-info"
                 (click)="viewBilling(u)"
-                title="View Billing"
+                [title]="'adminAthletes.actions.billingTooltip' | translate"
               >
-                📊 Billing
+                📊 {{ "adminAthletes.actions.billing" | translate }}
               </button>
               <button
                 *ngIf="u.role === 'MEMBER'"
                 class="btn-small btn-warning"
                 (click)="openPromoteModal(u)"
-                title="Promote to Trainer"
+                [title]="'adminAthletes.actions.promoteTooltip' | translate"
               >
-                ⬆️ Promote
+                ⬆️ {{ "adminAthletes.actions.promote" | translate }}
               </button>
               <button
                 class="btn-small btn-danger"
                 (click)="deleteUser(u)"
-                title="Delete User"
+                [title]="'adminAthletes.actions.deleteTooltip' | translate"
               >
-                🗑️ Delete
+                🗑️ {{ "adminAthletes.actions.delete" | translate }}
               </button>
             </div>
           </td>
@@ -123,39 +147,49 @@
     *ngIf="!isLoading && filteredTrainers.length > 0"
     class="athletes-table-container"
   >
-    <h2>Trainers</h2>
+    <h2>{{ "adminAthletes.sections.trainers" | translate }}</h2>
     <table class="athletes-table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{{ "adminAthletes.table.name" | translate }}</th>
+          <th>{{ "adminAthletes.table.email" | translate }}</th>
+          <th>{{ "adminAthletes.table.role" | translate }}</th>
+          <th>{{ "adminAthletes.table.status" | translate }}</th>
+          <th>{{ "adminAthletes.table.actions" | translate }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let t of filteredTrainers">
-          <td class="name-cell" [attr.data-label]="'Name'">{{ t.name }}</td>
-          <td [attr.data-label]="'Email'">{{ t.email }}</td>
-          <td [attr.data-label]="'Role'">
+          <td
+            class="name-cell"
+            [attr.data-label]="'adminAthletes.table.name' | translate"
+          >
+            {{ t.name }}
+          </td>
+          <td [attr.data-label]="'adminAthletes.table.email' | translate">
+            {{ t.email }}
+          </td>
+          <td [attr.data-label]="'adminAthletes.table.role' | translate">
             <span class="role-badge role-trainer">TRAINER</span>
           </td>
-          <td [attr.data-label]="'Status'">
+          <td [attr.data-label]="'adminAthletes.table.status' | translate">
             <span
               class="status-badge"
               [ngClass]="'status-' + (t.status || 'ACTIVE').toLowerCase()"
               >{{ t.status || "ACTIVE" }}</span
             >
           </td>
-          <td class="action-cell" [attr.data-label]="'Actions'">
+          <td
+            class="action-cell"
+            [attr.data-label]="'adminAthletes.table.actions' | translate"
+          >
             <div class="action-buttons">
               <button
                 class="btn-small btn-danger"
                 (click)="deleteUser(t)"
-                title="Delete User"
+                [title]="'adminAthletes.actions.deleteTooltip' | translate"
               >
-                🗑️ Delete
+                🗑️ {{ "adminAthletes.actions.delete" | translate }}
               </button>
             </div>
           </td>
@@ -172,10 +206,18 @@
       </div>
       <div class="modal-body">
         <div *ngIf="selectedMember">
-          <p><strong>Member:</strong> {{ selectedMember.name }}</p>
-          <p><strong>Email:</strong> {{ selectedMember.email }}</p>
+          <p>
+            <strong>{{ "adminAthletes.modal.memberLabel" | translate }}</strong>
+            {{ selectedMember.name }}
+          </p>
+          <p>
+            <strong>{{ "adminAthletes.modal.emailLabel" | translate }}</strong>
+            {{ selectedMember.email }}
+          </p>
           <div *ngIf="modalMode === 'baseCost'" class="form-group">
-            <label>Base Cost per Class (€):</label>
+            <label>{{
+              "adminAthletes.modal.baseCost.label" | translate
+            }}</label>
             <input
               type="number"
               [(ngModel)]="inputValue"
@@ -183,12 +225,14 @@
               step="0.01"
               class="form-input"
             />
-            <small
-              >This is the amount charged for same-day cancellations.</small
-            >
+            <small>
+              {{ "adminAthletes.modal.baseCost.hint" | translate }}
+            </small>
           </div>
           <div *ngIf="modalMode === 'bonusDays'" class="form-group">
-            <label>Bonus Days:</label>
+            <label>{{
+              "adminAthletes.modal.bonusDays.label" | translate
+            }}</label>
             <input
               type="number"
               [(ngModel)]="inputValue"
@@ -196,21 +240,36 @@
               step="1"
               class="form-input"
             />
-            <small>Number of free classes without cancellation charges.</small>
+            <small>
+              {{ "adminAthletes.modal.bonusDays.hint" | translate }}
+            </small>
           </div>
           <div *ngIf="modalMode === 'promote'" class="confirm-message">
             <p>
-              ⚠️ Are you sure you want to promote
-              <strong>{{ selectedMember.name }}</strong> to Trainer?
+              {{
+                "adminAthletes.modal.promote.confirm"
+                  | translate
+                    : {
+                        name: selectedMember.name
+                      }
+              }}
             </p>
-            <p>This will allow them to create and manage gym classes.</p>
+            <p>
+              {{ "adminAthletes.modal.promote.hint" | translate }}
+            </p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn-secondary" (click)="closeModal()">
+          {{ "adminAthletes.modal.actions.cancel" | translate }}
+        </button>
         <button class="btn-primary" (click)="saveChanges()">
-          {{ modalMode === "promote" ? "Promote" : "Save" }}
+          {{
+            modalMode === "promote"
+              ? ("adminAthletes.modal.actions.promote" | translate)
+              : ("adminAthletes.modal.actions.save" | translate)
+          }}
         </button>
       </div>
     </div>

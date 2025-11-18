@@ -5,11 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
 import { KeycloakService } from '../../../core/services/keycloak.service';
 import { BillingReport } from '../../../core/models/billing.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-admin-billing',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './admin-billing.component.html',
   styleUrls: ['./admin-billing.component.css']
 })
@@ -27,7 +28,8 @@ export class AdminBillingComponent implements OnInit {
     private adminService: AdminService,
     private kc: KeycloakService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {

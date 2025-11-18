@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 type UserRole = 'ADMIN' | 'TRAINER' | 'MEMBER';
 type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
@@ -20,7 +21,7 @@ interface UserMe {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
