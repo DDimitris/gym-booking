@@ -30,15 +30,17 @@ public class BillingService {
 
     private BigDecimal resolveBaseCostForClass(User user, GymClass gymClass) {
         if (gymClass == null || gymClass.getKind() == null) {
-            return user.getBaseCost() != null ? user.getBaseCost() : BigDecimal.ZERO;
+            return BigDecimal.ZERO;
         }
 
-        return switch (gymClass.getKind()) {
+        BigDecimal amount = switch (gymClass.getKind()) {
             case GROUP -> user.getGroupBaseCost();
             case SMALL_GROUP -> user.getSmallGroupBaseCost();
             case PERSONAL -> user.getPersonalBaseCost();
             case OPEN_GYM -> user.getOpenGymBaseCost();
         };
+
+        return amount != null ? amount : BigDecimal.ZERO;
     }
 
     /**

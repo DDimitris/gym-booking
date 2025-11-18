@@ -38,6 +38,7 @@
     },
     "labels": {
       "type": "Type:",
+      "kind": "Kind:",
       "start": "Start:",
       "end": "End:",
       "location": "Location:",
@@ -130,8 +131,6 @@
       "viewAllBilling": "View All Billing",
       "refresh": "Refresh",
       "refreshTooltip": "Reload users from server",
-      "setCost": "Set Cost",
-      "setCostTooltip": "Set base cost per class",
       "setKindCostsTooltip": "Set base costs per class kind",
       "bonus": "Bonus",
       "bonusTooltip": "Assign bonus days",
@@ -158,24 +157,18 @@
       "name": "Name",
       "email": "Email",
       "role": "Role",
-      "baseCost": "Base Cost",
       "bonusDays": "Bonus Days",
       "status": "Status",
       "actions": "Actions"
     },
     "modal": {
       "titles": {
-        "baseCost": "Set Base Cost",
         "kindCosts": "Set Costs per Class Kind",
         "bonusDays": "Assign Bonus Days",
         "promote": "Promote Member"
       },
       "memberLabel": "Member:",
       "emailLabel": "Email:",
-      "baseCost": {
-        "label": "Base Cost per Class (€):",
-        "hint": "This is the amount charged for same-day cancellations."
-      },
       "kindCosts": {
         "label": "Base cost per class kind (€):",
         "hint": "These amounts are used to calculate charges based on the kind of class (group, small group, personal, open gym). Leave 0 to fall back to the default base cost."
@@ -228,7 +221,6 @@
       "markSelectedPaid": "Mark selected as paid ({{count}})"
     },
     "report": {
-      "baseCost": "Base Cost:",
       "bonusDays": "Bonus Days:",
       "totalOwed": "Total Owed",
       "noEvents": "No billing events in this period."

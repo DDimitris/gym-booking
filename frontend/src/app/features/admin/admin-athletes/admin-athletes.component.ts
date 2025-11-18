@@ -24,7 +24,7 @@ export class AdminAthletesComponent implements OnInit {
   
   // Modal state
   showModal = false;
-  modalMode: 'baseCost' | 'kindCosts' | 'bonusDays' | 'promote' | null = null;
+  modalMode: 'kindCosts' | 'bonusDays' | 'promote' | null = null;
   selectedMember: User | null = null;
   inputValue = 0;
   kindCosts = {
@@ -87,13 +87,6 @@ export class AdminAthletesComponent implements OnInit {
 
   // Removed separate trainers load; consolidated in loadAllUsers
 
-  openBaseCostModal(member: User): void {
-    this.selectedMember = member;
-    this.inputValue = member.baseCost || 0;
-    this.modalMode = 'baseCost';
-    this.showModal = true;
-  }
-
   openKindCostsModal(member: User): void {
     this.selectedMember = member;
     this.kindCosts = {
@@ -135,26 +128,7 @@ export class AdminAthletesComponent implements OnInit {
   saveChanges(): void {
     if (!this.selectedMember) return;
 
-  if (this.modalMode === 'baseCost') {
-      this.adminService.setBaseCost(this.selectedMember.id, this.inputValue).subscribe({
-        next: () => {
-          alert(
-            this.translate.instant('adminAthletes.messages.baseCostSet', {
-              value: this.inputValue,
-              name: this.selectedMember!.name
-            })
-          );
-          this.loadAllUsers();
-          this.closeModal();
-        },
-        error: (err) => {
-          console.error('Error setting base cost:', err);
-          alert(
-            this.translate.instant('adminAthletes.errors.setBaseCost')
-          );
-        }
-      });
-    } else if (this.modalMode === 'kindCosts') {
+    if (this.modalMode === 'kindCosts') {
       this.adminService.setMemberBaseCosts(this.selectedMember.id, this.kindCosts).subscribe({
         next: () => {
           alert(
@@ -243,9 +217,6 @@ export class AdminAthletesComponent implements OnInit {
   }
 
   get modalTitle(): string {
-    if (this.modalMode === 'baseCost') {
-      return this.translate.instant('adminAthletes.modal.titles.baseCost');
-    }
     if (this.modalMode === 'kindCosts') {
       return this.translate.instant('adminAthletes.modal.titles.kindCosts');
     }

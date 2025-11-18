@@ -87,10 +87,6 @@
             <h3>{{ report.userName }}</h3>
             <div class="report-meta">
               <span>
-                {{ "adminBilling.report.baseCost" | translate }}
-                €{{ report.baseCost }}
-              </span>
-              <span>
                 {{ "adminBilling.report.bonusDays" | translate }}
                 {{ report.bonusDays }}
               </span>
@@ -125,6 +121,7 @@
                 </th>
                 <th>{{ "adminBilling.table.date" | translate }}</th>
                 <th>{{ "adminBilling.table.classInstructor" | translate }}</th>
+                <th>{{ "gymClasses.dialog.fields.kind" | translate }}</th>
                 <th>{{ "adminBilling.table.reason" | translate }}</th>
                 <th>{{ "adminBilling.table.amount" | translate }}</th>
                 <th>{{ "adminBilling.table.status" | translate }}</th>
@@ -163,6 +160,11 @@
                       {{ event.instructorName }}
                     </div>
                   </div>
+                </td>
+                <td>
+                  <span *ngIf="classKindKey(event.classKind) as key">
+                    {{ key | translate }}
+                  </span>
                 </td>
                 <td>{{ event.reason }}</td>
                 <td>€{{ event.amount.toFixed(2) }}</td>

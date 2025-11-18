@@ -7,7 +7,6 @@ import java.util.List;
 public class BillingReportDTO {
     private Long userId;
     private String userName;
-    private BigDecimal baseCost;
     private Integer bonusDays;
     private BigDecimal totalOwed;
     private List<BillingEventSummary> events;
@@ -22,6 +21,7 @@ public class BillingReportDTO {
         private LocalDateTime eventDate;
         private Boolean settled;
         private com.gym.booking.model.BillingEvent.SettlementType settlementType;
+    private String classKind;
 
         // Getters and Setters
         public Long getId() {
@@ -95,6 +95,14 @@ public class BillingReportDTO {
         public void setSettlementType(com.gym.booking.model.BillingEvent.SettlementType settlementType) {
             this.settlementType = settlementType;
         }
+
+        public String getClassKind() {
+            return classKind;
+        }
+
+        public void setClassKind(String classKind) {
+            this.classKind = classKind;
+        }
     }
 
     // Getters and Setters
@@ -112,14 +120,6 @@ public class BillingReportDTO {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public BigDecimal getBaseCost() {
-        return baseCost;
-    }
-
-    public void setBaseCost(BigDecimal baseCost) {
-        this.baseCost = baseCost;
     }
 
     public Integer getBonusDays() {

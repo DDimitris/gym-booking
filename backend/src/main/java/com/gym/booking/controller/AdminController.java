@@ -157,9 +157,8 @@ public class AdminController {
         User user = userService.findById(userId);
 
         BillingReportDTO report = new BillingReportDTO();
-        report.setUserId(userId);
-        report.setUserName(user.getName());
-        report.setBaseCost(user.getBaseCost());
+    report.setUserId(userId);
+    report.setUserName(user.getName());
         report.setBonusDays(user.getBonusDays());
         report.setTotalOwed(totalOwed);
         report.setEvents(events.stream()
@@ -182,7 +181,6 @@ public class AdminController {
             BillingReportDTO dto = new BillingReportDTO();
             dto.setUserId(user.getId());
             dto.setUserName(user.getName());
-            dto.setBaseCost(user.getBaseCost());
             dto.setBonusDays(user.getBonusDays());
             dto.setTotalOwed(billingService.calculateTotalOwed(user.getId()));
             dto.setEvents(events.stream()
@@ -277,6 +275,9 @@ public class AdminController {
             summary.setBookingId(event.getBooking().getId());
             if (event.getBooking().getClassInstance() != null) {
                 summary.setClassName(event.getBooking().getClassInstance().getName());
+                if (event.getBooking().getClassInstance().getKind() != null) {
+                    summary.setClassKind(event.getBooking().getClassInstance().getKind().name());
+                }
                 if (event.getBooking().getClassInstance().getTrainer() != null) {
                     summary.setInstructorName(event.getBooking().getClassInstance().getTrainer().getName());
                 }

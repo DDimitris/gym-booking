@@ -106,15 +106,15 @@ export class AdminBillingComponent implements OnInit {
     }
 
     // Build CSV content
-  let csv = 'Member Name,Email,Base Cost,Bonus Days,Total Owed,Event Date,Amount,Reason,Settled\n';
+    let csv = 'Member Name,Email,Bonus Days,Total Owed,Event Date,Amount,Reason,Settled\n';
     
     this.reports.forEach(report => {
       if (report.events.length === 0) {
         // Include member even if no events
-        csv += `"${report.userName}","","€${report.baseCost}","${report.bonusDays}","€${report.totalOwed}","","","",""\n`;
+        csv += `"${report.userName}","","${report.bonusDays}","€${report.totalOwed}","","","",""\n`;
       } else {
         report.events.forEach(event => {
-          csv += `"${report.userName}","","€${report.baseCost}","${report.bonusDays}","€${report.totalOwed}","${event.eventDate}","€${event.amount}","${event.reason}","${event.settled ? 'Yes' : 'No'}"\n`;
+          csv += `"${report.userName}","","${report.bonusDays}","€${report.totalOwed}","${event.eventDate}","€${event.amount}","${event.reason}","${event.settled ? 'Yes' : 'No'}"\n`;
         });
       }
     });
@@ -139,6 +139,23 @@ export class AdminBillingComponent implements OnInit {
 
   get totalEventsCount(): number {
     return this.reports.reduce((sum, report) => sum + report.events.length, 0);
+  }
+
+  // Map backend classKind enum values to i18n keys
+  classKindKey(kind: string | null | undefined): string | null {
+    if (!kind) return null;
+    switch (kind) {
+      case 'GROUP':
+        return 'gymClasses.kinds.group';
+      case 'SMALL_GROUP':
+        return 'gymClasses.kinds.smallGroup';
+      case 'PERSONAL':
+        return 'gymClasses.kinds.personal';
+      case 'OPEN_GYM':
+        return 'gymClasses.kinds.openGym';
+      default:
+        return null;
+    }
   }
 
   // Selection helpers
