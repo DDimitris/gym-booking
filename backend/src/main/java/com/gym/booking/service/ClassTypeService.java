@@ -16,25 +16,15 @@ import java.util.List;
 @Transactional
 public class ClassTypeService {
     private final ClassTypeRepository classTypeRepository;
-    private final UserService userService;
     private final GymClassRepository gymClassRepository;
 
     public ClassTypeService(ClassTypeRepository classTypeRepository,
-            UserService userService,
             GymClassRepository gymClassRepository) {
         this.classTypeRepository = classTypeRepository;
-        this.userService = userService;
         this.gymClassRepository = gymClassRepository;
     }
 
-    public ClassType createClassType(@NonNull ClassType classType, Long trainerId) {
-        if (trainerId != null) {
-            User trainer = userService.findById(trainerId);
-            if (trainer.getRole() != User.UserRole.TRAINER) {
-                throw new IllegalArgumentException("Only trainers can be assigned to a class type");
-            }
-            classType.setTrainer(trainer);
-        }
+    public ClassType createClassType(@NonNull ClassType classType) {
         classType.setIsActive(true);
         return classTypeRepository.save(classType);
     }
@@ -65,11 +55,6 @@ public class ClassTypeService {
 
     public List<ClassType> findActiveClassTypes() {
         return classTypeRepository.findByIsActiveTrue();
-    }
-
-    public List<ClassType> findByTrainer(@NonNull Long trainerId) {
-        User trainer = userService.findById(trainerId);
-        return classTypeRepository.findByTrainer(trainer);
     }
 
     public ClassType findById(@NonNull Long id) {

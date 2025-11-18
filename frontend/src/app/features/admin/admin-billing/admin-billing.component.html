@@ -71,9 +71,11 @@
         [disabled]="selectedEventIds.size === 0"
       >
         {{
-          "adminBilling.bulk.markSelectedPaid" | translate : {
-            count: selectedEventIds.size
-          }
+          "adminBilling.bulk.markSelectedPaid"
+            | translate
+              : {
+                  count: selectedEventIds.size
+                }
         }}
       </button>
     </div>
