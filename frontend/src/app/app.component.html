@@ -6,7 +6,7 @@
         (click)="kc.isAuthenticated() ? null : kcLogin()"
       >
         <div class="logo">🏋️</div>
-        <span class="brand-text">{{ 'common.appTitle' | translate }}</span>
+        <span class="brand-text">{{ "common.appTitle" | translate }}</span>
       </div>
       <button
         class="menu-toggle"
@@ -21,16 +21,23 @@
         *ngIf="kc.isReady() && kc.isAuthenticated()"
         [class.open]="mobileMenuOpen"
       >
-        <a routerLink="/classes" routerLinkActive="active">{{ 'nav.calendar' | translate }}</a>
-        <a *ngIf="showHistory" routerLink="/history" routerLinkActive="active"
-          >{{ 'nav.history' | translate }}</a
+        <a routerLink="/classes" routerLinkActive="active">{{
+          "nav.calendar" | translate
+        }}</a>
+        <a
+          *ngIf="showHistory"
+          routerLink="/history"
+          routerLinkActive="active"
+          >{{ "nav.history" | translate }}</a
         >
-        <a routerLink="/profile" routerLinkActive="active">{{ 'nav.profile' | translate }}</a>
+        <a routerLink="/profile" routerLinkActive="active">{{
+          "nav.profile" | translate
+        }}</a>
         <a
           *ngIf="showManagement"
           routerLink="/admin/management"
           routerLinkActive="active"
-          >{{ 'nav.admin' | translate }}</a
+          >{{ "nav.admin" | translate }}</a
         >
       </nav>
       <div class="user-actions" *ngIf="kc.isReady()">
@@ -57,7 +64,9 @@
               ΕΛ
             </button>
           </div>
-          <button class="btn ghost" (click)="logout()">{{ 'nav.logout' | translate }}</button>
+          <button class="btn ghost" (click)="logout()">
+            {{ "nav.logout" | translate }}
+          </button>
           <button
             class="btn ghost toggle"
             (click)="toggleTheme()"
@@ -84,7 +93,9 @@
               ΕΛ
             </button>
           </div>
-          <button class="btn primary" (click)="kcLogin()">{{ 'header.quickLogin' | translate }}</button>
+          <button class="btn primary" (click)="kcLogin()">
+            {{ "header.quickLogin" | translate }}
+          </button>
           <button
             class="btn ghost toggle"
             (click)="toggleTheme()"

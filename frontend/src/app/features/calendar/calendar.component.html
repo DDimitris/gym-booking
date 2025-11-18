@@ -1,13 +1,13 @@
 <div class="calendar-container">
   <!-- simple toast -->
   <div *ngIf="toastMessage" class="toast" [ngClass]="toastType">
-    {{ toastMessage }}
+    {{ toastMessage | translate }}
   </div>
   <div class="calendar-header">
-    <h1>{{ 'calendar.title' | translate }}</h1>
+    <h1>{{ "calendar.title" | translate }}</h1>
     <div class="filter-section">
       <label for="classTypeFilter">
-        {{ 'calendar.filter.classType.label' | translate }}
+        {{ "calendar.filter.classType.label" | translate }}
       </label>
       <select
         id="classTypeFilter"
@@ -15,7 +15,7 @@
         (ngModelChange)="onClassTypeFilterChange()"
       >
         <option [ngValue]="null">
-          {{ 'calendar.filter.classType.all' | translate }}
+          {{ "calendar.filter.classType.all" | translate }}
         </option>
         <option *ngFor="let classType of classTypes" [ngValue]="classType.id">
           {{ classType.name }}
@@ -37,36 +37,42 @@
       <div class="modal-body">
         <div *ngIf="selectedClass">
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.type' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.type" | translate }}</strong>
             {{ classTypeName }}
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.description' | translate }}</strong>
-            {{ selectedClass.description || ("calendar.values.na" | translate) }}
+            <strong>{{
+              "calendar.modal.labels.description" | translate
+            }}</strong>
+            {{
+              selectedClass.description || ("calendar.values.na" | translate)
+            }}
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.start' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.start" | translate }}</strong>
             {{ selectedClass.startTime | date : "medium" }}
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.end' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.end" | translate }}</strong>
             {{ selectedClass.endTime | date : "medium" }}
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.duration' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.duration" | translate }}</strong>
             {{ selectedClass.durationMinutes }}
-            {{ 'calendar.modal.values.minutes' | translate }}
+            {{ "calendar.values.minutes" | translate }}
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.location' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.location" | translate }}</strong>
             {{ selectedClass.location || ("calendar.values.na" | translate) }}
           </div>
           <div class="detail-row" *ngIf="trainerName">
-            <strong>{{ 'calendar.modal.labels.trainer' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.trainer" | translate }}</strong>
             {{ trainerName }}
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.availableSpots' | translate }}</strong>
+            <strong>{{
+              "calendar.modal.labels.availableSpots" | translate
+            }}</strong>
             <span
               [class.text-danger]="isFull"
               [class.text-warning]="availableSpots <= 2 && !isFull"
@@ -75,26 +81,26 @@
             </span>
           </div>
           <div class="detail-row">
-            <strong>{{ 'calendar.modal.labels.status' | translate }}</strong>
+            <strong>{{ "calendar.modal.labels.status" | translate }}</strong>
             {{ selectedClass.status }}
           </div>
 
           <div *ngIf="isFull" class="alert alert-warning">
-            {{ 'calendar.modal.full' | translate }}
+            {{ "calendar.modal.full" | translate }}
           </div>
 
           <div class="billing-notice">
             <strong>
-              {{ 'calendar.modal.cancellation.title' | translate }}
+              {{ "calendar.modal.cancellation.title" | translate }}
             </strong>
-            {{ 'calendar.modal.cancellation.text' | translate }}
+            {{ "calendar.modal.cancellation.text" | translate }}
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn-secondary" (click)="closeModal()">
-          {{ 'calendar.modal.actions.close' | translate }}
+          {{ "calendar.modal.actions.close" | translate }}
         </button>
         <button
           class="btn-primary"
@@ -102,7 +108,7 @@
           [disabled]="isFull || selectedClass?.status !== 'SCHEDULED'"
           *ngIf="!(isAdmin || isInstructor)"
         >
-          {{ 'calendar.modal.actions.book' | translate }}
+          {{ "calendar.modal.actions.book" | translate }}
         </button>
       </div>
     </div>

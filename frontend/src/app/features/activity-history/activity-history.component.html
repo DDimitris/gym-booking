@@ -1,19 +1,21 @@
 <div class="activity-history-container">
-  <h1 *ngIf="!isInstructor">{{ 'activity.title.member' | translate }}</h1>
-  <h1 *ngIf="isInstructor">{{ 'activity.title.instructor' | translate }}</h1>
+  <h1 *ngIf="!isInstructor">{{ "activity.title.member" | translate }}</h1>
+  <h1 *ngIf="isInstructor">{{ "activity.title.instructor" | translate }}</h1>
 
   <div *ngIf="isLoading" class="loading">
-    {{ 'activity.loading' | translate }}
+    {{ "activity.loading" | translate }}
   </div>
 
   <div *ngIf="!isLoading">
     <!-- Instructor view: upcoming classes -->
     <section class="bookings-section" *ngIf="isInstructor">
       <h2>
-        {{ 'activity.upcoming.instructor.title' | translate }} ({{ upcomingClasses.length }})
+        {{ "activity.upcoming.instructor.title" | translate }} ({{
+          upcomingClasses.length
+        }})
       </h2>
       <div *ngIf="upcomingClasses.length === 0" class="empty-state">
-        {{ 'activity.upcoming.instructor.empty' | translate }}
+        {{ "activity.upcoming.instructor.empty" | translate }}
       </div>
       <div class="bookings-grid">
         <div *ngFor="let c of upcomingClasses" class="booking-card">
@@ -23,23 +25,23 @@
           </div>
           <div class="booking-details">
             <div class="detail-row">
-              <strong>{{ 'activity.labels.type' | translate }}</strong>
+              <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ getClassTypeName(c.classTypeId) }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.start' | translate }}</strong>
+              <strong>{{ "activity.labels.start" | translate }}</strong>
               {{ c.startTime | date : "medium" }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.end' | translate }}</strong>
+              <strong>{{ "activity.labels.end" | translate }}</strong>
               {{ c.endTime | date : "medium" }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.location' | translate }}</strong>
+              <strong>{{ "activity.labels.location" | translate }}</strong>
               {{ c.location || ("activity.values.tbd" | translate) }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.capacity' | translate }}</strong>
+              <strong>{{ "activity.labels.capacity" | translate }}</strong>
               {{ c.capacity }}
             </div>
           </div>
@@ -50,7 +52,9 @@
     <!-- Member view: upcoming bookings -->
     <section class="bookings-section" *ngIf="!isInstructor">
       <h2>
-        {{ 'activity.upcoming.member.title' | translate }} ({{ upcomingBookings.length }})
+        {{ "activity.upcoming.member.title" | translate }} ({{
+          upcomingBookings.length
+        }})
       </h2>
 
       <div *ngIf="upcomingBookings.length === 0" class="empty-state">
@@ -68,23 +72,26 @@
 
           <div class="booking-details">
             <div class="detail-row">
-              <strong>{{ 'activity.labels.type' | translate }}</strong>
+              <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ booking.classTypeName || ("activity.values.na" | translate) }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.start' | translate }}</strong>
+              <strong>{{ "activity.labels.start" | translate }}</strong>
               {{ booking.gymClass?.startTime | date : "medium" }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.end' | translate }}</strong>
+              <strong>{{ "activity.labels.end" | translate }}</strong>
               {{ booking.gymClass?.endTime | date : "medium" }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.location' | translate }}</strong>
-              {{ booking.gymClass?.location || ("activity.values.tbd" | translate) }}
+              <strong>{{ "activity.labels.location" | translate }}</strong>
+              {{
+                booking.gymClass?.location ||
+                  ("activity.values.tbd" | translate)
+              }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.booked' | translate }}</strong>
+              <strong>{{ "activity.labels.booked" | translate }}</strong>
               {{ booking.bookedAt | date : "short" }}
             </div>
           </div>
@@ -95,7 +102,7 @@
               class="btn-danger"
               (click)="cancelBooking(booking)"
             >
-              {{ 'activity.actions.cancelBooking' | translate }}
+              {{ "activity.actions.cancelBooking" | translate }}
             </button>
           </div>
         </div>
@@ -105,34 +112,36 @@
     <!-- Instructor view: past classes -->
     <section class="bookings-section" *ngIf="isInstructor">
       <h2>
-        {{ 'activity.past.instructor.title' | translate }} ({{ pastClasses.length }})
+        {{ "activity.past.instructor.title" | translate }} ({{
+          pastClasses.length
+        }})
       </h2>
       <div *ngIf="pastClasses.length === 0" class="empty-state">
-        {{ 'activity.past.instructor.empty' | translate }}
+        {{ "activity.past.instructor.empty" | translate }}
       </div>
       <div class="bookings-grid">
         <div *ngFor="let c of pastClasses" class="booking-card past">
           <div class="booking-header">
             <h3>{{ c.name }}</h3>
             <span class="badge badge-success">
-              {{ 'activity.status.completed' | translate }}
+              {{ "activity.status.completed" | translate }}
             </span>
           </div>
           <div class="booking-details">
             <div class="detail-row">
-              <strong>{{ 'activity.labels.type' | translate }}</strong>
+              <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ getClassTypeName(c.classTypeId) }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.date' | translate }}</strong>
+              <strong>{{ "activity.labels.date" | translate }}</strong>
               {{ c.startTime | date : "medium" }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.location' | translate }}</strong>
+              <strong>{{ "activity.labels.location" | translate }}</strong>
               {{ c.location || ("activity.values.tbd" | translate) }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.capacity' | translate }}</strong>
+              <strong>{{ "activity.labels.capacity" | translate }}</strong>
               {{ c.capacity }}
             </div>
           </div>
@@ -143,11 +152,13 @@
     <!-- Member view: past bookings -->
     <section class="bookings-section" *ngIf="!isInstructor">
       <h2>
-        {{ 'activity.past.member.title' | translate }} ({{ pastBookings.length }})
+        {{ "activity.past.member.title" | translate }} ({{
+          pastBookings.length
+        }})
       </h2>
 
       <div *ngIf="pastBookings.length === 0" class="empty-state">
-        {{ 'activity.past.member.empty' | translate }}
+        {{ "activity.past.member.empty" | translate }}
       </div>
 
       <div class="bookings-grid">
@@ -161,23 +172,26 @@
 
           <div class="booking-details">
             <div class="detail-row">
-              <strong>{{ 'activity.labels.type' | translate }}</strong>
+              <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ booking.classTypeName || ("activity.values.na" | translate) }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.date' | translate }}</strong>
+              <strong>{{ "activity.labels.date" | translate }}</strong>
               {{ booking.gymClass?.startTime | date : "medium" }}
             </div>
             <div class="detail-row">
-              <strong>{{ 'activity.labels.location' | translate }}</strong>
-              {{ booking.gymClass?.location || ("activity.values.tbd" | translate) }}
+              <strong>{{ "activity.labels.location" | translate }}</strong>
+              {{
+                booking.gymClass?.location ||
+                  ("activity.values.tbd" | translate)
+              }}
             </div>
             <div class="detail-row" *ngIf="booking.completedAt">
-              <strong>{{ 'activity.labels.completed' | translate }}</strong>
+              <strong>{{ "activity.labels.completed" | translate }}</strong>
               {{ booking.completedAt | date : "short" }}
             </div>
             <div class="detail-row" *ngIf="booking.cancelledAt">
-              <strong>{{ 'activity.labels.cancelled' | translate }}</strong>
+              <strong>{{ "activity.labels.cancelled" | translate }}</strong>
               {{ booking.cancelledAt | date : "short" }}
             </div>
           </div>

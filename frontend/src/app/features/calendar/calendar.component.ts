@@ -245,10 +245,11 @@ export class CalendarComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error booking class:', err);
-        const message =
-          err.error?.message ||
-          this.translate.instant('calendar.errors.bookingFailed');
-        this.showToast(message, 'error');
+        const raw = err.error?.message || err.error;
+        const key = raw === 'BOOKING_ALREADY_EXISTS'
+          ? 'calendar.messages.alreadyBooked'
+          : 'calendar.errors.bookingFailed';
+        this.showToast(this.translate.instant(key), 'error');
       }
     });
   }

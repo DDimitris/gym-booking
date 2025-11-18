@@ -10,66 +10,67 @@ import { KeycloakService } from '../../../core/services/keycloak.service';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
 import { ClassType } from '../../../core/models/class-type.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-admin-create-class-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedModule],
+  imports: [CommonModule, FormsModule, SharedModule, TranslateModule],
   template: `
-    <h2 mat-dialog-title>Create Class</h2>
+    <h2 mat-dialog-title>{{ 'gymClasses.dialog.titleCreate' | translate }}</h2>
     <div mat-dialog-content>
       <form (ngSubmit)="submit()" #form="ngForm">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Trainer</mat-label>
+                <mat-label>{{ 'gymClasses.dialog.fields.trainer' | translate }}</mat-label>
                 <mat-select [(ngModel)]="trainerId" name="trainerId" required>
                   <mat-option *ngFor="let t of trainers" [value]="t.id">{{ t.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Class Type</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.classType' | translate }}</mat-label>
           <mat-select [(ngModel)]="classTypeId" name="classTypeId" required (selectionChange)="onClassTypeChange()">
             <mat-option *ngFor="let t of classTypes" [value]="t.id">{{ t.name }}</mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Name</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.name' | translate }}</mat-label>
           <input matInput [(ngModel)]="name" name="name" required (blur)="autoNameFromType()" />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.description' | translate }}</mat-label>
           <textarea matInput [(ngModel)]="description" name="description"></textarea>
         </mat-form-field>
 
         <div class="row">
           <mat-form-field appearance="outline">
-            <mat-label>Capacity</mat-label>
+            <mat-label>{{ 'gymClasses.dialog.fields.capacity' | translate }}</mat-label>
             <input matInput type="number" [(ngModel)]="capacity" name="capacity" required min="1" />
           </mat-form-field>
           <mat-form-field appearance="outline">
-            <mat-label>Duration (minutes)</mat-label>
+            <mat-label>{{ 'gymClasses.dialog.fields.durationMinutes' | translate }}</mat-label>
             <input matInput type="number" [(ngModel)]="durationMinutes" name="durationMinutes" required min="15" />
           </mat-form-field>
         </div>
 
         <div class="row">
           <mat-form-field appearance="outline" class="date-field">
-            <mat-label>Date</mat-label>
+            <mat-label>{{ 'gymClasses.dialog.fields.date' | translate }}</mat-label>
             <input matInput [matDatepicker]="picker" [(ngModel)]="startDateObj" name="startDateObj" required>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
           <div class="time-selectors">
             <mat-form-field appearance="outline">
-              <mat-label>Hour (24h)</mat-label>
+              <mat-label>{{ 'gymClasses.adminDialog.fields.hour' | translate }}</mat-label>
               <mat-select [(ngModel)]="startHour" name="startHour" required>
                 <mat-option *ngFor="let h of hours" [value]="h">{{ h }}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Minute</mat-label>
+              <mat-label>{{ 'gymClasses.adminDialog.fields.minute' | translate }}</mat-label>
               <mat-select [(ngModel)]="startMinute" name="startMinute" required>
                 <mat-option *ngFor="let m of minutes" [value]="m">{{ m }}</mat-option>
               </mat-select>
@@ -77,32 +78,46 @@ import { ClassType } from '../../../core/models/class-type.model';
           </div>
         </div>
 
-        <mat-slide-toggle [(ngModel)]="recurring" name="recurring">Recurring</mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="recurring" name="recurring">
+          {{ 'gymClasses.adminDialog.recurring.label' | translate }}
+        </mat-slide-toggle>
         <div *ngIf="recurring" class="recurrence-box">
           <div class="days">
-            <span class="label">Days of week:</span>
+            <span class="label">
+              {{ 'gymClasses.adminDialog.recurring.daysOfWeek' | translate }}
+            </span>
             <mat-button-toggle-group multiple [(ngModel)]="selectedDays" name="selectedDays">
-              <mat-button-toggle *ngFor="let d of weekdays" [value]="d.value">{{ d.label }}</mat-button-toggle>
+              <mat-button-toggle *ngFor="let d of weekdays" [value]="d.value">
+                {{ 'gymClasses.adminDialog.weekdays.' + d.key | translate }}
+              </mat-button-toggle>
             </mat-button-toggle-group>
           </div>
           <mat-form-field appearance="outline" class="weeks-field">
-            <mat-label>Weeks to repeat</mat-label>
+            <mat-label>{{ 'gymClasses.adminDialog.recurring.weeksToRepeat' | translate }}</mat-label>
             <input matInput type="number" [(ngModel)]="repeatWeeks" name="repeatWeeks" min="1" max="52" required />
           </mat-form-field>
-          <div class="hint" *ngIf="selectedDays.length">Will create {{ occurrencesPreview }} total instance(s).</div>
+          <div class="hint" *ngIf="selectedDays.length">
+            {{ 'gymClasses.adminDialog.recurring.preview' | translate:{ count: occurrencesPreview } }}
+          </div>
         </div>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Location</mat-label>
+          <mat-label>{{ 'gymClasses.dialog.fields.location' | translate }}</mat-label>
           <input matInput [(ngModel)]="location" name="location" />
         </mat-form-field>
 
-        <div *ngIf="message" class="message" [ngClass]="messageType">{{ message }}</div>
+        <div *ngIf="messageKey" class="message" [ngClass]="messageType">
+          {{ messageKey | translate:{ created: createdCount, failed: failedCount, total: totalCount } }}
+        </div>
       </form>
     </div>
     <div mat-dialog-actions align="end">
-      <button mat-button (click)="close()">Cancel</button>
-      <button mat-raised-button color="primary" (click)="submit()" [disabled]="!canSubmit">Create</button>
+      <button mat-button (click)="close()">
+        {{ 'gymClasses.dialog.actions.cancel' | translate }}
+      </button>
+      <button mat-raised-button color="primary" (click)="submit()" [disabled]="!canSubmit">
+        {{ 'gymClasses.dialog.actions.create' | translate }}
+      </button>
     </div>
   `,
   styles: [`
@@ -129,8 +144,11 @@ import { ClassType } from '../../../core/models/class-type.model';
 export class AdminCreateClassDialogComponent {
   trainers: User[] = [];
   classTypes: ClassType[] = [];
-  message: string | null = null;
+  messageKey: string | null = null;
   messageType: 'success' | 'error' | 'info' = 'info';
+  createdCount = 0;
+  failedCount = 0;
+  totalCount = 0;
 
   name = '';
   description = '';
@@ -148,13 +166,13 @@ export class AdminCreateClassDialogComponent {
   repeatWeeks = 4;
   selectedDays: number[] = []; // 0=Sun..6=Sat
   weekdays = [
-    { value: 1, label: 'Mon' },
-    { value: 2, label: 'Tue' },
-    { value: 3, label: 'Wed' },
-    { value: 4, label: 'Thu' },
-    { value: 5, label: 'Fri' },
-    { value: 6, label: 'Sat' },
-    { value: 0, label: 'Sun' }
+    { value: 1, key: 'mon' },
+    { value: 2, key: 'tue' },
+    { value: 3, key: 'wed' },
+    { value: 4, key: 'thu' },
+    { value: 5, key: 'fri' },
+    { value: 6, key: 'sat' },
+    { value: 0, key: 'sun' }
   ];
   hours = Array.from({ length: 24 }, (_, i) => i);
   minutes = [0, 15, 30, 45];
@@ -165,9 +183,10 @@ export class AdminCreateClassDialogComponent {
     private dialogRef: MatDialogRef<AdminCreateClassDialogComponent>,
     private adminService: AdminService,
     private gymClassService: GymClassService,
-    private classTypeService: ClassTypeService,
-    private kc: KeycloakService,
-    private users: UserService
+  private classTypeService: ClassTypeService,
+  private kc: KeycloakService,
+  private users: UserService,
+  private translate: TranslateService
   ) {
     this.load();
   }
@@ -209,7 +228,7 @@ export class AdminCreateClassDialogComponent {
   }
 
   submit(): void {
-    if (!this.canSubmit) { return; }
+  if (!this.canSubmit) { return; }
     // Base date/time
     const firstStart = this.composeDateTime(this.startDateObj!, this.startHour!, this.startMinute!);
     const firstEnd = this.formatLocalDateTime(new Date(firstStart.getTime() + this.durationMinutes * 60000));
@@ -225,12 +244,17 @@ export class AdminCreateClassDialogComponent {
     let created = 0;
     let failed = 0;
     const total = occurrences.length;
+    this.totalCount = total;
 
     const processNext = () => {
       const next = occurrences.shift();
       if (!next) {
         this.messageType = failed === 0 ? 'success' : 'error';
-        this.message = failed === 0 ? `Created ${created} class(es)` : `Created ${created}/${total}, ${failed} failed`;
+        this.createdCount = created;
+        this.failedCount = failed;
+        this.messageKey = failed === 0
+          ? 'gymClasses.adminDialog.messages.recurringSuccess'
+          : 'gymClasses.adminDialog.messages.recurringPartial';
         this.dialogRef.close('created');
         return;
       }
@@ -282,12 +306,12 @@ export class AdminCreateClassDialogComponent {
     this.gymClassService.createGymClass(payload).subscribe({
       next: () => {
         this.messageType = 'success';
-        this.message = 'Class created successfully';
+        this.messageKey = 'gymClasses.list.messages.classCreated';
         this.dialogRef.close('created');
       },
       error: (err) => {
         this.messageType = 'error';
-        this.message = err?.error?.message || 'Failed to create class.';
+        this.messageKey = err?.error?.message || 'gymClasses.list.errors.createClass';
       }
     });
   }

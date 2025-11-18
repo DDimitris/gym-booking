@@ -3,65 +3,65 @@
     <h1>
       {{
         memberId
-          ? ('adminBilling.title.member' | translate)
-          : ('adminBilling.title.all' | translate)
+          ? ("adminBilling.title.member" | translate)
+          : ("adminBilling.title.all" | translate)
       }}
     </h1>
     <div class="header-actions">
       <button class="btn-secondary" (click)="backToMembers()">
-        {{ 'adminBilling.actions.backToMembers' | translate }}
+        {{ "adminBilling.actions.backToMembers" | translate }}
       </button>
       <button
         class="btn-success"
         (click)="exportToCSV()"
         [disabled]="reports.length === 0"
       >
-        {{ 'adminBilling.actions.exportCsv' | translate }}
+        {{ "adminBilling.actions.exportCsv" | translate }}
       </button>
     </div>
   </div>
   <div class="filters-section">
     <div class="date-filters">
       <div class="filter-group">
-        <label>{{ 'adminBilling.filters.startDate' | translate }}</label>
+        <label>{{ "adminBilling.filters.startDate" | translate }}</label>
         <input type="date" [(ngModel)]="startDate" class="date-input" />
       </div>
       <div class="filter-group">
-        <label>{{ 'adminBilling.filters.endDate' | translate }}</label>
+        <label>{{ "adminBilling.filters.endDate" | translate }}</label>
         <input type="date" [(ngModel)]="endDate" class="date-input" />
       </div>
       <button class="btn-primary" (click)="applyDateFilter()">
-        {{ 'adminBilling.filters.apply' | translate }}
+        {{ "adminBilling.filters.apply" | translate }}
       </button>
     </div>
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    {{ 'adminBilling.loading' | translate }}
+    {{ "adminBilling.loading" | translate }}
   </div>
 
   <div *ngIf="!isLoading && reports.length === 0" class="empty-state">
-    <p>{{ 'adminBilling.empty' | translate }}</p>
+    <p>{{ "adminBilling.empty" | translate }}</p>
   </div>
 
   <div *ngIf="!isLoading && reports.length > 0">
     <div class="summary-cards">
       <div class="summary-card">
-        <h3>{{ 'adminBilling.summary.totalMembers' | translate }}</h3>
+        <h3>{{ "adminBilling.summary.totalMembers" | translate }}</h3>
         <div class="summary-value">{{ reports.length }}</div>
       </div>
       <div class="summary-card">
-        <h3>{{ 'adminBilling.summary.totalEvents' | translate }}</h3>
+        <h3>{{ "adminBilling.summary.totalEvents" | translate }}</h3>
         <div class="summary-value">{{ totalEventsCount }}</div>
       </div>
       <div class="summary-card highlight">
-        <h3>{{ 'adminBilling.summary.totalOwed' | translate }}</h3>
+        <h3>{{ "adminBilling.summary.totalOwed" | translate }}</h3>
         <div class="summary-value">€{{ totalOwedAcrossAll.toFixed(2) }}</div>
       </div>
     </div>
 
     <p class="admin-hint">
-      {{ 'adminBilling.hint' | translate }}
+      {{ "adminBilling.hint" | translate }}
     </p>
 
     <div class="bulk-actions" *ngIf="reports.length > 0">
@@ -70,8 +70,11 @@
         (click)="markSelectedAsPaid()"
         [disabled]="selectedEventIds.size === 0"
       >
-        {{ 'adminBilling.bulk.markSelectedPaid' | translate }}
-        ({{ selectedEventIds.size }})
+        {{
+          "adminBilling.bulk.markSelectedPaid" | translate : {
+            count: selectedEventIds.size
+          }
+        }}
       </button>
     </div>
 
@@ -82,26 +85,25 @@
             <h3>{{ report.userName }}</h3>
             <div class="report-meta">
               <span>
-                {{ 'adminBilling.report.baseCost' | translate }}
+                {{ "adminBilling.report.baseCost" | translate }}
                 €{{ report.baseCost }}
               </span>
               <span>
-                {{ 'adminBilling.report.bonusDays' | translate }}
+                {{ "adminBilling.report.bonusDays" | translate }}
                 {{ report.bonusDays }}
               </span>
             </div>
           </div>
           <div class="total-owed">
             <div class="label">
-              {{ 'adminBilling.report.totalOwed' | translate }}
+              {{ "adminBilling.report.totalOwed" | translate }}
             </div>
-            <div class="amount">ac{{ report.totalOwed.toFixed(2) }}</div>
             <div class="amount">€{{ report.totalOwed.toFixed(2) }}</div>
           </div>
         </div>
 
         <div *ngIf="report.events.length === 0" class="no-events">
-          {{ 'adminBilling.report.noEvents' | translate }}
+          {{ "adminBilling.report.noEvents" | translate }}
         </div>
 
         <div *ngIf="report.events.length > 0" class="events-table-container">
@@ -119,14 +121,14 @@
                     "
                   />
                 </th>
-                <th>{{ 'adminBilling.table.date' | translate }}</th>
-                <th>{{ 'adminBilling.table.classInstructor' | translate }}</th>
-                <th>{{ 'adminBilling.table.reason' | translate }}</th>
-                <th>{{ 'adminBilling.table.amount' | translate }}</th>
-                <th>{{ 'adminBilling.table.status' | translate }}</th>
-                <th>{{ 'adminBilling.table.settlement' | translate }}</th>
+                <th>{{ "adminBilling.table.date" | translate }}</th>
+                <th>{{ "adminBilling.table.classInstructor" | translate }}</th>
+                <th>{{ "adminBilling.table.reason" | translate }}</th>
+                <th>{{ "adminBilling.table.amount" | translate }}</th>
+                <th>{{ "adminBilling.table.status" | translate }}</th>
+                <th>{{ "adminBilling.table.settlement" | translate }}</th>
                 <th style="min-width: 180px">
-                  {{ 'adminBilling.table.actions' | translate }}
+                  {{ "adminBilling.table.actions" | translate }}
                 </th>
               </tr>
             </thead>
@@ -145,17 +147,17 @@
                     "
                   />
                 </td>
-                <td>{{ event.eventDate | date : 'short' }}</td>
+                <td>{{ event.eventDate | date : "short" }}</td>
                 <td>
                   <div class="event-context">
                     <div class="event-class-name">
                       {{
                         event.className ||
-                          ('adminBilling.values.unknownClass' | translate)
+                          ("adminBilling.values.unknownClass" | translate)
                       }}
                     </div>
                     <div class="event-instructor" *ngIf="event.instructorName">
-                      {{ 'adminBilling.table.instructorLabel' | translate }}
+                      {{ "adminBilling.table.instructorLabel" | translate }}
                       {{ event.instructorName }}
                     </div>
                   </div>
@@ -169,8 +171,8 @@
                   >
                     {{
                       event.settled
-                        ? ('adminBilling.status.settled' | translate)
-                        : ('adminBilling.status.pending' | translate)
+                        ? ("adminBilling.status.settled" | translate)
+                        : ("adminBilling.status.pending" | translate)
                     }}
                   </span>
                 </td>
@@ -178,17 +180,19 @@
                   <span
                     class="settlement-badge"
                     [ngClass]="{
-                      'settlement-none': !event.settlementType || event.settlementType === 'NONE',
+                      'settlement-none':
+                        !event.settlementType ||
+                        event.settlementType === 'NONE',
                       'settlement-payment': event.settlementType === 'PAYMENT',
                       'settlement-bonus': event.settlementType === 'BONUS'
                     }"
                   >
                     {{
-                      !event.settlementType || event.settlementType === 'NONE'
-                        ? ('adminBilling.settlement.none' | translate)
-                        : event.settlementType === 'PAYMENT'
-                        ? ('adminBilling.settlement.payment' | translate)
-                        : ('adminBilling.settlement.bonus' | translate)
+                      !event.settlementType || event.settlementType === "NONE"
+                        ? ("adminBilling.settlement.none" | translate)
+                        : event.settlementType === "PAYMENT"
+                        ? ("adminBilling.settlement.payment" | translate)
+                        : ("adminBilling.settlement.bonus" | translate)
                     }}
                   </span>
                 </td>
@@ -202,7 +206,7 @@
                         'adminBilling.actions.settlePaymentTooltip' | translate
                       "
                     >
-                      {{ 'adminBilling.actions.markPaid' | translate }}
+                      {{ "adminBilling.actions.markPaid" | translate }}
                     </button>
                     <button
                       class="btn-xs btn-bonus"
@@ -212,7 +216,7 @@
                         'adminBilling.actions.settleBonusTooltip' | translate
                       "
                     >
-                      {{ 'adminBilling.actions.useBonus' | translate }}
+                      {{ "adminBilling.actions.useBonus" | translate }}
                     </button>
                   </div>
                 </td>
@@ -220,10 +224,10 @@
             </tbody>
           </table>
           <div class="bonus-info" *ngIf="report.bonusDays > 0">
-            {{ 'adminBilling.bonus.info' | translate }}
+            {{ "adminBilling.bonus.info" | translate }}
             <strong>{{ report.bonusDays }}</strong>
             <span class="bonus-hint">
-              {{ 'adminBilling.bonus.hint' | translate }}
+              {{ "adminBilling.bonus.hint" | translate }}
             </span>
           </div>
         </div>

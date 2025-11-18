@@ -1,9 +1,9 @@
 <div class="admin-athletes-container">
   <div class="page-header">
-    <h1>{{ 'adminAthletes.title' | translate }}</h1>
+    <h1>{{ "adminAthletes.title" | translate }}</h1>
     <div class="header-actions">
       <button class="btn-secondary" routerLink="/admin/billing">
-        {{ 'adminAthletes.actions.viewAllBilling' | translate }}
+        {{ "adminAthletes.actions.viewAllBilling" | translate }}
       </button>
     </div>
   </div>
@@ -21,12 +21,12 @@
       (click)="loadAllUsers()"
       [title]="'adminAthletes.actions.refreshTooltip' | translate"
     >
-      🔄 {{ 'adminAthletes.actions.refresh' | translate }}
+      🔄 {{ "adminAthletes.actions.refresh" | translate }}
     </button>
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    {{ 'adminAthletes.loading' | translate }}
+    {{ "adminAthletes.loading" | translate }}
   </div>
 
   <div
@@ -38,10 +38,10 @@
     class="empty-state"
   >
     <p *ngIf="searchTerm">
-      {{ 'adminAthletes.empty.withSearch' | translate:{ term: searchTerm } }}
+      {{ "adminAthletes.empty.withSearch" | translate : { term: searchTerm } }}
     </p>
     <p *ngIf="!searchTerm">
-      {{ 'adminAthletes.empty.noSearch' | translate }}
+      {{ "adminAthletes.empty.noSearch" | translate }}
     </p>
   </div>
 
@@ -49,17 +49,17 @@
     *ngIf="!isLoading && filteredMembers.length > 0"
     class="athletes-table-container"
   >
-    <h2>{{ 'adminAthletes.sections.members' | translate }}</h2>
+    <h2>{{ "adminAthletes.sections.members" | translate }}</h2>
     <table class="athletes-table">
       <thead>
         <tr>
-          <th>{{ 'adminAthletes.table.name' | translate }}</th>
-          <th>{{ 'adminAthletes.table.email' | translate }}</th>
-          <th>{{ 'adminAthletes.table.role' | translate }}</th>
-          <th>{{ 'adminAthletes.table.baseCost' | translate }}</th>
-          <th>{{ 'adminAthletes.table.bonusDays' | translate }}</th>
-          <th>{{ 'adminAthletes.table.status' | translate }}</th>
-          <th>{{ 'adminAthletes.table.actions' | translate }}</th>
+          <th>{{ "adminAthletes.table.name" | translate }}</th>
+          <th>{{ "adminAthletes.table.email" | translate }}</th>
+          <th>{{ "adminAthletes.table.role" | translate }}</th>
+          <th>{{ "adminAthletes.table.baseCost" | translate }}</th>
+          <th>{{ "adminAthletes.table.bonusDays" | translate }}</th>
+          <th>{{ "adminAthletes.table.status" | translate }}</th>
+          <th>{{ "adminAthletes.table.actions" | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -104,7 +104,7 @@
                 (click)="openBaseCostModal(u)"
                 [title]="'adminAthletes.actions.setCostTooltip' | translate"
               >
-                💲 {{ 'adminAthletes.actions.setCost' | translate }}
+                💲 {{ "adminAthletes.actions.setCost" | translate }}
               </button>
               <button
                 *ngIf="u.role === 'MEMBER'"
@@ -112,14 +112,14 @@
                 (click)="openBonusDaysModal(u)"
                 [title]="'adminAthletes.actions.bonusTooltip' | translate"
               >
-                🎁 {{ 'adminAthletes.actions.bonus' | translate }}
+                🎁 {{ "adminAthletes.actions.bonus" | translate }}
               </button>
               <button
                 class="btn-small btn-info"
                 (click)="viewBilling(u)"
                 [title]="'adminAthletes.actions.billingTooltip' | translate"
               >
-                📊 {{ 'adminAthletes.actions.billing' | translate }}
+                📊 {{ "adminAthletes.actions.billing" | translate }}
               </button>
               <button
                 *ngIf="u.role === 'MEMBER'"
@@ -127,14 +127,14 @@
                 (click)="openPromoteModal(u)"
                 [title]="'adminAthletes.actions.promoteTooltip' | translate"
               >
-                ⬆️ {{ 'adminAthletes.actions.promote' | translate }}
+                ⬆️ {{ "adminAthletes.actions.promote" | translate }}
               </button>
               <button
                 class="btn-small btn-danger"
                 (click)="deleteUser(u)"
                 [title]="'adminAthletes.actions.deleteTooltip' | translate"
               >
-                🗑️ {{ 'adminAthletes.actions.delete' | translate }}
+                🗑️ {{ "adminAthletes.actions.delete" | translate }}
               </button>
             </div>
           </td>
@@ -147,15 +147,15 @@
     *ngIf="!isLoading && filteredTrainers.length > 0"
     class="athletes-table-container"
   >
-    <h2>{{ 'adminAthletes.sections.trainers' | translate }}</h2>
+    <h2>{{ "adminAthletes.sections.trainers" | translate }}</h2>
     <table class="athletes-table">
       <thead>
         <tr>
-          <th>{{ 'adminAthletes.table.name' | translate }}</th>
-          <th>{{ 'adminAthletes.table.email' | translate }}</th>
-          <th>{{ 'adminAthletes.table.role' | translate }}</th>
-          <th>{{ 'adminAthletes.table.status' | translate }}</th>
-          <th>{{ 'adminAthletes.table.actions' | translate }}</th>
+          <th>{{ "adminAthletes.table.name" | translate }}</th>
+          <th>{{ "adminAthletes.table.email" | translate }}</th>
+          <th>{{ "adminAthletes.table.role" | translate }}</th>
+          <th>{{ "adminAthletes.table.status" | translate }}</th>
+          <th>{{ "adminAthletes.table.actions" | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -189,7 +189,7 @@
                 (click)="deleteUser(t)"
                 [title]="'adminAthletes.actions.deleteTooltip' | translate"
               >
-                🗑️ {{ 'adminAthletes.actions.delete' | translate }}
+                🗑️ {{ "adminAthletes.actions.delete" | translate }}
               </button>
             </div>
           </td>
@@ -207,15 +207,17 @@
       <div class="modal-body">
         <div *ngIf="selectedMember">
           <p>
-            <strong>{{ 'adminAthletes.modal.memberLabel' | translate }}</strong>
+            <strong>{{ "adminAthletes.modal.memberLabel" | translate }}</strong>
             {{ selectedMember.name }}
           </p>
           <p>
-            <strong>{{ 'adminAthletes.modal.emailLabel' | translate }}</strong>
+            <strong>{{ "adminAthletes.modal.emailLabel" | translate }}</strong>
             {{ selectedMember.email }}
           </p>
           <div *ngIf="modalMode === 'baseCost'" class="form-group">
-            <label>{{ 'adminAthletes.modal.baseCost.label' | translate }}</label>
+            <label>{{
+              "adminAthletes.modal.baseCost.label" | translate
+            }}</label>
             <input
               type="number"
               [(ngModel)]="inputValue"
@@ -224,11 +226,13 @@
               class="form-input"
             />
             <small>
-              {{ 'adminAthletes.modal.baseCost.hint' | translate }}
+              {{ "adminAthletes.modal.baseCost.hint" | translate }}
             </small>
           </div>
           <div *ngIf="modalMode === 'bonusDays'" class="form-group">
-            <label>{{ 'adminAthletes.modal.bonusDays.label' | translate }}</label>
+            <label>{{
+              "adminAthletes.modal.bonusDays.label" | translate
+            }}</label>
             <input
               type="number"
               [(ngModel)]="inputValue"
@@ -237,32 +241,34 @@
               class="form-input"
             />
             <small>
-              {{ 'adminAthletes.modal.bonusDays.hint' | translate }}
+              {{ "adminAthletes.modal.bonusDays.hint" | translate }}
             </small>
           </div>
           <div *ngIf="modalMode === 'promote'" class="confirm-message">
             <p>
               {{
-                'adminAthletes.modal.promote.confirm' | translate:{
-                  name: selectedMember.name
-                }
+                "adminAthletes.modal.promote.confirm"
+                  | translate
+                    : {
+                        name: selectedMember.name
+                      }
               }}
             </p>
             <p>
-              {{ 'adminAthletes.modal.promote.hint' | translate }}
+              {{ "adminAthletes.modal.promote.hint" | translate }}
             </p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" (click)="closeModal()">
-          {{ 'adminAthletes.modal.actions.cancel' | translate }}
+          {{ "adminAthletes.modal.actions.cancel" | translate }}
         </button>
         <button class="btn-primary" (click)="saveChanges()">
           {{
-            modalMode === 'promote'
-              ? ('adminAthletes.modal.actions.promote' | translate)
-              : ('adminAthletes.modal.actions.save' | translate)
+            modalMode === "promote"
+              ? ("adminAthletes.modal.actions.promote" | translate)
+              : ("adminAthletes.modal.actions.save" | translate)
           }}
         </button>
       </div>
