@@ -54,31 +54,12 @@
         <h3>{{ "adminBilling.summary.totalEvents" | translate }}</h3>
         <div class="summary-value">{{ totalEventsCount }}</div>
       </div>
-      <div class="summary-card highlight">
-        <h3>{{ "adminBilling.summary.totalOwed" | translate }}</h3>
-        <div class="summary-value">€{{ totalOwedAcrossAll.toFixed(2) }}</div>
-      </div>
+      <!-- totalOwed summary removed (wallet-driven settlement replaces owed) -->
     </div>
 
-    <p class="admin-hint">
-      {{ "adminBilling.hint" | translate }}
-    </p>
+    <!-- admin hint removed (wallet-driven settlement used instead) -->
 
-    <div class="bulk-actions" *ngIf="reports.length > 0">
-      <button
-        class="btn-secondary"
-        (click)="markSelectedAsPaid()"
-        [disabled]="selectedEventIds.size === 0"
-      >
-        {{
-          "adminBilling.bulk.markSelectedPaid"
-            | translate
-              : {
-                  count: selectedEventIds.size
-                }
-        }}
-      </button>
-    </div>
+    <!-- Manual bulk mark-as-paid removed: wallet auto-charging will settle payments -->
 
     <div class="reports-list">
       <div *ngFor="let report of reports" class="report-card">
@@ -92,11 +73,31 @@
               </span>
             </div>
           </div>
-          <div class="total-owed">
-            <div class="label">
-              {{ "adminBilling.report.totalOwed" | translate }}
+          <!-- per-report totalOwed removed -->
+          <div class="wallet-block wallet-panel" *ngIf="memberId">
+            <div class="wallet-info">
+              <label>{{ 'adminBilling.wallet.balance' | translate }}</label>
+              <div class="wallet-balance">{{ walletBalance !== null ? ('€' + walletBalance.toFixed(2)) : ('--') }}</div>
             </div>
-            <div class="amount">€{{ report.totalOwed.toFixed(2) }}</div>
+            <div class="wallet-actions">
+              <div class="quick-topups">
+                <span class="quick-label">Quick top-up:</span>
+                <button class="btn-xs" (click)="setQuickTopup(5)">€5</button>
+                <button class="btn-xs" (click)="setQuickTopup(10)">€10</button>
+                <button class="btn-xs" (click)="setQuickTopup(20)">€20</button>
+              </div>
+              <div class="manual-topup">
+                <label>{{ 'adminBilling.wallet.amount' | translate }}</label>
+                <input type="number" step="0.01" [(ngModel)]="adminAmount" />
+                <label>{{ 'adminBilling.wallet.reference' | translate }}</label>
+                <input type="text" [(ngModel)]="adminReference" />
+                <div class="ref-hint">{{ 'adminBilling.wallet.referenceHint' | translate }}</div>
+                <div class="manual-actions">
+                  <button class="btn-xs btn-primary" (click)="adminTopUpMember()">{{ 'adminBilling.wallet.topUp' | translate }}</button>
+                  <button class="btn-xs btn-warning" (click)="adminSetMemberBalance()">{{ 'adminBilling.wallet.setBalance' | translate }}</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

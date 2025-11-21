@@ -65,10 +65,9 @@
     "title": "My Profile",
     "membership": {
       "title": "Membership & Billing",
+      "walletBalance": "Wallet balance",
       "baseCost": "Base cost per class",
-      "bonusDays": "Bonus days remaining",
-      "totalOwed": "Total owed",
-      "hint": "Total owed includes completed classes and late cancellations (within 12 hours of start), excluding any classes cancelled by the gym."
+      "bonusDays": "Bonus days remaining"
     },
     "trainer": {
       "title": "Trainer Overview",
@@ -105,6 +104,9 @@
       "labels": {
         "type": "Type:",
         "kind": "Kind:",
+        "cost": "Cost:",
+        "yourWallet": "Your Wallet:",
+        "bonusDays": "Bonus days:",
         "description": "Description:",
         "start": "Start:",
         "end": "End:",
@@ -113,6 +115,9 @@
         "trainer": "Trainer:",
         "availableSpots": "Available Spots:",
         "status": "Status:"
+      },
+      "errors": {
+        "insufficientFunds": "Insufficient funds — please top-up your wallet or use a bonus day."
       },
       "full": "This class is currently full",
       "cancellation": {
@@ -213,16 +218,14 @@
     "empty": "No billing data found for the selected date range.",
     "summary": {
       "totalMembers": "Total Members",
-      "totalEvents": "Total Events",
-      "totalOwed": "Total Amount Owed"
+      "totalEvents": "Total Events"
     },
-    "hint": "Select individual events to mark them as paid or use bonus days, or use the bulk action to mark multiple selected events as paid at once.",
+  "hint": "",
     "bulk": {
       "markSelectedPaid": "Mark selected as paid ({{count}})"
     },
     "report": {
       "bonusDays": "Bonus Days:",
-      "totalOwed": "Total Owed",
       "noEvents": "No billing events in this period."
     },
     "table": {
@@ -250,6 +253,15 @@
     "bonus": {
       "info": "Bonus days available for this member:",
       "hint": "(one bonus day settles one charge)"
+    }
+    ,
+    "wallet": {
+      "balance": "Wallet balance",
+      "reference": "Reference",
+      "referenceHint": "Optional text to record admin notes for the transaction (e.g., 'manual top-up', 'refund').",
+      "topUp": "Top-up",
+      "setBalance": "Set balance",
+      "amount": "Amount"
     }
   },
   "gymClasses": {

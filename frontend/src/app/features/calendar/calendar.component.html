@@ -89,6 +89,8 @@
             {{ selectedClass.status }}
           </div>
 
+          <!-- Cost and wallet are intentionally not shown in the booking dialog to match previous behavior -->
+
           <div *ngIf="isFull" class="alert alert-warning">
             {{ "calendar.modal.full" | translate }}
           </div>

@@ -153,14 +153,12 @@ public class AdminController {
         LocalDateTime startDate = parseStartDate(startDateStr);
         LocalDateTime endDate = parseEndDate(endDateStr);
         List<BillingEvent> events = billingService.getUserEventsForDateRange(userId, startDate, endDate);
-        BigDecimal totalOwed = billingService.calculateTotalOwed(userId);
         User user = userService.findById(userId);
 
         BillingReportDTO report = new BillingReportDTO();
-        report.setUserId(userId);
+    report.setUserId(userId);
         report.setUserName(user.getName());
         report.setBonusDays(user.getBonusDays());
-        report.setTotalOwed(totalOwed);
         report.setEvents(events.stream()
                 .map(this::convertBillingEventToSimpleDTO)
                 .collect(Collectors.toList()));
@@ -178,11 +176,10 @@ public class AdminController {
         List<User> members = userService.findAllMembers();
         List<BillingReportDTO> reports = members.stream().map(user -> {
             List<BillingEvent> events = billingService.getUserEventsForDateRange(user.getId(), startDate, endDate);
-            BillingReportDTO dto = new BillingReportDTO();
+        BillingReportDTO dto = new BillingReportDTO();
             dto.setUserId(user.getId());
             dto.setUserName(user.getName());
             dto.setBonusDays(user.getBonusDays());
-            dto.setTotalOwed(billingService.calculateTotalOwed(user.getId()));
             dto.setEvents(events.stream()
                     .map(this::convertBillingEventToSimpleDTO)
                     .collect(Collectors.toList()));

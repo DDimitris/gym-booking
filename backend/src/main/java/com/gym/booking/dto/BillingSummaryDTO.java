@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class BillingSummaryDTO {
     private Long userId;
-    private BigDecimal totalOwed;
+    private BigDecimal placeholder; // removed totalOwed: retained field to keep DTO structure minimal
 
     public Long getUserId() {
         return userId;
@@ -13,12 +13,11 @@ public class BillingSummaryDTO {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-
-    public BigDecimal getTotalOwed() {
-        return totalOwed;
+    public BigDecimal getPlaceholder() {
+        return placeholder;
     }
 
-    public void setTotalOwed(BigDecimal totalOwed) {
-        this.totalOwed = totalOwed;
+    public void setPlaceholder(BigDecimal placeholder) {
+        this.placeholder = placeholder;
     }
 }

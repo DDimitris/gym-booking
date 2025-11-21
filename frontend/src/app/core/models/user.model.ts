@@ -8,6 +8,7 @@ export interface User {
     smallGroupBaseCost?: number;
     personalBaseCost?: number;
     openGymBaseCost?: number;
+    walletBalance?: number;
     status?: UserStatus;
 }
 

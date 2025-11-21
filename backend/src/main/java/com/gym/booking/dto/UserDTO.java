@@ -35,6 +35,7 @@ public class UserDTO {
     private BigDecimal personalBaseCost;
 
     private BigDecimal openGymBaseCost;
+    private BigDecimal walletBalance;
     private Integer bonusDays;
     private UserStatus status;
     private String avatarUrl;

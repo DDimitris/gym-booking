@@ -8,7 +8,6 @@ public class BillingReportDTO {
     private Long userId;
     private String userName;
     private Integer bonusDays;
-    private BigDecimal totalOwed;
     private List<BillingEventSummary> events;
 
     public static class BillingEventSummary {
@@ -128,14 +127,6 @@ public class BillingReportDTO {
 
     public void setBonusDays(Integer bonusDays) {
         this.bonusDays = bonusDays;
-    }
-
-    public BigDecimal getTotalOwed() {
-        return totalOwed;
-    }
-
-    public void setTotalOwed(BigDecimal totalOwed) {
-        this.totalOwed = totalOwed;
     }
 
     public List<BillingEventSummary> getEvents() {

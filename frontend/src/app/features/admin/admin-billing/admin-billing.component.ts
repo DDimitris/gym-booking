@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
+import { WalletService, WalletTransaction } from '../../../core/services/wallet.service';
 import { KeycloakService } from '../../../core/services/keycloak.service';
 import { BillingReport } from '../../../core/models/billing.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -19,6 +20,11 @@ export class AdminBillingComponent implements OnInit {
   memberId: number | null = null;
   isLoading = true;
   selectedEventIds: Set<number> = new Set<number>();
+  // Wallet/admin controls
+  walletBalance: number | null = null;
+  walletTransactions: WalletTransaction[] = [];
+  adminAmount: number | null = null;
+  adminReference = '';
   
   // Date range
   startDate = '';
@@ -30,6 +36,8 @@ export class AdminBillingComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private translate: TranslateService
+    ,
+    private walletService: WalletService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +80,8 @@ export class AdminBillingComponent implements OnInit {
         next: (report) => {
           this.reports = [report];
           this.isLoading = false;
+          // Load wallet info for this member
+          this.loadWalletForMember(this.memberId!);
         },
         error: (err) => {
           console.error('Error loading member report:', err);
@@ -95,6 +105,44 @@ export class AdminBillingComponent implements OnInit {
     }
   }
 
+  loadWalletForMember(memberId: number): void {
+    this.walletService.adminGetTransactions(memberId).subscribe({
+      next: (txs) => {
+        this.walletTransactions = txs;
+        // derive balance from transactions ledger (assumes ledger contains all ops)
+        this.walletBalance = txs.reduce((s, t) => s + (t.amount || 0), 0);
+      },
+      error: (err) => {
+        console.error('Failed to load wallet transactions', err);
+        this.walletTransactions = [];
+        this.walletBalance = null;
+      }
+    });
+  }
+
+  adminTopUpMember(): void {
+    if (!this.memberId || this.adminAmount == null) return;
+    this.walletService.adminTopUp(this.memberId, this.adminAmount, this.adminReference).subscribe({
+      next: () => { this.loadWalletForMember(this.memberId!); this.loadReports(); },
+      error: (err) => { console.error('Top-up failed', err); alert('Top-up failed'); }
+    });
+  }
+
+  setQuickTopup(amount: number): void {
+    if (!this.memberId) return;
+    this.adminAmount = amount;
+    this.adminReference = 'quick-topup';
+    this.adminTopUpMember();
+  }
+
+  adminSetMemberBalance(): void {
+    if (!this.memberId || this.adminAmount == null) return;
+    this.walletService.adminSetBalance(this.memberId, this.adminAmount, this.adminReference).subscribe({
+      next: () => { this.loadWalletForMember(this.memberId!); this.loadReports(); },
+      error: (err) => { console.error('Set balance failed', err); alert('Set balance failed'); }
+    });
+  }
+
   applyDateFilter(): void {
     this.loadReports();
   }
@@ -106,15 +154,15 @@ export class AdminBillingComponent implements OnInit {
     }
 
     // Build CSV content
-    let csv = 'Member Name,Email,Bonus Days,Total Owed,Event Date,Amount,Reason,Settled\n';
+    let csv = 'Member Name,Email,Bonus Days,Event Date,Amount,Reason,Settled\n';
     
     this.reports.forEach(report => {
       if (report.events.length === 0) {
         // Include member even if no events
-        csv += `"${report.userName}","","${report.bonusDays}","€${report.totalOwed}","","","",""\n`;
+        csv += `"${report.userName}","","${report.bonusDays}","","","",""\n`;
       } else {
         report.events.forEach(event => {
-          csv += `"${report.userName}","","${report.bonusDays}","€${report.totalOwed}","${event.eventDate}","€${event.amount}","${event.reason}","${event.settled ? 'Yes' : 'No'}"\n`;
+          csv += `"${report.userName}","","${report.bonusDays}","${event.eventDate}","€${event.amount}","${event.reason}","${event.settled ? 'Yes' : 'No'}"\n`;
         });
       }
     });
@@ -134,7 +182,7 @@ export class AdminBillingComponent implements OnInit {
   }
 
   get totalOwedAcrossAll(): number {
-    return this.reports.reduce((sum, report) => sum + report.totalOwed, 0);
+    return 0; // removed totalOwed aggregation; keep getter for template compatibility
   }
 
   get totalEventsCount(): number {

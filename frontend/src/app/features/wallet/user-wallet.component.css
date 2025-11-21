@@ -1,0 +1,17 @@
+.wallet-card { padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 6px 18px rgba(12,40,80,0.04); }
+.wallet-header { display:flex; justify-content:space-between; align-items:center; }
+.wallet-cta button { padding: 0.5rem 0.9rem; border-radius: 8px; border: none; background: #007bff; color: #fff; cursor: pointer; }
+.wallet-body { margin-top: 12px }
+.balance-row { display:flex; justify-content:space-between; align-items:baseline; padding: 8px 0 }
+.balance-label { font-size: 0.9rem; color:#666 }
+.balance-amount { font-size: 1.6rem; font-weight:700; color:#0b63d6 }
+.topup-panel { margin: 0.75rem 0; padding: 0.75rem; border-radius: 8px; background:#f6f9ff; color:#123; }
+.transactions-list { list-style:none; padding:0; margin:0 }
+.transactions-list li { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5fa; align-items:center }
+.tx-date { width:150px; color:#666; font-size:0.85rem }
+.tx-type { flex:1; color:#333 }
+.tx-amount { width:96px; text-align:right; font-weight:600 }
+.tx-amount.credit { color: #218838 }
+.tx-amount.debit { color: #c82333 }
+.tx-ref { width:160px; color:#888; font-size:0.85rem }
+.empty { color:#888; font-style:italic; padding: 0.5rem 0 }

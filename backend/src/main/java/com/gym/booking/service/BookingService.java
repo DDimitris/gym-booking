@@ -75,6 +75,20 @@ public class BookingService {
         if (!existingBookings.isEmpty()) {
             throw new BookingException("User already has a booking for this class");
         }
+
+        // Enforce wallet/bonus validation: user must have either sufficient wallet
+        // balance for the class kind, or at least 1 bonus day to cover the class.
+        java.math.BigDecimal chargeAmount = billingService.getChargeAmountForClass(user, classInstance);
+        java.math.BigDecimal wallet = java.util.Optional.ofNullable(user.getWalletBalance()).orElse(java.math.BigDecimal.ZERO);
+        Integer bonus = java.util.Optional.ofNullable(user.getBonusDays()).orElse(0);
+
+        boolean canPayWithWallet = wallet.compareTo(chargeAmount) >= 0;
+        boolean canUseBonus = bonus > 0;
+
+        if (chargeAmount.compareTo(java.math.BigDecimal.ZERO) > 0 && !canPayWithWallet && !canUseBonus) {
+            throw new BookingException("Insufficient funds: wallet=" + wallet + " bonusDays=" + bonus + 
+                    " required=" + chargeAmount + ". Please top-up wallet or use a bonus day.");
+        }
     }
 
     public void cancelBooking(Long bookingId) {
@@ -95,6 +109,8 @@ public class BookingService {
         booking.setStatus(Booking.BookingStatus.COMPLETED);
         booking.setAttendedAt(LocalDateTime.now());
         bookingRepository.save(booking);
+        // Attempt to create and auto-settle billing for completed booking
+        billingService.createCompletionCharge(booking);
     }
 
     public List<Booking> findByUser(Long userId) {

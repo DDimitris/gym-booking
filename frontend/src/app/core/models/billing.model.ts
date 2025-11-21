@@ -25,6 +25,5 @@ export interface BillingReport {
   userId: number;
   userName: string;
   bonusDays: number;
-  totalOwed: number;
   events: BillingEventSummary[];
 }

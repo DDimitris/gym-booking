@@ -1,7 +1,6 @@
 package com.gym.booking.controller;
 
 import com.gym.booking.dto.UserDTO;
-import com.gym.booking.dto.BillingSummaryDTO;
 import com.gym.booking.service.BillingService;
 import com.gym.booking.model.User;
 import com.gym.booking.service.UserService;
@@ -48,20 +47,7 @@ public class UserController {
         return ResponseEntity.status(401).build();
     }
 
-    @GetMapping("/me/billing")
-    public ResponseEntity<BillingSummaryDTO> getMyBilling(
-            org.springframework.security.core.Authentication authentication) {
-        if (authentication instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken jwtAuth) {
-            java.util.Map<String, Object> claims = new java.util.HashMap<>(jwtAuth.getToken().getClaims());
-            User user = userService.findOrCreateFromJwtClaims(claims);
-            java.math.BigDecimal total = billingService.calculateTotalOwed(user.getId());
-            BillingSummaryDTO dto = new BillingSummaryDTO();
-            dto.setUserId(user.getId());
-            dto.setTotalOwed(total);
-            return ResponseEntity.ok(dto);
-        }
-        return ResponseEntity.status(401).build();
-    }
+    // Billing summary endpoint removed: wallet now handles payments and 'owed' concept is deprecated
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -120,6 +106,7 @@ public class UserController {
         dto.setSmallGroupBaseCost(user.getSmallGroupBaseCost());
         dto.setPersonalBaseCost(user.getPersonalBaseCost());
         dto.setOpenGymBaseCost(user.getOpenGymBaseCost());
+    dto.setWalletBalance(user.getWalletBalance());
         dto.setBonusDays(user.getBonusDays());
         dto.setStatus(user.getStatus());
         return dto;

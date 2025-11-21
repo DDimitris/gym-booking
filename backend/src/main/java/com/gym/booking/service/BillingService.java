@@ -18,14 +18,17 @@ import java.util.List;
 public class BillingService {
     private final BillingEventRepository billingEventRepository;
     private final UserService userService;
+    private final com.gym.booking.service.WalletService walletService;
 
     // Same-day cancellation threshold (12 hours before class start)
     private static final long SAME_DAY_THRESHOLD_HOURS = 12;
 
     public BillingService(BillingEventRepository billingEventRepository,
-            UserService userService) {
+            UserService userService,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) @org.springframework.context.annotation.Lazy com.gym.booking.service.WalletService walletService) {
         this.billingEventRepository = billingEventRepository;
         this.userService = userService;
+        this.walletService = walletService;
     }
 
     private BigDecimal resolveBaseCostForClass(User user, GymClass gymClass) {
@@ -41,6 +44,15 @@ public class BillingService {
         };
 
         return amount != null ? amount : BigDecimal.ZERO;
+    }
+
+    /**
+     * Public helper to obtain the charge amount for a given user and class.
+     * This is used by other services (e.g. booking) to check eligibility without
+     * duplicating the resolve logic.
+     */
+    public BigDecimal getChargeAmountForClass(User user, GymClass gymClass) {
+        return resolveBaseCostForClass(user, gymClass);
     }
 
     /**
@@ -64,16 +76,39 @@ public class BillingService {
                 chargeAmount = BigDecimal.ZERO;
             }
 
-            BillingEvent event = new BillingEvent();
-            event.setUser(user);
-            event.setBooking(booking);
-            event.setAmount(chargeAmount);
-            event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
-            event.setEventDate(LocalDateTime.now());
-            event.setSettled(false);
-            event.setSettlementType(BillingEvent.SettlementType.NONE);
+            // Attempt to settle automatically via wallet (consume wallet and optionally a bonus day)
+            if (walletService != null) {
+                WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount, booking);
 
-            return billingEventRepository.save(event);
+                BillingEvent event = new BillingEvent();
+                event.setUser(user);
+                event.setBooking(booking);
+                event.setAmount(chargeAmount);
+                event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
+                event.setEventDate(LocalDateTime.now());
+
+                if (res.fullySettled()) {
+                    event.setSettled(true);
+                    event.setSettlementType(res.bonusConsumed() ? BillingEvent.SettlementType.BONUS : BillingEvent.SettlementType.PAYMENT);
+                    return billingEventRepository.save(event);
+                } else {
+                    // Partially paid or unpaid: create event and mark unsettled
+                    event.setSettled(false);
+                    event.setSettlementType(BillingEvent.SettlementType.NONE);
+                    BillingEvent saved = billingEventRepository.save(event);
+                    return saved;
+                }
+            } else {
+                BillingEvent event = new BillingEvent();
+                event.setUser(user);
+                event.setBooking(booking);
+                event.setAmount(chargeAmount);
+                event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
+                event.setEventDate(LocalDateTime.now());
+                event.setSettled(false);
+                event.setSettlementType(BillingEvent.SettlementType.NONE);
+                return billingEventRepository.save(event);
+            }
         }
 
         return null; // No charge
@@ -85,16 +120,6 @@ public class BillingService {
     public List<BillingEvent> getUnsettledCharges(Long userId) {
         User user = userService.findById(userId);
         return billingEventRepository.findByUserAndSettledFalse(user);
-    }
-
-    /**
-     * Calculate total unsettled amount for a user
-     */
-    public BigDecimal calculateTotalOwed(Long userId) {
-        List<BillingEvent> unsettled = getUnsettledCharges(userId);
-        return unsettled.stream()
-                .map(BillingEvent::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
@@ -133,6 +158,46 @@ public class BillingService {
             return;
         for (Long id : eventIds) {
             markAsSettled(id);
+        }
+    }
+
+    /**
+     * Create and attempt to settle a billing event for a completed booking.
+     */
+    public BillingEvent createCompletionCharge(Booking booking) {
+        User user = booking.getUser();
+        BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
+        if (chargeAmount == null) chargeAmount = BigDecimal.ZERO;
+
+        if (walletService != null) {
+            WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount, booking);
+
+            BillingEvent event = new BillingEvent();
+            event.setUser(user);
+            event.setBooking(booking);
+            event.setAmount(chargeAmount);
+            event.setReason("Class completed");
+            event.setEventDate(LocalDateTime.now());
+
+            if (res.fullySettled()) {
+                event.setSettled(true);
+                event.setSettlementType(res.bonusConsumed() ? BillingEvent.SettlementType.BONUS : BillingEvent.SettlementType.PAYMENT);
+                return billingEventRepository.save(event);
+            } else {
+                event.setSettled(false);
+                event.setSettlementType(BillingEvent.SettlementType.NONE);
+                return billingEventRepository.save(event);
+            }
+        } else {
+            BillingEvent event = new BillingEvent();
+            event.setUser(user);
+            event.setBooking(booking);
+            event.setAmount(chargeAmount);
+            event.setReason("Class completed");
+            event.setEventDate(LocalDateTime.now());
+            event.setSettled(false);
+            event.setSettlementType(BillingEvent.SettlementType.NONE);
+            return billingEventRepository.save(event);
         }
     }
 
