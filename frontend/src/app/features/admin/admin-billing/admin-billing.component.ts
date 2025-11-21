@@ -128,12 +128,6 @@ export class AdminBillingComponent implements OnInit {
     });
   }
 
-  setQuickTopup(amount: number): void {
-    if (!this.memberId) return;
-    this.adminAmount = amount;
-    this.adminReference = 'quick-topup';
-    this.adminTopUpMember();
-  }
 
   adminSetMemberBalance(): void {
     if (!this.memberId || this.adminAmount == null) return;

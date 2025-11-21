@@ -84,12 +84,6 @@
               </div>
             </div>
             <div class="wallet-actions">
-              <div class="quick-topups">
-                <span class="quick-label">Quick top-up:</span>
-                <button class="btn-xs" (click)="setQuickTopup(5)">€5</button>
-                <button class="btn-xs" (click)="setQuickTopup(10)">€10</button>
-                <button class="btn-xs" (click)="setQuickTopup(20)">€20</button>
-              </div>
               <div class="manual-topup">
                 <label>{{ "adminBilling.wallet.amount" | translate }}</label>
                 <input type="number" step="0.01" [(ngModel)]="adminAmount" />
