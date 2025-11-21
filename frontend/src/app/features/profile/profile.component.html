@@ -33,19 +33,27 @@
       <h2>{{ "profile.membership.title" | translate }}</h2>
       <div class="billing-row">
         <span>{{ "gymClasses.kinds.group" | translate }}</span>
-        <strong>{{ user.groupBaseCost != null ? "$" + user.groupBaseCost : "—" }}</strong>
+        <strong>{{
+          user.groupBaseCost != null ? "$" + user.groupBaseCost : "—"
+        }}</strong>
       </div>
       <div class="billing-row">
         <span>{{ "gymClasses.kinds.smallGroup" | translate }}</span>
-        <strong>{{ user.smallGroupBaseCost != null ? "$" + user.smallGroupBaseCost : "—" }}</strong>
+        <strong>{{
+          user.smallGroupBaseCost != null ? "$" + user.smallGroupBaseCost : "—"
+        }}</strong>
       </div>
       <div class="billing-row">
         <span>{{ "gymClasses.kinds.personal" | translate }}</span>
-        <strong>{{ user.personalBaseCost != null ? "$" + user.personalBaseCost : "—" }}</strong>
+        <strong>{{
+          user.personalBaseCost != null ? "$" + user.personalBaseCost : "—"
+        }}</strong>
       </div>
       <div class="billing-row">
         <span>{{ "gymClasses.kinds.openGym" | translate }}</span>
-        <strong>{{ user.openGymBaseCost != null ? "$" + user.openGymBaseCost : "—" }}</strong>
+        <strong>{{
+          user.openGymBaseCost != null ? "$" + user.openGymBaseCost : "—"
+        }}</strong>
       </div>
       <div class="billing-row">
         <span>{{ "profile.membership.bonusDays" | translate }}</span>

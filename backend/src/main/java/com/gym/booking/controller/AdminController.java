@@ -157,8 +157,8 @@ public class AdminController {
         User user = userService.findById(userId);
 
         BillingReportDTO report = new BillingReportDTO();
-    report.setUserId(userId);
-    report.setUserName(user.getName());
+        report.setUserId(userId);
+        report.setUserName(user.getName());
         report.setBonusDays(user.getBonusDays());
         report.setTotalOwed(totalOwed);
         report.setEvents(events.stream()

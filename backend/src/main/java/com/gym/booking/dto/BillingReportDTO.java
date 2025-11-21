@@ -21,7 +21,7 @@ public class BillingReportDTO {
         private LocalDateTime eventDate;
         private Boolean settled;
         private com.gym.booking.model.BillingEvent.SettlementType settlementType;
-    private String classKind;
+        private String classKind;
 
         // Getters and Setters
         public Long getId() {
