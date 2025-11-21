@@ -24,7 +24,8 @@ public class UserWalletController {
     }
 
     @GetMapping
-    public ResponseEntity<UserWalletResponse> getMyWallet(org.springframework.security.core.Authentication authentication) {
+    public ResponseEntity<UserWalletResponse> getMyWallet(
+            org.springframework.security.core.Authentication authentication) {
         if (authentication instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken jwtAuth) {
             java.util.Map<String, Object> claims = new java.util.HashMap<>(jwtAuth.getToken().getClaims());
             User user = userService.findOrCreateFromJwtClaims(claims);

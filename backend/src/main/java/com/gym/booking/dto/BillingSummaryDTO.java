@@ -13,6 +13,7 @@ public class BillingSummaryDTO {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+
     public BigDecimal getPlaceholder() {
         return placeholder;
     }

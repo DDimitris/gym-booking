@@ -47,7 +47,8 @@ public class UserController {
         return ResponseEntity.status(401).build();
     }
 
-    // Billing summary endpoint removed: wallet now handles payments and 'owed' concept is deprecated
+    // Billing summary endpoint removed: wallet now handles payments and 'owed'
+    // concept is deprecated
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -106,7 +107,7 @@ public class UserController {
         dto.setSmallGroupBaseCost(user.getSmallGroupBaseCost());
         dto.setPersonalBaseCost(user.getPersonalBaseCost());
         dto.setOpenGymBaseCost(user.getOpenGymBaseCost());
-    dto.setWalletBalance(user.getWalletBalance());
+        dto.setWalletBalance(user.getWalletBalance());
         dto.setBonusDays(user.getBonusDays());
         dto.setStatus(user.getStatus());
         return dto;

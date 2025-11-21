@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -22,13 +24,16 @@ public class BillingService {
 
     // Same-day cancellation threshold (12 hours before class start)
     private static final long SAME_DAY_THRESHOLD_HOURS = 12;
+    private final ZoneId zoneId;
 
     public BillingService(BillingEventRepository billingEventRepository,
             UserService userService,
-            @org.springframework.beans.factory.annotation.Autowired(required = false) @org.springframework.context.annotation.Lazy com.gym.booking.service.WalletService walletService) {
+            @org.springframework.beans.factory.annotation.Autowired(required = false) @org.springframework.context.annotation.Lazy com.gym.booking.service.WalletService walletService,
+            @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.billingEventRepository = billingEventRepository;
         this.userService = userService;
         this.walletService = walletService;
+        this.zoneId = ZoneId.of(appTimezone);
     }
 
     private BigDecimal resolveBaseCostForClass(User user, GymClass gymClass) {
@@ -61,10 +66,11 @@ public class BillingService {
      * time.
      */
     public BillingEvent createCancellationCharge(Booking booking) {
-        LocalDateTime classStartTime = booking.getClassInstance().getStartTime();
-        LocalDateTime cancellationTime = booking.getCancelledAt() != null
-                ? booking.getCancelledAt()
-                : LocalDateTime.now();
+        // Use application timezone to evaluate cancellation windows
+        ZonedDateTime classStartTime = booking.getClassInstance().getStartTime().atZone(zoneId);
+        ZonedDateTime cancellationTime = booking.getCancelledAt() != null
+                ? booking.getCancelledAt().atZone(zoneId)
+                : ZonedDateTime.now(zoneId);
 
         long hoursUntilClass = Duration.between(cancellationTime, classStartTime).toHours();
 
@@ -76,20 +82,23 @@ public class BillingService {
                 chargeAmount = BigDecimal.ZERO;
             }
 
-            // Attempt to settle automatically via wallet (consume wallet and optionally a bonus day)
+            // Attempt to settle automatically via wallet (consume wallet and optionally a
+            // bonus day)
             if (walletService != null) {
-                WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount, booking);
+                WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount,
+                        booking);
 
                 BillingEvent event = new BillingEvent();
                 event.setUser(user);
                 event.setBooking(booking);
                 event.setAmount(chargeAmount);
                 event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
-                event.setEventDate(LocalDateTime.now());
+                event.setEventDate(LocalDateTime.now(zoneId));
 
                 if (res.fullySettled()) {
                     event.setSettled(true);
-                    event.setSettlementType(res.bonusConsumed() ? BillingEvent.SettlementType.BONUS : BillingEvent.SettlementType.PAYMENT);
+                    event.setSettlementType(res.bonusConsumed() ? BillingEvent.SettlementType.BONUS
+                            : BillingEvent.SettlementType.PAYMENT);
                     return billingEventRepository.save(event);
                 } else {
                     // Partially paid or unpaid: create event and mark unsettled
@@ -104,7 +113,7 @@ public class BillingService {
                 event.setBooking(booking);
                 event.setAmount(chargeAmount);
                 event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
-                event.setEventDate(LocalDateTime.now());
+                event.setEventDate(LocalDateTime.now(zoneId));
                 event.setSettled(false);
                 event.setSettlementType(BillingEvent.SettlementType.NONE);
                 return billingEventRepository.save(event);
@@ -167,7 +176,8 @@ public class BillingService {
     public BillingEvent createCompletionCharge(Booking booking) {
         User user = booking.getUser();
         BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
-        if (chargeAmount == null) chargeAmount = BigDecimal.ZERO;
+        if (chargeAmount == null)
+            chargeAmount = BigDecimal.ZERO;
 
         if (walletService != null) {
             WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount, booking);
@@ -177,11 +187,12 @@ public class BillingService {
             event.setBooking(booking);
             event.setAmount(chargeAmount);
             event.setReason("Class completed");
-            event.setEventDate(LocalDateTime.now());
+            event.setEventDate(LocalDateTime.now(zoneId));
 
             if (res.fullySettled()) {
                 event.setSettled(true);
-                event.setSettlementType(res.bonusConsumed() ? BillingEvent.SettlementType.BONUS : BillingEvent.SettlementType.PAYMENT);
+                event.setSettlementType(
+                        res.bonusConsumed() ? BillingEvent.SettlementType.BONUS : BillingEvent.SettlementType.PAYMENT);
                 return billingEventRepository.save(event);
             } else {
                 event.setSettled(false);

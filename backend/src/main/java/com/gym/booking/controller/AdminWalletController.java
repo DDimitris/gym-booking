@@ -41,4 +41,3 @@ public class AdminWalletController {
         public String reference;
     }
 }
-

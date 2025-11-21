@@ -6,7 +6,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface WalletService {
-    record WalletChargeResult(boolean fullySettled, boolean bonusConsumed, BigDecimal chargedAmount) {}
+    record WalletChargeResult(boolean fullySettled, boolean bonusConsumed, BigDecimal chargedAmount) {
+    }
 
     BigDecimal getBalance(Long userId);
 
@@ -18,4 +19,3 @@ public interface WalletService {
 
     List<WalletTransaction> getTransactions(Long userId);
 }
-

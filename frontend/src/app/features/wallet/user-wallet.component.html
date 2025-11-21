@@ -1,8 +1,10 @@
 <div class="wallet-card">
   <div class="wallet-header">
-    <h2>{{ 'profile.membership.title' | translate }}</h2>
+    <h2>{{ "profile.membership.title" | translate }}</h2>
     <div class="wallet-cta">
-      <button class="btn-primary" (click)="toggleTopUp()">{{ 'adminBilling.wallet.topUp' | translate }}</button>
+      <button class="btn-primary" (click)="toggleTopUp()">
+        {{ "adminBilling.wallet.topUp" | translate }}
+      </button>
     </div>
   </div>
 
@@ -11,24 +13,35 @@
 
   <div *ngIf="!loading" class="wallet-body">
     <div class="balance-row">
-      <div class="balance-label">{{ 'profile.membership.walletBalance' | translate }}</div>
-      <div class="balance-amount">{{ balance != null ? ('€' + (balance | number : '1.2-2')) : '—' }}</div>
+      <div class="balance-label">
+        {{ "profile.membership.walletBalance" | translate }}
+      </div>
+      <div class="balance-amount">
+        {{ balance != null ? "€" + (balance | number : "1.2-2") : "—" }}
+      </div>
     </div>
 
     <div class="topup-panel" *ngIf="showTopUp">
       <p>
-        To top-up your wallet, please contact the admin or use the payment flow configured by the gym.
+        To top-up your wallet, please contact the admin or use the payment flow
+        configured by the gym.
         <a href="mailto:admin@localhost">Contact admin</a>
       </p>
     </div>
 
     <h3>Transactions</h3>
-    <div *ngIf="transactions.length === 0" class="empty">No transactions yet.</div>
+    <div *ngIf="transactions.length === 0" class="empty">
+      No transactions yet.
+    </div>
     <ul class="transactions-list">
       <li *ngFor="let tx of transactions">
-        <span class="tx-date">{{ tx.createdAt | date : 'short' }}</span>
+        <span class="tx-date">{{ tx.createdAt | date : "short" }}</span>
         <span class="tx-type">{{ tx.type }}</span>
-        <span class="tx-amount" [ngClass]="{ credit: tx.amount > 0, debit: tx.amount < 0 }">{{ tx.amount | number : '1.2-2' }}</span>
+        <span
+          class="tx-amount"
+          [ngClass]="{ credit: tx.amount > 0, debit: tx.amount < 0 }"
+          >{{ tx.amount | number : "1.2-2" }}</span
+        >
         <span class="tx-ref">{{ tx.reference }}</span>
       </li>
     </ul>

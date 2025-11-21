@@ -58,9 +58,20 @@
       <!-- per-kind costs shown above; Wallet balance and bonus days are shown in the compact wallet card below -->
       <div class="wallet-mini">
         <a class="wallet-link" routerLink="/wallet">
-          <div class="wallet-label">{{ "profile.membership.walletBalance" | translate }}</div>
-          <div class="wallet-amount">{{ user.walletBalance != null ? ('€' + (user.walletBalance | number : '1.2-2')) : '—' }}</div>
-          <div class="wallet-sub">{{ "profile.membership.bonusDays" | translate }}: <strong>{{ user.bonusDays != null ? user.bonusDays : '—' }}</strong></div>
+          <div class="wallet-label">
+            {{ "profile.membership.walletBalance" | translate }}
+          </div>
+          <div class="wallet-amount">
+            {{
+              user.walletBalance != null
+                ? "€" + (user.walletBalance | number : "1.2-2")
+                : "—"
+            }}
+          </div>
+          <div class="wallet-sub">
+            {{ "profile.membership.bonusDays" | translate }}:
+            <strong>{{ user.bonusDays != null ? user.bonusDays : "—" }}</strong>
+          </div>
         </a>
       </div>
     </div>

@@ -29,7 +29,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Atomically debit if sufficient funds. Returns number of rows updated (1 = success)
+    // Atomically debit if sufficient funds. Returns number of rows updated (1 =
+    // success)
     public int debitIfSufficient(@NonNull Long userId, @NonNull java.math.BigDecimal amount) {
         return userRepository.debitIfSufficient(userId, amount);
     }
@@ -45,7 +46,8 @@ public class UserService {
     }
 
     // Compare and set balance
-    public int compareAndSetBalance(@NonNull Long userId, @NonNull java.math.BigDecimal expected, @NonNull java.math.BigDecimal newBalance) {
+    public int compareAndSetBalance(@NonNull Long userId, @NonNull java.math.BigDecimal expected,
+            @NonNull java.math.BigDecimal newBalance) {
         return userRepository.compareAndSetBalance(userId, expected, newBalance);
     }
 

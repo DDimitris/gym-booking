@@ -33,8 +33,10 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletTransaction topUp(Long userId, BigDecimal amount, String reference) {
-        if (amount == null) throw new IllegalArgumentException("amount required");
-        if (amount.signum() <= 0) throw new IllegalArgumentException("amount must be positive");
+        if (amount == null)
+            throw new IllegalArgumentException("amount required");
+        if (amount.signum() <= 0)
+            throw new IllegalArgumentException("amount must be positive");
         // Use atomic credit and then fetch fresh user for the ledger entry
         userService.creditBalance(userId, amount);
         User user = userService.findById(userId);
@@ -49,7 +51,8 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletTransaction setBalance(Long userId, BigDecimal amount, String reference) {
-        if (amount == null) throw new IllegalArgumentException("amount required");
+        if (amount == null)
+            throw new IllegalArgumentException("amount required");
         // Record old balance for ledger, then set atomically
         User user = userService.findById(userId);
         BigDecimal old = Optional.ofNullable(user.getWalletBalance()).orElse(BigDecimal.ZERO);
@@ -66,7 +69,8 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletChargeResult chargeForBooking(Long userId, BigDecimal amount, Booking booking) {
-        if (amount == null) amount = BigDecimal.ZERO;
+        if (amount == null)
+            amount = BigDecimal.ZERO;
         BigDecimal charged = BigDecimal.ZERO;
         boolean bonusConsumed = false;
 
@@ -88,7 +92,8 @@ public class WalletServiceImpl implements WalletService {
         for (int i = 0; i < 3; i++) {
             User u = userService.findById(userId);
             BigDecimal wallet = Optional.ofNullable(u.getWalletBalance()).orElse(BigDecimal.ZERO);
-            if (wallet.compareTo(BigDecimal.ZERO) <= 0) break;
+            if (wallet.compareTo(BigDecimal.ZERO) <= 0)
+                break;
 
             int drained = userService.compareAndSetBalance(userId, wallet, BigDecimal.ZERO);
             if (drained == 1) {

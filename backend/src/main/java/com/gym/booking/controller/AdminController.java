@@ -156,7 +156,7 @@ public class AdminController {
         User user = userService.findById(userId);
 
         BillingReportDTO report = new BillingReportDTO();
-    report.setUserId(userId);
+        report.setUserId(userId);
         report.setUserName(user.getName());
         report.setBonusDays(user.getBonusDays());
         report.setEvents(events.stream()
@@ -176,7 +176,7 @@ public class AdminController {
         List<User> members = userService.findAllMembers();
         List<BillingReportDTO> reports = members.stream().map(user -> {
             List<BillingEvent> events = billingService.getUserEventsForDateRange(user.getId(), startDate, endDate);
-        BillingReportDTO dto = new BillingReportDTO();
+            BillingReportDTO dto = new BillingReportDTO();
             dto.setUserId(user.getId());
             dto.setUserName(user.getName());
             dto.setBonusDays(user.getBonusDays());

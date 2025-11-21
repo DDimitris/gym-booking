@@ -22,7 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String name, String email);
 
-    // Atomically debit if sufficient funds. Returns number of rows updated (1 = success, 0 = insufficient funds)
+    // Atomically debit if sufficient funds. Returns number of rows updated (1 =
+    // success, 0 = insufficient funds)
     @Modifying
     @Transactional
     @Query("update User u set u.walletBalance = u.walletBalance - :amount where u.id = :userId and u.walletBalance >= :amount")
@@ -44,9 +45,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Transactional
     @Query("update User u set u.walletBalance = :newBalance where u.id = :userId and u.walletBalance = :expected")
-    int compareAndSetBalance(@Param("userId") Long userId, @Param("expected") BigDecimal expected, @Param("newBalance") BigDecimal newBalance);
+    int compareAndSetBalance(@Param("userId") Long userId, @Param("expected") BigDecimal expected,
+            @Param("newBalance") BigDecimal newBalance);
 
-    // Decrement bonusDays by 1 if it's positive. Returns 1 if decremented, 0 otherwise.
+    // Decrement bonusDays by 1 if it's positive. Returns 1 if decremented, 0
+    // otherwise.
     @Modifying
     @Transactional
     @Query("update User u set u.bonusDays = u.bonusDays - 1 where u.id = :userId and u.bonusDays > 0")
