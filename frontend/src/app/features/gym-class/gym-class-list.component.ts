@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { GymClassDialogComponent } from './gym-class-dialog.component';
-import { GymClass } from '../../core/models/gym-class.model';
+import { GymClass, ClassKind } from '../../core/models/gym-class.model';
 import { GymClassService } from '../../core/services/gym-class.service';
 import { BookingService } from '../../core/services/booking.service';
 import { UserService } from '../../core/services/user.service';
@@ -54,7 +54,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           <div class="day-list">
             <div class="class-item" *ngFor="let c of group.items; trackBy: trackById">
               <div class="left">
-                <div class="title">{{ c.name }}</div>
+                <div class="title">
+                  {{ c.name }}
+                  <span class="kind-chip" *ngIf="c.kind">{{ kindLabel(c.kind) | translate }}</span>
+                </div>
                 <div class="desc" *ngIf="c.description">{{ c.description }}</div>
               </div>
               <div class="middle">
@@ -107,6 +110,15 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .class-item:last-child { border-bottom: none; }
     .left { flex: 1; min-width: 0; }
     .title { font-weight: 600; }
+    .kind-chip {
+      margin-left: 8px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      background-color: #e0e0e0;
+      color: #424242;
+      text-transform: uppercase;
+    }
     .desc { color: #555; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .middle { width: 140px; text-align: center; font-variant-numeric: tabular-nums; }
     .right { width: auto; min-width: 140px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
@@ -138,6 +150,8 @@ export class GymClassListComponent implements OnInit {
     private snackBar: MatSnackBar,
     private translate: TranslateService
   ) {}
+
+  readonly ClassKind = ClassKind;
 
   ngOnInit(): void {
     this.loadClasses();
@@ -339,4 +353,23 @@ export class GymClassListComponent implements OnInit {
   }
 
   trackById(_: number, item: GymClass) { return item.id; }
+
+  kindLabel(kind: ClassKind | string | undefined): string {
+    switch (kind) {
+      case ClassKind.GROUP:
+      case 'GROUP':
+        return 'gymClasses.kinds.group';
+      case ClassKind.SMALL_GROUP:
+      case 'SMALL_GROUP':
+        return 'gymClasses.kinds.smallGroup';
+      case ClassKind.PERSONAL:
+      case 'PERSONAL':
+        return 'gymClasses.kinds.personal';
+      case ClassKind.OPEN_GYM:
+      case 'OPEN_GYM':
+        return 'gymClasses.kinds.openGym';
+      default:
+        return '';
+    }
+  }
 }

@@ -128,6 +128,39 @@
 	margin-top: 0.75rem;
 }
 
+.wallet-mini {
+	margin-top: 0.75rem;
+}
+
+.wallet-link {
+	display: block;
+	text-decoration: none;
+	background: linear-gradient(90deg, #f7f9fc, #ffffff);
+	border: 1px solid #e6eefc;
+	padding: 0.8rem 1rem;
+	border-radius: 10px;
+	box-shadow: 0 4px 12px rgba(20, 60, 120, 0.04);
+	color: inherit;
+}
+
+.wallet-amount {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #0b63d6;
+	margin-top: 0.25rem;
+}
+
+.wallet-label {
+	font-size: 0.85rem;
+	color: #556;
+}
+
+.wallet-sub {
+	margin-top: 0.4rem;
+	font-size: 0.85rem;
+	color: #666;
+}
+
 .notice {
 	margin: 0.5rem 0 1rem;
 	padding: 0.75rem;

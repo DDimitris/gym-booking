@@ -32,20 +32,48 @@
     <div class="card" *ngIf="isMember">
       <h2>{{ "profile.membership.title" | translate }}</h2>
       <div class="billing-row">
-        <span>{{ "profile.membership.baseCost" | translate }}</span>
-        <strong>{{ user.baseCost != null ? "$" + user.baseCost : "—" }}</strong>
+        <span>{{ "gymClasses.kinds.group" | translate }}</span>
+        <strong>{{
+          user.groupBaseCost != null ? "$" + user.groupBaseCost : "—"
+        }}</strong>
       </div>
       <div class="billing-row">
-        <span>{{ "profile.membership.bonusDays" | translate }}</span>
-        <strong>{{ user.bonusDays != null ? user.bonusDays : "—" }}</strong>
+        <span>{{ "gymClasses.kinds.smallGroup" | translate }}</span>
+        <strong>{{
+          user.smallGroupBaseCost != null ? "$" + user.smallGroupBaseCost : "—"
+        }}</strong>
       </div>
       <div class="billing-row">
-        <span>{{ "profile.membership.totalOwed" | translate }}</span>
-        <strong>{{ totalOwed === null ? "—" : "$" + totalOwed }}</strong>
+        <span>{{ "gymClasses.kinds.personal" | translate }}</span>
+        <strong>{{
+          user.personalBaseCost != null ? "$" + user.personalBaseCost : "—"
+        }}</strong>
       </div>
-      <p class="hint">
-        {{ "profile.membership.hint" | translate }}
-      </p>
+      <div class="billing-row">
+        <span>{{ "gymClasses.kinds.openGym" | translate }}</span>
+        <strong>{{
+          user.openGymBaseCost != null ? "$" + user.openGymBaseCost : "—"
+        }}</strong>
+      </div>
+      <!-- per-kind costs shown above; Wallet balance and bonus days are shown in the compact wallet card below -->
+      <div class="wallet-mini">
+        <a class="wallet-link" routerLink="/wallet">
+          <div class="wallet-label">
+            {{ "profile.membership.walletBalance" | translate }}
+          </div>
+          <div class="wallet-amount">
+            {{
+              user.walletBalance != null
+                ? "€" + (user.walletBalance | number : "1.2-2")
+                : "—"
+            }}
+          </div>
+          <div class="wallet-sub">
+            {{ "profile.membership.bonusDays" | translate }}:
+            <strong>{{ user.bonusDays != null ? user.bonusDays : "—" }}</strong>
+          </div>
+        </a>
+      </div>
     </div>
 
     <!-- Trainer-specific info -->

@@ -37,6 +37,21 @@ public class User extends BaseEntity {
     @Column(precision = 10, scale = 2)
     private BigDecimal baseCost;
 
+    @Column(precision = 10, scale = 2)
+    private BigDecimal groupBaseCost;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal smallGroupBaseCost;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal personalBaseCost;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal openGymBaseCost;
+
+    @Column(name = "wallet_balance", precision = 10, scale = 2)
+    private BigDecimal walletBalance = java.math.BigDecimal.ZERO;
+
     @Column
     private Integer bonusDays = 0;
 

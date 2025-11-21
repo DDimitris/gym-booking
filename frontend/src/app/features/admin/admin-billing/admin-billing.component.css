@@ -132,6 +132,47 @@
   color: #666;
 }
 
+.wallet-panel {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: linear-gradient(90deg, #ffffff, #fbfdff);
+  border: 1px solid #e6eefc;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.wallet-info {
+  min-width: 180px;
+}
+
+.wallet-balance {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0b63d6;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.wallet-actions input[type="number"], .wallet-actions input[type="text"] {
+  padding: 0.45rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.wallet-actions label { display:block; font-size:0.75rem; color:#666 }
+
+.quick-topups { display:flex; gap:0.5rem; align-items:center; margin-right:1rem }
+.quick-topups .quick-label { font-size:0.9rem; color:#444; margin-right:0.5rem }
+.quick-topups .btn-xs { padding: 0.25rem 0.6rem; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer }
+.manual-topup { display:flex; flex-direction:column; gap:0.25rem }
+.manual-actions { display:flex; gap:0.5rem; margin-top:0.25rem }
+.ref-hint { font-size:0.8rem; color:#888 }
+
 .bulk-actions {
   margin-bottom: 1.5rem;
 }

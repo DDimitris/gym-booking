@@ -11,7 +11,7 @@ import { GymClassService } from '../../core/services/gym-class.service';
 import { ClassTypeService } from '../../core/services/class-type.service';
 import { BookingService } from '../../core/services/booking.service';
 import { KeycloakService } from '../../core/services/keycloak.service';
-import { GymClass } from '../../core/models/gym-class.model';
+import { GymClass, ClassKind } from '../../core/models/gym-class.model';
 import { ClassType } from '../../core/models/class-type.model';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../../core/services/user.service';
@@ -32,6 +32,9 @@ export class CalendarComponent implements OnInit {
   modalMode: 'view' | 'book' = 'view';
   selectedClass: GymClass | null = null;
   bookingCount = 0;
+  currentUser: User | null = null;
+  chargeAmount: number | null = null;
+  canBookByFunds: boolean | null = null;
   // simple in-component toast message
   toastMessage: string | null = null;
   toastType: 'success' | 'error' | 'info' = 'info';
@@ -203,6 +206,30 @@ export class CalendarComponent implements OnInit {
         this.bookingCount = count;
         this.modalMode = 'view';
         this.showModal = true;
+        // If user is authenticated, fetch profile to compute wallet/bonus eligibility
+        if (this.kc.isReady() && this.kc.isAuthenticated()) {
+          this.users.getMe().subscribe({
+            next: (me) => {
+              this.currentUser = me as User;
+              // Compute charge amount based on user's per-kind costs
+              const kind = selectedClass.kind as string;
+              const amount = this.resolveChargeAmountFromUser(this.currentUser, kind);
+              this.chargeAmount = amount !== null ? Number(amount) : 0;
+              const wallet = Number(this.currentUser.walletBalance ?? 0);
+              const bonus = Number(this.currentUser.bonusDays ?? 0);
+              this.canBookByFunds = (this.chargeAmount <= wallet) || (bonus > 0) || this.chargeAmount === 0;
+            },
+            error: () => {
+              this.currentUser = null;
+              this.chargeAmount = null;
+              this.canBookByFunds = null;
+            }
+          });
+        } else {
+          this.currentUser = null;
+          this.chargeAmount = null;
+          this.canBookByFunds = null;
+        }
       },
       error: (err) => {
         console.error('Error loading bookings:', err);
@@ -246,10 +273,13 @@ export class CalendarComponent implements OnInit {
       error: (err) => {
         console.error('Error booking class:', err);
         const raw = err.error?.message || err.error;
-        const key = raw === 'BOOKING_ALREADY_EXISTS'
-          ? 'calendar.messages.alreadyBooked'
-          : 'calendar.errors.bookingFailed';
-        this.showToast(this.translate.instant(key), 'error');
+        if (raw && typeof raw === 'string') {
+          // Show server-provided message when available (e.g. insufficient funds)
+          this.showToast(raw, 'error');
+        } else {
+          const key = 'calendar.errors.bookingFailed';
+          this.showToast(this.translate.instant(key), 'error');
+        }
       }
     });
   }
@@ -286,5 +316,47 @@ export class CalendarComponent implements OnInit {
     const id = (this.selectedClass as any).trainerId ?? (this.selectedClass as any).instructorId;
     if (!id) return '';
     return this.trainersMap.get(id) || '';
+  }
+
+  kindLabel(kind: ClassKind | string | undefined | null): string {
+    switch (kind) {
+      case ClassKind.GROUP:
+      case 'GROUP':
+        return 'gymClasses.kinds.group';
+      case ClassKind.SMALL_GROUP:
+      case 'SMALL_GROUP':
+        return 'gymClasses.kinds.smallGroup';
+      case ClassKind.PERSONAL:
+      case 'PERSONAL':
+        return 'gymClasses.kinds.personal';
+      case ClassKind.OPEN_GYM:
+      case 'OPEN_GYM':
+        return 'gymClasses.kinds.openGym';
+      default:
+        return '';
+    }
+  }
+
+  // Compute the charge amount for a class based on the user's per-kind base costs
+  private resolveChargeAmountFromUser(user: User | null, kind: string | undefined | null): number | null {
+    if (!user || !kind) return null;
+    switch (kind) {
+      case 'GROUP':
+      case 'group':
+        return user.groupBaseCost ?? user.groupBaseCost ?? 0;
+      case 'SMALL_GROUP':
+      case 'small_group':
+      case 'smallGroup':
+        return user.smallGroupBaseCost ?? 0;
+      case 'PERSONAL':
+      case 'personal':
+        return user.personalBaseCost ?? 0;
+      case 'OPEN_GYM':
+      case 'open_gym':
+      case 'openGym':
+        return user.openGymBaseCost ?? 0;
+      default:
+        return 0;
+    }
   }
 }

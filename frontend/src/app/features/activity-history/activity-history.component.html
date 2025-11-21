@@ -28,6 +28,10 @@
               <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ getClassTypeName(c.classTypeId) }}
             </div>
+            <div class="detail-row" *ngIf="c.kind">
+              <strong>{{ "activity.labels.kind" | translate }}</strong>
+              {{ kindLabel(c.kind) | translate }}
+            </div>
             <div class="detail-row">
               <strong>{{ "activity.labels.start" | translate }}</strong>
               {{ c.startTime | date : "medium" }}
@@ -74,6 +78,10 @@
             <div class="detail-row">
               <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ booking.classTypeName || ("activity.values.na" | translate) }}
+            </div>
+            <div class="detail-row" *ngIf="booking.gymClass?.kind">
+              <strong>{{ "activity.labels.kind" | translate }}</strong>
+              {{ kindLabel(booking.gymClass?.kind) | translate }}
             </div>
             <div class="detail-row">
               <strong>{{ "activity.labels.start" | translate }}</strong>
@@ -174,6 +182,10 @@
             <div class="detail-row">
               <strong>{{ "activity.labels.type" | translate }}</strong>
               {{ booking.classTypeName || ("activity.values.na" | translate) }}
+            </div>
+            <div class="detail-row" *ngIf="booking.gymClass?.kind">
+              <strong>{{ "activity.labels.kind" | translate }}</strong>
+              {{ kindLabel(booking.gymClass?.kind) | translate }}
             </div>
             <div class="detail-row">
               <strong>{{ "activity.labels.date" | translate }}</strong>

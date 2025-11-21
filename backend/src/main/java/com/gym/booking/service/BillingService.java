@@ -2,6 +2,7 @@ package com.gym.booking.service;
 
 import com.gym.booking.model.Booking;
 import com.gym.booking.model.BillingEvent;
+import com.gym.booking.model.GymClass;
 import com.gym.booking.model.User;
 import com.gym.booking.repository.BillingEventRepository;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -17,45 +20,104 @@ import java.util.List;
 public class BillingService {
     private final BillingEventRepository billingEventRepository;
     private final UserService userService;
+    private final com.gym.booking.service.WalletService walletService;
 
     // Same-day cancellation threshold (12 hours before class start)
     private static final long SAME_DAY_THRESHOLD_HOURS = 12;
+    private final ZoneId zoneId;
 
     public BillingService(BillingEventRepository billingEventRepository,
-            UserService userService) {
+            UserService userService,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) @org.springframework.context.annotation.Lazy com.gym.booking.service.WalletService walletService,
+            @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.billingEventRepository = billingEventRepository;
         this.userService = userService;
+        this.walletService = walletService;
+        this.zoneId = ZoneId.of(appTimezone);
+    }
+
+    private BigDecimal resolveBaseCostForClass(User user, GymClass gymClass) {
+        if (gymClass == null || gymClass.getKind() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal amount = switch (gymClass.getKind()) {
+            case GROUP -> user.getGroupBaseCost();
+            case SMALL_GROUP -> user.getSmallGroupBaseCost();
+            case PERSONAL -> user.getPersonalBaseCost();
+            case OPEN_GYM -> user.getOpenGymBaseCost();
+        };
+
+        return amount != null ? amount : BigDecimal.ZERO;
+    }
+
+    /**
+     * Public helper to obtain the charge amount for a given user and class.
+     * This is used by other services (e.g. booking) to check eligibility without
+     * duplicating the resolve logic.
+     */
+    public BigDecimal getChargeAmountForClass(User user, GymClass gymClass) {
+        return resolveBaseCostForClass(user, gymClass);
     }
 
     /**
      * Calculate and create billing event for same-day cancellation.
-     * Charges apply if cancelled within SAME_DAY_THRESHOLD_HOURS of class start time.
+     * Charges apply if cancelled within SAME_DAY_THRESHOLD_HOURS of class start
+     * time.
      */
     public BillingEvent createCancellationCharge(Booking booking) {
-        LocalDateTime classStartTime = booking.getClassInstance().getStartTime();
-        LocalDateTime cancellationTime = booking.getCancelledAt() != null
-                ? booking.getCancelledAt()
-                : LocalDateTime.now();
+        // Use application timezone to evaluate cancellation windows
+        ZonedDateTime classStartTime = booking.getClassInstance().getStartTime().atZone(zoneId);
+        ZonedDateTime cancellationTime = booking.getCancelledAt() != null
+                ? booking.getCancelledAt().atZone(zoneId)
+                : ZonedDateTime.now(zoneId);
 
         long hoursUntilClass = Duration.between(cancellationTime, classStartTime).toHours();
 
         // Only charge if cancelled within same-day threshold
         if (hoursUntilClass < SAME_DAY_THRESHOLD_HOURS) {
             User user = booking.getUser();
-            BigDecimal chargeAmount = user.getBaseCost() != null
-                    ? user.getBaseCost()
-                    : BigDecimal.ZERO;
+            BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
+            if (chargeAmount == null) {
+                chargeAmount = BigDecimal.ZERO;
+            }
 
-            BillingEvent event = new BillingEvent();
-            event.setUser(user);
-            event.setBooking(booking);
-            event.setAmount(chargeAmount);
-            event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
-            event.setEventDate(LocalDateTime.now());
-            event.setSettled(false);
-            event.setSettlementType(BillingEvent.SettlementType.NONE);
+            // Attempt to settle automatically via wallet (consume wallet and optionally a
+            // bonus day)
+            if (walletService != null) {
+                WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount,
+                        booking);
 
-            return billingEventRepository.save(event);
+                BillingEvent event = new BillingEvent();
+                event.setUser(user);
+                event.setBooking(booking);
+                event.setAmount(chargeAmount);
+                event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
+                event.setEventDate(LocalDateTime.now(zoneId));
+
+                if (res.fullySettled()) {
+                    event.setSettled(true);
+                    event.setSettlementType(res.bonusConsumed() ? BillingEvent.SettlementType.BONUS
+                            : BillingEvent.SettlementType.PAYMENT);
+                    return billingEventRepository.save(event);
+                } else {
+                    // Partially paid or unpaid: create event and mark unsettled
+                    event.setSettled(false);
+                    event.setSettlementType(BillingEvent.SettlementType.NONE);
+                    BillingEvent saved = billingEventRepository.save(event);
+                    return saved;
+                }
+            } else {
+                BillingEvent event = new BillingEvent();
+                event.setUser(user);
+                event.setBooking(booking);
+                event.setAmount(chargeAmount);
+                event.setReason("Same-day cancellation (cancelled " + hoursUntilClass + " hours before class)");
+                event.setEventDate(LocalDateTime.now(zoneId));
+                event.setSettled(false);
+                event.setSettlementType(BillingEvent.SettlementType.NONE);
+                return billingEventRepository.save(event);
+            }
         }
 
         return null; // No charge
@@ -67,16 +129,6 @@ public class BillingService {
     public List<BillingEvent> getUnsettledCharges(Long userId) {
         User user = userService.findById(userId);
         return billingEventRepository.findByUserAndSettledFalse(user);
-    }
-
-    /**
-     * Calculate total unsettled amount for a user
-     */
-    public BigDecimal calculateTotalOwed(Long userId) {
-        List<BillingEvent> unsettled = getUnsettledCharges(userId);
-        return unsettled.stream()
-                .map(BillingEvent::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
@@ -115,6 +167,48 @@ public class BillingService {
             return;
         for (Long id : eventIds) {
             markAsSettled(id);
+        }
+    }
+
+    /**
+     * Create and attempt to settle a billing event for a completed booking.
+     */
+    public BillingEvent createCompletionCharge(Booking booking) {
+        User user = booking.getUser();
+        BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
+        if (chargeAmount == null)
+            chargeAmount = BigDecimal.ZERO;
+
+        if (walletService != null) {
+            WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount, booking);
+
+            BillingEvent event = new BillingEvent();
+            event.setUser(user);
+            event.setBooking(booking);
+            event.setAmount(chargeAmount);
+            event.setReason("Class completed");
+            event.setEventDate(LocalDateTime.now(zoneId));
+
+            if (res.fullySettled()) {
+                event.setSettled(true);
+                event.setSettlementType(
+                        res.bonusConsumed() ? BillingEvent.SettlementType.BONUS : BillingEvent.SettlementType.PAYMENT);
+                return billingEventRepository.save(event);
+            } else {
+                event.setSettled(false);
+                event.setSettlementType(BillingEvent.SettlementType.NONE);
+                return billingEventRepository.save(event);
+            }
+        } else {
+            BillingEvent event = new BillingEvent();
+            event.setUser(user);
+            event.setBooking(booking);
+            event.setAmount(chargeAmount);
+            event.setReason("Class completed");
+            event.setEventDate(LocalDateTime.now());
+            event.setSettled(false);
+            event.setSettlementType(BillingEvent.SettlementType.NONE);
+            return billingEventRepository.save(event);
         }
     }
 

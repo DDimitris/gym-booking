@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-gym_booking,keycloak}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d
@@ -22,6 +20,8 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-22.0.1}
     container_name: gym-booking-keycloak
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
@@ -93,8 +93,7 @@ services:
       KEYCLOAK_AUTH_SERVER_URL: ${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080/auth}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-gym-booking}
       KEYCLOAK_RESOURCE: ${KEYCLOAK_RESOURCE:-gym-booking-client}
-    ports:
-      - "${BACKEND_PORT:-8080}:8080"
+    # Do NOT publish backend port to the host for improved security; frontend accesses the backend via the compose network.
     depends_on:
       postgres:
         condition: service_healthy

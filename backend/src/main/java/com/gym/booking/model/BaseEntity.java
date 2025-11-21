@@ -5,6 +5,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import jakarta.persistence.Column;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -25,11 +26,14 @@ public abstract class BaseEntity {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        // Use application timezone (read from system property set at startup)
+        String tz = System.getProperty("user.timezone", "Europe/Athens");
+        createdAt = LocalDateTime.now(ZoneId.of(tz));
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        String tz = System.getProperty("user.timezone", "Europe/Athens");
+        updatedAt = LocalDateTime.now(ZoneId.of(tz));
     }
 }
