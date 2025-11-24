@@ -8,8 +8,8 @@
 	--color-border: rgba(255,212,0,0.08);
 	--color-text: #f5f5f5;           /* light text on dark bg */
 	--color-text-muted: rgba(245,245,245,0.7);
-		--color-primary: #E6B800;        /* brand yellow (darker) */
-		--color-primary-700: #C99F00;    /* darker yellow */
+			--color-primary: #fab300;        /* brand yellow (user requested) */
+			--color-primary-700: #d79a00;    /* darker yellow */
 	--color-accent: #000000;         /* black accent */
 	--radius: 10px;
 }
@@ -113,9 +113,9 @@ a:hover { color: var(--color-primary-700); }
 .hero .actions { display: flex; gap: 12px; }
 .hero .art { text-align: center; }
 .logo-object, .logo-mini-object { display: block; border: none; }
-.logo-object { max-width: 360px; width: 100%; height: auto; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
-.logo-mini-object { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; }
-.brand-logo-img { width: 32px; height: 32px; object-fit: cover; border-radius: 50%; }
+.logo-object { max-width: 360px; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
+.logo-mini-object { width: 32px; height: 32px; border-radius: 8px; overflow: hidden; }
+.brand-logo-img { width: 32px; height: 32px; object-fit: cover; border-radius: 8px; }
 
 /* Strong brand buttons */
 .btn.primary { background: var(--color-primary); color: #000; padding: 12px 18px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); }

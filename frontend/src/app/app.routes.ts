@@ -25,7 +25,7 @@ import { KeycloakService } from './core/services/keycloak.service';
           </div>
         </div>
         <div class="art" aria-hidden="true">
-          <img src="assets/images/logo.jpg" alt="Gym logo" class="logo-object" />
+          <img src="assets/images/logo.png" alt="Gym logo" class="logo-object" />
         </div>
       </div>
     </section>
