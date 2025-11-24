@@ -481,6 +481,18 @@
     "logout": "Logout"
   },
   "header": {
-    "quickLogin": "Quick login"
+    "quickLogin": "Quick login",
+    "register": "Register"
   }
+  ,
+  "start": {
+    "learnMore": "Learn more",
+    "fastBooking": "Fast booking",
+    "fastBookingDesc": "Find and reserve a spot in seconds with a clean calendar view.",
+    "clearHistory": "Clear history",
+    "clearHistoryDesc": "See your past and upcoming classes at a glance.",
+    "trainerTools": "Trainer tools",
+    "trainerToolsDesc": "Manage schedules and participants with powerful trainer tools."
+  }
+ 
 }

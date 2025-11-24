@@ -5,7 +5,13 @@
         class="brand-group"
         (click)="kc.isAuthenticated() ? null : kcLogin()"
       >
-        <div class="logo">🏋️</div>
+        <div class="logo">
+          <img
+            src="assets/images/logo.jpg"
+            alt="Gym logo"
+            class="brand-logo-img logo-mini-object"
+          />
+        </div>
         <span class="brand-text">{{ "common.appTitle" | translate }}</span>
       </div>
       <button
@@ -93,9 +99,7 @@
               ΕΛ
             </button>
           </div>
-          <button class="btn primary" (click)="kcLogin()">
-            {{ "header.quickLogin" | translate }}
-          </button>
+          <!-- Login CTA removed from header to avoid duplication on landing page -->
           <button
             class="btn ghost toggle"
             (click)="toggleTheme()"
