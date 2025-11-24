@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "class_types")
 @lombok.Getter
 @lombok.Setter
-@lombok.ToString(exclude = { "trainer" })
+@lombok.ToString
 public class ClassType extends BaseEntity {
 
     @NotBlank
@@ -16,10 +16,6 @@ public class ClassType extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trainer_id")
-    private User trainer;
 
     @Column(nullable = false)
     private Boolean isActive = true;

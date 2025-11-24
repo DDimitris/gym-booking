@@ -105,6 +105,7 @@ public class GymClassController {
         dto.setStartTime(gymClass.getStartTime());
         dto.setEndTime(gymClass.getEndTime());
         dto.setLocation(gymClass.getLocation());
+        dto.setKind(gymClass.getKind() != null ? gymClass.getKind().name() : GymClass.ClassKind.GROUP.name());
         return dto;
     }
 
@@ -118,6 +119,9 @@ public class GymClassController {
         gymClass.setStartTime(dto.getStartTime());
         gymClass.setEndTime(dto.getEndTime());
         gymClass.setLocation(dto.getLocation());
+        if (dto.getKind() != null) {
+            gymClass.setKind(GymClass.ClassKind.valueOf(dto.getKind()));
+        }
         if (dto.getClassTypeId() != null) {
             gymClass.setClassType(classTypeService.findById(java.util.Objects.requireNonNull(dto.getClassTypeId())));
         }

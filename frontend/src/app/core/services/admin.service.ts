@@ -18,12 +18,6 @@ export class AdminService {
     return this.http.get<User[]>(`${this.apiUrl}/members`);
   }
 
-  setBaseCost(userId: number, baseCost: number): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/members/${userId}/base-cost`, null, {
-      params: { baseCost: baseCost.toString() }
-    });
-  }
-
   assignBonusDays(userId: number, bonusDays: number): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/members/${userId}/bonus-days`, null, {
       params: { bonusDays: bonusDays.toString() }
@@ -32,6 +26,15 @@ export class AdminService {
 
   promoteToTrainer(userId: number): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/members/${userId}/promote-to-trainer`, {});
+  }
+
+  setMemberBaseCosts(userId: number, costs: {
+    groupBaseCost?: number;
+    smallGroupBaseCost?: number;
+    personalBaseCost?: number;
+    openGymBaseCost?: number;
+  }): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/members/${userId}/base-costs`, costs);
   }
 
   // Billing Reports

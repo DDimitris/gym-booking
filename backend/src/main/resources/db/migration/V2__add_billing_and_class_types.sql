@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS class_types (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
-    instructor_id BIGINT REFERENCES users(id),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
@@ -82,7 +81,6 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_class_types_name ON class_types(name);
-CREATE INDEX IF NOT EXISTS idx_class_types_instructor ON class_types(instructor_id);
 CREATE INDEX IF NOT EXISTS idx_class_instances_type ON class_instances(class_type_id);
 CREATE INDEX IF NOT EXISTS idx_class_instances_start_time ON class_instances(start_time);
 CREATE INDEX IF NOT EXISTS idx_class_instances_status ON class_instances(status);

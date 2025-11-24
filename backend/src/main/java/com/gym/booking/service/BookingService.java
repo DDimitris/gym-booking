@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -20,14 +22,18 @@ public class BookingService {
     private final UserService userService;
     private final BillingService billingService;
 
+    private final ZoneId zoneId;
+
     public BookingService(BookingRepository bookingRepository,
             GymClassService gymClassService,
             UserService userService,
-            @Lazy BillingService billingService) {
+            @Lazy BillingService billingService,
+            @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.bookingRepository = bookingRepository;
         this.gymClassService = gymClassService;
         this.userService = userService;
         this.billingService = billingService;
+        this.zoneId = ZoneId.of(appTimezone);
     }
 
     public Booking createBooking(Long userId, Long classInstanceId) {
@@ -60,7 +66,9 @@ public class BookingService {
             throw new BookingException("This class has been cancelled");
         }
 
-        if (classInstance.getStartTime().isBefore(LocalDateTime.now())) {
+        ZonedDateTime classStartZ = classInstance.getStartTime().atZone(zoneId);
+        ZonedDateTime nowZ = ZonedDateTime.now(zoneId);
+        if (classStartZ.isBefore(nowZ)) {
             throw new BookingException("Cannot book past classes");
         }
 
@@ -75,15 +83,31 @@ public class BookingService {
         if (!existingBookings.isEmpty()) {
             throw new BookingException("User already has a booking for this class");
         }
+
+        // Enforce wallet/bonus validation: user must have either sufficient wallet
+        // balance for the class kind, or at least 1 bonus day to cover the class.
+        java.math.BigDecimal chargeAmount = billingService.getChargeAmountForClass(user, classInstance);
+        java.math.BigDecimal wallet = java.util.Optional.ofNullable(user.getWalletBalance())
+                .orElse(java.math.BigDecimal.ZERO);
+        Integer bonus = java.util.Optional.ofNullable(user.getBonusDays()).orElse(0);
+
+        boolean canPayWithWallet = wallet.compareTo(chargeAmount) >= 0;
+        boolean canUseBonus = bonus > 0;
+
+        if (chargeAmount.compareTo(java.math.BigDecimal.ZERO) > 0 && !canPayWithWallet && !canUseBonus) {
+            throw new BookingException("Insufficient funds: wallet=" + wallet + " bonusDays=" + bonus +
+                    " required=" + chargeAmount + ". Please top-up wallet or use a bonus day.");
+        }
     }
 
     public void cancelBooking(Long bookingId) {
         Booking booking = findById(bookingId);
-        if (booking.getClassInstance().getStartTime().isBefore(LocalDateTime.now())) {
+        ZonedDateTime startZ = booking.getClassInstance().getStartTime().atZone(zoneId);
+        if (startZ.isBefore(ZonedDateTime.now(zoneId))) {
             throw new BookingException("Cannot cancel past bookings");
         }
         booking.setStatus(Booking.BookingStatus.CANCELLED_BY_USER);
-        booking.setCancelledAt(LocalDateTime.now());
+        booking.setCancelledAt(LocalDateTime.now(zoneId));
         bookingRepository.save(booking);
 
         // Create billing event if same-day cancellation (user-initiated only)
@@ -95,6 +119,8 @@ public class BookingService {
         booking.setStatus(Booking.BookingStatus.COMPLETED);
         booking.setAttendedAt(LocalDateTime.now());
         bookingRepository.save(booking);
+        // Attempt to create and auto-settle billing for completed booking
+        billingService.createCompletionCharge(booking);
     }
 
     public List<Booking> findByUser(Long userId) {

@@ -37,6 +37,9 @@ public class GymClassDTO {
     // Status returned to clients (SCHEDULED/CANCELLED/COMPLETED)
     private String status;
 
+    // Class kind: GROUP, SMALL_GROUP, PERSONAL, OPEN_GYM
+    private String kind;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String location;

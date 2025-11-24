@@ -40,9 +40,4 @@ export class UserService {
   updateMe(payload: { name: string; avatarUrl?: string | null }): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/me`, payload);
   }
-
-  // Billing summary placeholder (backend endpoint to be added)
-  getMyBillingSummary(): Observable<{ totalOwed: number }> {
-    return this.http.get<{ totalOwed: number }>(`${this.apiUrl}/me/billing`);
-  }
 }

@@ -29,6 +29,33 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // Atomically debit if sufficient funds. Returns number of rows updated (1 =
+    // success)
+    public int debitIfSufficient(@NonNull Long userId, @NonNull java.math.BigDecimal amount) {
+        return userRepository.debitIfSufficient(userId, amount);
+    }
+
+    // Atomically credit (top-up)
+    public int creditBalance(@NonNull Long userId, @NonNull java.math.BigDecimal amount) {
+        return userRepository.creditBalance(userId, amount);
+    }
+
+    // Atomically set balance
+    public int setBalanceAtomic(@NonNull Long userId, @NonNull java.math.BigDecimal newBalance) {
+        return userRepository.setBalance(userId, newBalance);
+    }
+
+    // Compare and set balance
+    public int compareAndSetBalance(@NonNull Long userId, @NonNull java.math.BigDecimal expected,
+            @NonNull java.math.BigDecimal newBalance) {
+        return userRepository.compareAndSetBalance(userId, expected, newBalance);
+    }
+
+    // Decrement bonus days atomically if positive
+    public int decrementBonusIfPositive(@NonNull Long userId) {
+        return userRepository.decrementBonusIfPositive(userId);
+    }
+
     public User updateUser(@NonNull Long id, @NonNull User userDetails) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));

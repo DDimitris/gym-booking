@@ -27,6 +27,15 @@ public class UserDTO {
     private UserRole role;
 
     private BigDecimal baseCost;
+
+    private BigDecimal groupBaseCost;
+
+    private BigDecimal smallGroupBaseCost;
+
+    private BigDecimal personalBaseCost;
+
+    private BigDecimal openGymBaseCost;
+    private BigDecimal walletBalance;
     private Integer bonusDays;
     private UserStatus status;
     private String avatarUrl;

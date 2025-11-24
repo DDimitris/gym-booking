@@ -19,12 +19,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     <div mat-dialog-content>
       <form (ngSubmit)="create()" #form="ngForm">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'adminManagement.classTypeDialog.fields.trainer' | translate }}</mat-label>
-          <mat-select [(ngModel)]="trainerId" name="trainerId">
-            <mat-option *ngFor="let i of instructors" [value]="i.id">{{ i.name }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'adminManagement.classTypeDialog.fields.name' | translate }}</mat-label>
           <input matInput [(ngModel)]="name" name="name" required />
         </mat-form-field>
@@ -56,30 +50,17 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class AdminCreateClassTypeDialogComponent {
   name = '';
   description = '';
-  trainerId: number | null = null;
   messageKey: string | null = null;
   messageType: 'success' | 'error' | 'info' = 'info';
-  instructors: User[] = [];
-  instructorLocked = false;
+  // Trainer selection has been removed; class types are no longer bound to a single trainer
 
   constructor(
     private ref: MatDialogRef<AdminCreateClassTypeDialogComponent>,
     private classTypeService: ClassTypeService,
     private adminService: AdminService,
     private kc: KeycloakService,
-    private users: UserService,
     private translate: TranslateService
-  ) {
-    this.loadInstructors();
-  }
-
-  loadInstructors(): void {
-    // Load all trainers for both admins and instructors from /api/users/instructors
-    this.users.getAllTrainers().subscribe({
-      next: (list) => (this.instructors = list),
-      error: () => (this.instructors = [])
-    });
-  }
+  ) {}
 
   create(): void {
     if (!this.name) {
@@ -91,7 +72,6 @@ export class AdminCreateClassTypeDialogComponent {
       id: 0,
       name: this.name,
       description: this.description,
-      trainerId: this.trainerId,
       isActive: true
     }).subscribe({
       next: () => {

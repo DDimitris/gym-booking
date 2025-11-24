@@ -77,6 +77,8 @@ import { AdminBillingComponent } from './features/admin/admin-billing/admin-bill
 // Removed standalone admin class routes; classes managed inside Management tabs
 import { ManagementComponent } from './features/admin/management/management.component';
 import { ProfileComponent } from './features/profile/profile.component';
+import { UserWalletComponent } from './features/wallet/user-wallet.component';
+import { AdminWalletComponent } from './features/admin/admin-wallet/admin-wallet.component';
 
 export const routes: Routes = [
   {
@@ -116,6 +118,18 @@ export const routes: Routes = [
   {
     path: 'admin/billing/:memberId',
     component: AdminBillingComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'wallet',
+    component: UserWalletComponent,
+    canActivate: [AuthGuard],
+    data: { authRequired: true }
+  },
+  {
+    path: 'admin/wallet',
+    component: AdminWalletComponent,
     canActivate: [AuthGuard],
     data: { roles: ['ADMIN'] }
   },

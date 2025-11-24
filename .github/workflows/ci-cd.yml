@@ -151,7 +151,7 @@ jobs:
             git reset --hard origin/${{ github.ref_name }}
             export IMAGE_TAG=${{ steps.meta.outputs.tag }}
             docker compose pull
-            docker compose down -v
+            docker compose stop frontend backend
             docker compose up -d
 
   deploy-master:
