@@ -61,10 +61,31 @@ p.lead { font-size: 18px; color: var(--color-text-muted); }
 .card.pad { padding: 16px; }
 
 /* Dialogs - global polish */
+.mat-mdc-dialog-container {
+	/* Ensure dialogs have breathing room on small screens */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+}
+
 .mat-mdc-dialog-container .mdc-dialog__surface {
-	background: var(--color-surface);
-	border: 1px solid var(--color-border);
-	border-radius: 12px !important;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: 12px !important;
+		/* Make dialog content scrollable and respect viewport on small screens */
+		max-height: calc(100vh - 2rem);
+		overflow-y: auto;
+		box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+	.mat-mdc-dialog-container {
+		/* anchor near the top on narrow viewports so the dialog can scroll within the window */
+		align-items: flex-start;
+		padding-top: 1.25rem;
+		padding-bottom: 1.25rem;
+	}
 }
 .mat-mdc-dialog-container .mdc-dialog__title { font-weight: 700; letter-spacing: .2px; color: var(--color-text); }
 .mat-mdc-dialog-container .mdc-dialog__content { color: var(--color-text); }

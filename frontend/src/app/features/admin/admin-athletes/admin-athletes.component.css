@@ -228,8 +228,10 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  /* anchor near the top so dialogs can scroll within viewport on small screens */
+  align-items: flex-start;
   justify-content: center;
+  padding: 1.5rem;
   z-index: 1000;
 }
 
@@ -237,8 +239,12 @@
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 600px;
+    /* ensure dialog fits vertically and becomes scrollable when content is tall */
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+    box-sizing: border-box;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
