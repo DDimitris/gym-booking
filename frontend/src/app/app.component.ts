@@ -15,13 +15,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'Habit Fitness & More';
+  title = 'gym-booking-app';
 
   backendRole: string | null = null;
   currentYear = new Date().getFullYear();
   mobileMenuOpen = false;
   theme: 'dark' | 'light' = 'dark';
-  currentLang: 'en' | 'el' = 'el';
+  currentLang: 'en' | 'el' = 'en';
 
   constructor(
     public kc: KeycloakService,
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
     this.applyTheme(pref);
 
     // Language preference
-  const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'el';
+    const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'en';
     this.currentLang = storedLang;
     this.translate.use(storedLang);
   }
@@ -95,6 +95,9 @@ export class AppComponent implements OnInit {
   get showHistory(): boolean {
     if (!(this.kc.isReady() && this.kc.isAuthenticated())) return false;
     const roles = this.kc.getRoles();
+    // Ensure trainer/instructor roles take precedence and do NOT see history
+    if (roles.includes('TRAINER') || roles.includes('INSTRUCTOR')) return false;
+    if (this.backendRole === 'TRAINER' || this.backendRole === 'INSTRUCTOR') return false;
     return roles.includes('MEMBER') || roles.includes('ATHLETE') || ['MEMBER','ATHLETE'].includes(this.backendRole || '');
   }
 
