@@ -15,13 +15,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'gym-booking-app';
+  title = 'Habit Fitness & More';
 
   backendRole: string | null = null;
   currentYear = new Date().getFullYear();
   mobileMenuOpen = false;
   theme: 'dark' | 'light' = 'dark';
-  currentLang: 'en' | 'el' = 'en';
+  currentLang: 'en' | 'el' = 'el';
 
   constructor(
     public kc: KeycloakService,
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
     this.applyTheme(pref);
 
     // Language preference
-    const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'en';
+  const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'el';
     this.currentLang = storedLang;
     this.translate.use(storedLang);
   }

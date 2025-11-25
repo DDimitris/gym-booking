@@ -97,8 +97,8 @@ body:not(.light) .mat-mdc-chip { background: var(--color-surface-2); color: var(
 .mat-mdc-text-field-wrapper { border-radius: 10px !important; }
 
 /* Links */
-a { color: var(--color-primary); }
-a:hover { color: var(--color-primary-700); }
+a { color: #000; }
+a:hover { color: #111; }
 
 /* Utility */
 .stack { display: flex; flex-direction: column; gap: 12px; }
