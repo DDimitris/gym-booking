@@ -95,6 +95,9 @@ export class AppComponent implements OnInit {
   get showHistory(): boolean {
     if (!(this.kc.isReady() && this.kc.isAuthenticated())) return false;
     const roles = this.kc.getRoles();
+    // Ensure trainer/instructor roles take precedence and do NOT see history
+    if (roles.includes('TRAINER') || roles.includes('INSTRUCTOR')) return false;
+    if (this.backendRole === 'TRAINER' || this.backendRole === 'INSTRUCTOR') return false;
     return roles.includes('MEMBER') || roles.includes('ATHLETE') || ['MEMBER','ATHLETE'].includes(this.backendRole || '');
   }
 

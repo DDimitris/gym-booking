@@ -3,6 +3,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { CalendarComponent } from './features/calendar/calendar.component';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { KeycloakService } from './core/services/keycloak.service';
 
@@ -10,34 +11,37 @@ import { KeycloakService } from './core/services/keycloak.service';
 @Component({
   selector: 'app-start',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <section class="hero container">
       <div class="hero-inner">
         <div class="copy">
           <h1>Book smarter. Train better.</h1>
-          <p class="lead">Manage classes, track your history, and stay on top of your fitness goals.</p>
+          <p class="lead">Find classes, manage your wallet, and keep track of your progress — all in one place.</p>
           <div class="actions">
-            <button class="btn primary" (click)="login()">Login</button>
-            <a class="btn ghost" href="#features">Learn more</a>
+            <button class="btn primary" (click)="login()">{{ 'header.quickLogin' | translate }}</button>
+            <button class="btn ghost" (click)="register()">{{ 'header.register' | translate }}</button>
+            <a class="btn ghost" href="#features">{{ 'start.learnMore' | translate }}</a>
           </div>
         </div>
-        <div class="art" aria-hidden="true">🏋️‍♀️</div>
+        <div class="art" aria-hidden="true">
+          <img src="assets/images/logo.png" alt="Gym logo" class="logo-object" />
+        </div>
       </div>
     </section>
     <section id="features" class="features container">
       <div class="grid">
         <div class="card pad">
-          <h3>Fast booking</h3>
-          <p>Find and reserve a spot in seconds with a clean calendar view.</p>
+          <h3>{{ 'start.fastBooking' | translate }}</h3>
+          <p>{{ 'start.fastBookingDesc' | translate }}</p>
         </div>
         <div class="card pad">
-          <h3>Clear history</h3>
-          <p>See your past and upcoming classes at a glance.</p>
+          <h3>{{ 'start.clearHistory' | translate }}</h3>
+          <p>{{ 'start.clearHistoryDesc' | translate }}</p>
         </div>
         <div class="card pad">
-          <h3>Trainer tools</h3>
-          <p>Manage schedules and participants with confidence.</p>
+          <h3>{{ 'start.trainerTools' | translate }}</h3>
+          <p>{{ 'start.trainerToolsDesc' | translate }}</p>
         </div>
       </div>
     </section>
@@ -45,10 +49,12 @@ import { KeycloakService } from './core/services/keycloak.service';
   styles: [`
     .hero { padding: 56px 0; }
     .hero-inner { display: grid; grid-template-columns: 1.2fr .8fr; gap: 24px; align-items: center; }
-    .copy h1 { font-size: 44px; line-height: 1.05; margin: 0 0 12px; }
+    .copy h1 { font-size: 44px; line-height: 1.05; margin: 0 0 12px; color: var(--color-text); }
     .lead { color: var(--color-text-muted); margin: 0 0 20px; font-size: 18px; }
     .actions { display: flex; gap: 12px; }
-    .art { font-size: 72px; text-align: center; }
+    .art { text-align: center; }
+  .logo-object { max-width: 420px; width: 100%; height: auto; object-fit: contain; }
+    .brand-logo-img { max-width: 420px; width: 100%; height: 240px; object-fit: contain; }
     .features { padding: 20px 0 56px; }
     .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; } }
@@ -69,6 +75,7 @@ class StartComponent implements OnInit {
     }
   }
   login(): void { this.kc.login(); }
+  register(): void { this.kc.register(); }
 }
 import { ActivityHistoryComponent } from './features/activity-history/activity-history.component';
 // TODO: Rename component & folder to admin-members; temporary import kept for transition
