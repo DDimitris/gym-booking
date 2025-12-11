@@ -33,6 +33,7 @@ export class CalendarComponent implements OnInit {
   selectedClass: GymClass | null = null;
   bookingCount = 0;
   currentUser: User | null = null;
+  backendRole: string | null = null;
   chargeAmount: number | null = null;
   canBookByFunds: boolean | null = null;
   // simple in-component toast message
@@ -66,6 +67,25 @@ export class CalendarComponent implements OnInit {
   this.isAdmin = ready && roles.includes('ADMIN');
   this.isInstructor = ready && (roles.includes('INSTRUCTOR') || roles.includes('TRAINER'));
   this.isMember = ready && (roles.includes('MEMBER') || roles.includes('ATHLETE'));
+
+    // If backend role differs from token roles (e.g. promoted by admin while logged in),
+    // fetch current profile and respect backend role to correctly hide member-only UI.
+    if (this.kc.isReady() && this.kc.isAuthenticated()) {
+      this.users.getMe().subscribe({
+        next: (me) => {
+          const br = (me as any)?.role || null;
+          this.backendRole = br;
+          // If backend says user is trainer/instructor, ensure member UI is hidden
+          if (br === 'INSTRUCTOR' || br === 'TRAINER') {
+            this.isInstructor = true;
+            this.isMember = false;
+          }
+        },
+        error: () => {
+          this.backendRole = null;
+        }
+      });
+    }
 
     this.loadData();
   }
@@ -211,6 +231,13 @@ export class CalendarComponent implements OnInit {
           this.users.getMe().subscribe({
             next: (me) => {
               this.currentUser = me as User;
+              const br = (me as any)?.role || null;
+              this.backendRole = br;
+              // Apply backend role to instructor/member flags immediately for modal context
+              if (br === 'INSTRUCTOR' || br === 'TRAINER') {
+                this.isInstructor = true;
+                this.isMember = false;
+              }
               // Compute charge amount based on user's per-kind costs
               const kind = selectedClass.kind as string;
               const amount = this.resolveChargeAmountFromUser(this.currentUser, kind);

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { OnDestroy } from '@angular/core';
 
 type UserRole = 'ADMIN' | 'TRAINER' | 'MEMBER';
 type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
@@ -33,6 +34,38 @@ export class ProfileComponent implements OnInit {
   me: UserMe | null = null;
   message: string | null = null; // Keeping message for informational purposes
   messageType: 'success' | 'error' | 'info' = 'info'; // Keeping messageType for informational purposes
+  subscription: any = null;
+  subscriptionHistory: any[] = [];
+
+  get daysRemaining(): number | null {
+    if (!this.subscription || !this.subscription.endDate) {
+      return null;
+    }
+    const end = new Date(this.subscription.endDate);
+    const diffMs = end.getTime() - Date.now();
+    const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return Math.max(0, days);
+  }
+
+  parseHistoryEventData(eventData: string | null): { key: string; value: string }[] {
+    if (!eventData) return [];
+    const parts = eventData.split(',').map(p => p.trim()).filter(p => p.length > 0);
+    const parsed: { key: string; value: string }[] = [];
+    let anyKv = false;
+    for (const p of parts) {
+      const idx = p.indexOf('=');
+      if (idx > 0) {
+        anyKv = true;
+        const k = p.substring(0, idx).trim();
+        const v = p.substring(idx + 1).trim();
+        parsed.push({ key: k, value: v });
+      }
+    }
+    if (!anyKv) {
+      return [{ key: 'data', value: eventData }];
+    }
+    return parsed;
+  }
 
   constructor(private userService: UserService) {}
 
@@ -44,6 +77,15 @@ export class ProfileComponent implements OnInit {
     this.userService.getMe().subscribe({
       next: (me: UserMe) => { this.me = me; },
       error: () => { this.message = 'Failed to load profile'; this.messageType = 'error'; }
+    });
+    // Load subscription info for this member
+    this.userService.getMySubscription().subscribe({
+      next: (s) => { this.subscription = s; },
+      error: () => { this.subscription = null; }
+    });
+    this.userService.getMySubscriptionHistory().subscribe({
+      next: (h) => { this.subscriptionHistory = h || []; },
+      error: () => { this.subscriptionHistory = []; }
     });
     // 'owed' concept removed; wallet balance is part of the user payload (me.walletBalance)
   }

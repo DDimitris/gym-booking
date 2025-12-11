@@ -34,6 +34,37 @@
         {{ "adminBilling.filters.apply" | translate }}
       </button>
     </div>
+    <div class="extra-filters">
+      <div class="filter-group">
+        <label>{{ "adminBilling.filters.settlementType" | translate }}</label>
+        <select [(ngModel)]="settlementFilter" (ngModelChange)="applyFilters()">
+          <option value="ALL">
+            {{ "adminBilling.filters.settlement.all" | translate }}
+          </option>
+          <option value="SUBSCRIPTION">
+            {{ "adminBilling.settlement.subscription" | translate }}
+          </option>
+          <option value="PAYMENT">
+            {{ "adminBilling.settlement.payment" | translate }}
+          </option>
+          <option value="BONUS">
+            {{ "adminBilling.settlement.bonus" | translate }}
+          </option>
+          <option value="NONE">
+            {{ "adminBilling.settlement.none" | translate }}
+          </option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>{{ "adminBilling.filters.search" | translate }}</label>
+        <input
+          type="text"
+          [(ngModel)]="reasonFilter"
+          (ngModelChange)="applyFilters()"
+          placeholder="Search reason/class/instructor"
+        />
+      </div>
+    </div>
   </div>
 
   <div *ngIf="isLoading" class="loading">
@@ -72,6 +103,7 @@
                 {{ report.bonusDays }}
               </span>
             </div>
+            <!-- Subscription creation handled via Angular Material dialog -->
           </div>
           <!-- per-report totalOwed removed -->
           <div class="wallet-block wallet-panel" *ngIf="memberId">
@@ -105,6 +137,93 @@
                   >
                     {{ "adminBilling.wallet.setBalance" | translate }}
                   </button>
+                </div>
+              </div>
+            </div>
+            <div class="subscription-panel">
+              <button
+                class="btn-primary"
+                (click)="openSubscriptionDialog()"
+                *ngIf="!subscription"
+              >
+                {{ "adminBilling.subscription.create" | translate }}
+              </button>
+              <div *ngIf="subscription" class="subscription-info">
+                <div class="sub-header">
+                  <h4>{{ "adminBilling.subscription.active" | translate }}</h4>
+                  <span
+                    class="status-badge sub-{{
+                      subscription.status?.toLowerCase()
+                    }}"
+                    >{{ subscription.status }}</span
+                  >
+                </div>
+                <div class="sub-body">
+                  <div>
+                    {{
+                      "adminBilling.subscription.initialPayment" | translate
+                    }}: €{{ subscription.initialPayment }}
+                  </div>
+                  <div>
+                    {{ "adminBilling.subscription.months" | translate }}:
+                    {{ subscription.months }}
+                  </div>
+                  <div>
+                    {{ "adminBilling.subscription.startDate" | translate }}:
+                    {{ subscription.startDate | date : "shortDate" }}
+                  </div>
+                  <div>
+                    {{ "adminBilling.subscription.endDate" | translate }}:
+                    {{ subscription.endDate | date : "shortDate" }}
+                  </div>
+                  <div>
+                    {{
+                      "adminBilling.subscription.lateCancellations" | translate
+                    }}:
+                    {{ subscription.lateCancellations }}
+                  </div>
+                  <div *ngIf="daysRemainingFor(subscription) !== null">
+                    <strong
+                      >{{
+                        "adminBilling.subscription.daysRemaining" | translate
+                      }}:</strong
+                    >
+                    {{ daysRemainingFor(subscription) }}
+                  </div>
+                </div>
+                <div class="subscription-actions">
+                  <button class="btn-warning" (click)="cancelSubscription()">
+                    {{ "adminBilling.subscription.cancel" | translate }}
+                  </button>
+                </div>
+              </div>
+              <div
+                *ngIf="subscriptionHistory.length"
+                class="subscription-history-cards"
+              >
+                <h5>{{ "adminBilling.subscription.history" | translate }}</h5>
+                <div class="history-cards">
+                  <div
+                    *ngFor="let h of subscriptionHistory"
+                    class="history-card"
+                  >
+                    <div class="history-card-header">
+                      <div class="history-date">
+                        {{ h.createdAt | date : "short" }}
+                      </div>
+                      <div class="history-type">{{ h.eventType }}</div>
+                    </div>
+                    <div class="history-body">
+                      <ng-container
+                        *ngFor="let kv of parseHistoryEventData(h.eventData)"
+                      >
+                        <div class="history-kv">
+                          <strong>{{ kv.key }}:</strong>
+                          <span class="history-val">{{ kv.value }}</span>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -92,10 +92,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);
 -- Insert default class types
 INSERT INTO class_types (name, description, is_active, created_at)
 VALUES 
-    ('Pilates', 'Core strengthening and flexibility training', TRUE, CURRENT_TIMESTAMP),
-    ('CrossFit', 'High-intensity functional fitness', TRUE, CURRENT_TIMESTAMP),
-    ('Yoga', 'Mind-body practice with physical postures', TRUE, CURRENT_TIMESTAMP),
-    ('Spin', 'Indoor cycling cardio workout', TRUE, CURRENT_TIMESTAMP),
-    ('Boxing', 'Combat sport training and conditioning', TRUE, CURRENT_TIMESTAMP),
-    ('HIIT', 'High-Intensity Interval Training', TRUE, CURRENT_TIMESTAMP)
+    ('Pilates', 'Ενδυνάμωση κορμού και προπόνηση ευλυγισίας', TRUE, CURRENT_TIMESTAMP),
+    ('Cross-Training', 'Υψηλής έντασης λειτουργική προπόνηση', TRUE, CURRENT_TIMESTAMP),
+    ('OpenGym', 'Ελεύθερη χρήση γυμναστηρίου', TRUE, CURRENT_TIMESTAMP)
 ON CONFLICT (name) DO NOTHING;

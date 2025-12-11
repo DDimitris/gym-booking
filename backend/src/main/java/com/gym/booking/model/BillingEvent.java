@@ -11,7 +11,8 @@ public class BillingEvent extends BaseEntity {
     public enum SettlementType {
         NONE,
         PAYMENT,
-        BONUS
+        BONUS,
+        SUBSCRIPTION
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

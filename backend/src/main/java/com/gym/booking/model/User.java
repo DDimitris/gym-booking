@@ -55,6 +55,9 @@ public class User extends BaseEntity {
     @Column
     private Integer bonusDays = 0;
 
+    @Column(name = "booking_blocked", nullable = false)
+    private Boolean bookingBlocked = false;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
     private UserStatus status = UserStatus.ACTIVE;
