@@ -74,6 +74,52 @@
           </div>
         </a>
       </div>
+      <div class="subscription-mini" *ngIf="subscription">
+        <h3>Subscription</h3>
+        <div class="sub-line">
+          <strong>Status:</strong> {{ subscription.status }}
+        </div>
+        <div class="sub-line">
+          <strong>Period:</strong>
+          {{ subscription.startDate | date : "shortDate" }} →
+          {{ subscription.endDate | date : "shortDate" }}
+        </div>
+        <div class="sub-line">
+          <strong>Months:</strong> {{ subscription.months }}
+        </div>
+        <div class="sub-line">
+          <strong>Late cancellations:</strong>
+          {{ subscription.lateCancellations }}
+        </div>
+        <div class="sub-line" *ngIf="daysRemaining !== null">
+          <strong>Days remaining:</strong>
+          {{ daysRemaining }}
+        </div>
+      </div>
+      <div
+        *ngIf="subscriptionHistory.length"
+        class="subscription-history-cards"
+      >
+        <h4>{{ "adminBilling.subscription.history" | translate }}</h4>
+        <div class="history-cards">
+          <div *ngFor="let h of subscriptionHistory" class="history-card">
+            <div class="history-card-header">
+              <div class="history-date">{{ h.createdAt | date : "short" }}</div>
+              <div class="history-type">{{ h.eventType }}</div>
+            </div>
+            <div class="history-body">
+              <ng-container
+                *ngFor="let kv of parseHistoryEventData(h.eventData)"
+              >
+                <div class="history-kv">
+                  <strong>{{ kv.key }}:</strong>
+                  <span class="history-val">{{ kv.value }}</span>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Trainer-specific info -->

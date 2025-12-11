@@ -194,6 +194,11 @@
     "filters": {
       "startDate": "Ημερομηνία έναρξης:",
       "endDate": "Ημερομηνία λήξης:",
+      "settlementType": "Τύπος εξόφλησης:",
+      "search": "Αναζήτηση:",
+      "settlement": {
+        "all": "Όλα"
+      },
       "apply": "Εφαρμογή φίλτρου"
     },
     "loading": "Φόρτωση αναφορών χρεώσεων...",
@@ -229,6 +234,7 @@
     },
     "settlement": {
       "none": "Απροσδιόριστο",
+      "subscription": "Συνδρομή",
       "payment": "Πληρωμή",
       "bonus": "Bonus ημέρα"
     },
@@ -260,6 +266,7 @@
       "historyDate": "Ημερομηνία",
       "historyEvent": "Γεγονός",
       "historyData": "Δεδομένα"
+      ,"daysRemaining": "Ημέρες υπολοίπου"
     }
   },
   "profile": {

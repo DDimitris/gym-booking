@@ -22,6 +22,8 @@ import { SubscriptionDialogComponent } from '../subscription-dialog/subscription
 })
 export class AdminBillingComponent implements OnInit {
   reports: BillingReport[] = [];
+  // keep raw reports to support client-side filtering
+  reportsRaw: BillingReport[] = [];
   memberId: number | null = null;
   isLoading = true;
   selectedEventIds: Set<number> = new Set<number>();
@@ -36,6 +38,9 @@ export class AdminBillingComponent implements OnInit {
   // Date range
   startDate = '';
   endDate = '';
+  // Filters
+  settlementFilter: 'ALL' | 'SUBSCRIPTION' | 'PAYMENT' | 'BONUS' | 'NONE' = 'ALL';
+  reasonFilter = '';
 
   constructor(
     private adminService: AdminService,
@@ -86,6 +91,8 @@ export class AdminBillingComponent implements OnInit {
       this.adminService.getMemberReport(this.memberId, this.startDate, this.endDate).subscribe({
         next: (report) => {
           this.reports = [report];
+            this.reportsRaw = [report];
+            this.applyFilters();
           this.isLoading = false;
           // Load wallet info for this member
           this.loadWalletForMember(this.memberId!);
@@ -102,7 +109,8 @@ export class AdminBillingComponent implements OnInit {
       // Load all billing events
       this.adminService.getAllBillingEvents(this.startDate, this.endDate).subscribe({
         next: (reports) => {
-          this.reports = reports;
+          this.reportsRaw = reports;
+          this.applyFilters();
           this.isLoading = false;
         },
         error: (err) => {
@@ -125,6 +133,61 @@ export class AdminBillingComponent implements OnInit {
       next: (hist) => { this.subscriptionHistory = hist || []; },
       error: (err) => { this.subscriptionHistory = []; }
     });
+  }
+
+  applyFilters(): void {
+    const sf = this.settlementFilter || 'ALL';
+    const term = (this.reasonFilter || '').trim().toLowerCase();
+    // Map reports -> filter events per report
+    this.reports = this.reportsRaw.map(r => {
+      const events = (r.events || []).filter(e => {
+        // settlement filter
+        if (sf !== 'ALL') {
+          const st = (e as any).settlementType || 'NONE';
+          if (sf === 'SUBSCRIPTION') {
+            if (st !== 'SUBSCRIPTION') return false;
+          } else if (st !== sf) {
+            return false;
+          }
+        }
+        // reason/text filter
+        if (term) {
+          const hay = (`${(e as any).reason || ''} ${(e as any).className || ''} ${(e as any).instructorName || ''}`).toLowerCase();
+          if (!hay.includes(term)) return false;
+        }
+        return true;
+      });
+      return { ...r, events } as BillingReport;
+    });
+  }
+
+  daysRemainingFor(sub: any): number | null {
+    if (!sub || !sub.endDate) return null;
+    const end = new Date(sub.endDate);
+    const diff = Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, diff);
+  }
+
+  parseHistoryEventData(eventData: string | null): { key: string; value: string }[] {
+    if (!eventData) return [];
+    // Try key=value pairs separated by commas, fallback to raw string
+    const parts = eventData.split(',').map(p => p.trim()).filter(p => p.length > 0);
+    const parsed: { key: string; value: string }[] = [];
+    let anyKv = false;
+    for (const p of parts) {
+      const idx = p.indexOf('=');
+      if (idx > 0) {
+        anyKv = true;
+        const k = p.substring(0, idx).trim();
+        const v = p.substring(idx + 1).trim();
+        parsed.push({ key: k, value: v });
+      }
+    }
+    if (!anyKv) {
+      // treat entire string as single entry
+      return [{ key: 'data', value: eventData }];
+    }
+    return parsed;
   }
 
   openSubscriptionDialog(): void {

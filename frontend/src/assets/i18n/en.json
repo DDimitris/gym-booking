@@ -212,6 +212,11 @@
     "filters": {
       "startDate": "Start Date:",
       "endDate": "End Date:",
+      "settlementType": "Settlement Type:",
+      "search": "Search:",
+      "settlement": {
+        "all": "All"
+      },
       "apply": "Apply Filter"
     },
     "loading": "Loading billing reports...",
@@ -247,6 +252,7 @@
     },
     "settlement": {
       "none": "Unassigned",
+      "subscription": "Subscription",
       "payment": "Payment",
       "bonus": "Bonus day"
     },
@@ -277,7 +283,8 @@
       "history": "Subscription history",
       "historyDate": "Date",
       "historyEvent": "Event",
-      "historyData": "Data"
+      "historyData": "Data",
+      "daysRemaining": "Days remaining"
     }
   },
   "gymClasses": {
