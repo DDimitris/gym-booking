@@ -72,6 +72,7 @@
                 {{ report.bonusDays }}
               </span>
             </div>
+            <!-- Subscription creation handled via Angular Material dialog -->
           </div>
           <!-- per-report totalOwed removed -->
           <div class="wallet-block wallet-panel" *ngIf="memberId">
@@ -106,6 +107,79 @@
                     {{ "adminBilling.wallet.setBalance" | translate }}
                   </button>
                 </div>
+              </div>
+            </div>
+            <div class="subscription-panel">
+              <button
+                class="btn-primary"
+                (click)="openSubscriptionDialog()"
+                *ngIf="!subscription"
+              >
+                {{ "adminBilling.subscription.create" | translate }}
+              </button>
+              <div *ngIf="subscription" class="subscription-info">
+                <h4>{{ "adminBilling.subscription.active" | translate }}</h4>
+                <div>
+                  {{ "adminBilling.subscription.initialPayment" | translate }}:
+                  €{{ subscription.initialPayment }}
+                </div>
+                <div>
+                  {{ "adminBilling.subscription.months" | translate }}:
+                  {{ subscription.months }}
+                </div>
+                <div>
+                  {{ "adminBilling.subscription.startDate" | translate }}:
+                  {{ subscription.startDate }}
+                </div>
+                <div>
+                  {{ "adminBilling.subscription.endDate" | translate }}:
+                  {{ subscription.endDate }}
+                </div>
+                <div>
+                  {{ "adminBilling.subscription.status" | translate }}:
+                  {{ subscription.status }}
+                </div>
+                <div>
+                  {{
+                    "adminBilling.subscription.lateCancellations" | translate
+                  }}: {{ subscription.lateCancellations }}
+                </div>
+                <div class="subscription-actions">
+                  <button class="btn-warning" (click)="cancelSubscription()">
+                    {{ "adminBilling.subscription.cancel" | translate }}
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="subscriptionHistory.length">
+                <h5>{{ "adminBilling.subscription.history" | translate }}</h5>
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        {{
+                          "adminBilling.subscription.historyDate" | translate
+                        }}
+                      </th>
+                      <th>
+                        {{
+                          "adminBilling.subscription.historyEvent" | translate
+                        }}
+                      </th>
+                      <th>
+                        {{
+                          "adminBilling.subscription.historyData" | translate
+                        }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let h of subscriptionHistory">
+                      <td>{{ h.createdAt | date : "short" }}</td>
+                      <td>{{ h.eventType }}</td>
+                      <td>{{ h.eventData }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

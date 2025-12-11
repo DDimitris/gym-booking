@@ -7,11 +7,16 @@ import { WalletService, WalletTransaction } from '../../../core/services/wallet.
 import { KeycloakService } from '../../../core/services/keycloak.service';
 import { BillingReport } from '../../../core/models/billing.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { SubscriptionDialogComponent } from '../subscription-dialog/subscription-dialog.component';
 
 @Component({
   selector: 'app-admin-billing',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule, SubscriptionDialogComponent],
   templateUrl: './admin-billing.component.html',
   styleUrls: ['./admin-billing.component.css']
 })
@@ -23,6 +28,8 @@ export class AdminBillingComponent implements OnInit {
   // Wallet/admin controls
   walletBalance: number | null = null;
   walletTransactions: WalletTransaction[] = [];
+  subscription: any = null;
+  subscriptionHistory: any[] = [];
   adminAmount: number | null = null;
   adminReference = '';
   
@@ -35,8 +42,8 @@ export class AdminBillingComponent implements OnInit {
     private kc: KeycloakService,
     private router: Router,
     private route: ActivatedRoute,
-    private translate: TranslateService
-    ,
+    private translate: TranslateService,
+    private dialog: MatDialog,
     private walletService: WalletService
   ) {}
 
@@ -82,6 +89,8 @@ export class AdminBillingComponent implements OnInit {
           this.isLoading = false;
           // Load wallet info for this member
           this.loadWalletForMember(this.memberId!);
+          // load subscription info
+          this.loadSubscriptionInfo(this.memberId!);
         },
         error: (err) => {
           console.error('Error loading member report:', err);
@@ -103,6 +112,47 @@ export class AdminBillingComponent implements OnInit {
         }
       });
     }
+  }
+
+  loadSubscriptionInfo(memberId: number): void {
+    this.subscription = null;
+    this.subscriptionHistory = [];
+    this.adminService.getActiveSubscription(memberId).subscribe({
+      next: (sub) => { this.subscription = sub; },
+      error: (err) => { /* ignore 204/no-content */ }
+    });
+    this.adminService.getSubscriptionHistory(memberId).subscribe({
+      next: (hist) => { this.subscriptionHistory = hist || []; },
+      error: (err) => { this.subscriptionHistory = []; }
+    });
+  }
+
+  openSubscriptionDialog(): void {
+    if (!this.memberId) return;
+    const dialogRef = this.dialog.open(SubscriptionDialogComponent, {
+      width: '420px',
+      data: { initialPayment: '0.00', months: 1 }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+      const initialPayment = parseFloat(result.initialPayment as any);
+      const months = Number(result.months);
+      if (isNaN(initialPayment) || isNaN(months) || months <= 0) { alert('Invalid input'); return; }
+      this.adminService.createSubscription(this.memberId!, initialPayment, months).subscribe({
+        next: () => { this.loadSubscriptionInfo(this.memberId!); this.loadReports(); },
+        error: (err) => { console.error('Failed to create subscription', err); alert('Failed to create subscription: ' + (err?.error || err?.message || err)); }
+      });
+    });
+  }
+
+  cancelSubscription(): void {
+    if (!this.memberId || !this.subscription) return;
+    const confirmed = window.confirm('Cancel subscription? This will remove remaining days.');
+    if (!confirmed) return;
+    this.adminService.cancelSubscription(this.memberId, this.subscription.id).subscribe({
+      next: () => { this.loadSubscriptionInfo(this.memberId!); this.loadReports(); },
+      error: (err) => { console.error('Failed to cancel subscription', err); alert('Failed to cancel subscription.'); }
+    });
   }
 
   loadWalletForMember(memberId: number): void {

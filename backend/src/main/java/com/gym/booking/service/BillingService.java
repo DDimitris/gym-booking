@@ -21,6 +21,7 @@ public class BillingService {
     private final BillingEventRepository billingEventRepository;
     private final UserService userService;
     private final com.gym.booking.service.WalletService walletService;
+    private final com.gym.booking.service.SubscriptionService subscriptionService;
 
     // Same-day cancellation threshold (12 hours before class start)
     private static final long SAME_DAY_THRESHOLD_HOURS = 12;
@@ -29,10 +30,12 @@ public class BillingService {
     public BillingService(BillingEventRepository billingEventRepository,
             UserService userService,
             @org.springframework.beans.factory.annotation.Autowired(required = false) @org.springframework.context.annotation.Lazy com.gym.booking.service.WalletService walletService,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) com.gym.booking.service.SubscriptionService subscriptionService,
             @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.billingEventRepository = billingEventRepository;
         this.userService = userService;
         this.walletService = walletService;
+        this.subscriptionService = subscriptionService;
         this.zoneId = ZoneId.of(appTimezone);
     }
 
@@ -76,10 +79,35 @@ public class BillingService {
 
         // Only charge if cancelled within same-day threshold
         if (hoursUntilClass < SAME_DAY_THRESHOLD_HOURS) {
-            User user = booking.getUser();
+            // Reload user to obtain latest wallet balance and state
+            User user = userService.findById(booking.getUser().getId());
             BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
             if (chargeAmount == null) {
                 chargeAmount = BigDecimal.ZERO;
+            }
+
+            // Attempt to settle via subscription if active and wallet is empty
+            if (subscriptionService != null) {
+                java.util.Optional<com.gym.booking.model.Subscription> opt = subscriptionService
+                        .getActiveByUser(user.getId());
+                java.math.BigDecimal wallet = java.util.Optional.ofNullable(user.getWalletBalance())
+                        .orElse(java.math.BigDecimal.ZERO);
+                if (opt.isPresent() && wallet.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                    // treat same-day cancellation as paid by subscription but marked as late
+                    // cancellation
+                    BillingEvent event = new BillingEvent();
+                    event.setUser(user);
+                    event.setBooking(booking);
+                    event.setAmount(chargeAmount);
+                    event.setReason("Late cancellation (subscription)");
+                    event.setEventDate(LocalDateTime.now(zoneId));
+                    event.setSettled(true);
+                    event.setSettlementType(BillingEvent.SettlementType.SUBSCRIPTION);
+                    BillingEvent saved = billingEventRepository.save(event);
+                    // increment late cancellation counter and possibly auto-cancel
+                    subscriptionService.incrementLateCancellation(opt.get());
+                    return saved;
+                }
             }
 
             // Attempt to settle automatically via wallet (consume wallet and optionally a
@@ -174,10 +202,31 @@ public class BillingService {
      * Create and attempt to settle a billing event for a completed booking.
      */
     public BillingEvent createCompletionCharge(Booking booking) {
-        User user = booking.getUser();
+        // Reload user to ensure we use the latest wallet balance/state
+        User user = userService.findById(booking.getUser().getId());
         BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
         if (chargeAmount == null)
             chargeAmount = BigDecimal.ZERO;
+
+        // If subscription exists and wallet is empty, treat completion as covered by
+        // subscription.
+        if (subscriptionService != null) {
+            java.util.Optional<com.gym.booking.model.Subscription> opt = subscriptionService
+                    .getActiveByUser(user.getId());
+            java.math.BigDecimal wallet = java.util.Optional.ofNullable(user.getWalletBalance())
+                    .orElse(java.math.BigDecimal.ZERO);
+            if (opt.isPresent() && wallet.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                BillingEvent event = new BillingEvent();
+                event.setUser(user);
+                event.setBooking(booking);
+                event.setAmount(chargeAmount);
+                event.setReason("Class completed (subscription)");
+                event.setEventDate(LocalDateTime.now(zoneId));
+                event.setSettled(true);
+                event.setSettlementType(BillingEvent.SettlementType.SUBSCRIPTION);
+                return billingEventRepository.save(event);
+            }
+        }
 
         if (walletService != null) {
             WalletService.WalletChargeResult res = walletService.chargeForBooking(user.getId(), chargeAmount, booking);

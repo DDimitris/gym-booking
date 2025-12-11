@@ -19,10 +19,24 @@ public class WalletServiceImpl implements WalletService {
 
     private final WalletTransactionRepository repo;
     private final UserService userService;
+    private final com.gym.booking.service.SubscriptionService subscriptionService;
 
-    public WalletServiceImpl(WalletTransactionRepository repo, UserService userService) {
+    public WalletServiceImpl(WalletTransactionRepository repo, UserService userService,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) com.gym.booking.service.SubscriptionService subscriptionService) {
         this.repo = repo;
         this.userService = userService;
+        this.subscriptionService = subscriptionService;
+    }
+
+    private void startPendingAfterDrain(Long userId) {
+        if (this.subscriptionService != null) {
+            // If user's wallet is now zero, start pending subscription
+            java.math.BigDecimal wallet = java.util.Optional.ofNullable(userService.findById(userId).getWalletBalance())
+                    .orElse(java.math.BigDecimal.ZERO);
+            if (wallet.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                subscriptionService.startPendingSubscription(userId);
+            }
+        }
     }
 
     @Override
@@ -85,6 +99,12 @@ public class WalletServiceImpl implements WalletService {
             tx.setReference(booking != null ? "booking:" + booking.getId() : null);
             repo.save(tx);
             charged = amount;
+            // If wallet reached zero after this charge, attempt to start pending
+            // subscription
+            try {
+                this.startPendingAfterDrain(userId);
+            } catch (Exception ex) {
+                /* ignore */ }
             return new WalletChargeResult(true, false, charged);
         }
 
@@ -105,6 +125,10 @@ public class WalletServiceImpl implements WalletService {
                 tx.setType("CHARGE_PARTIAL");
                 tx.setReference(booking != null ? "booking:" + booking.getId() : null);
                 repo.save(tx);
+                try {
+                    this.startPendingAfterDrain(userId);
+                } catch (Exception ex) {
+                    /* ignore */ }
                 break;
             }
             // else retry

@@ -21,6 +21,7 @@ public class BookingService {
     private final GymClassService gymClassService;
     private final UserService userService;
     private final BillingService billingService;
+    private final com.gym.booking.service.SubscriptionService subscriptionService;
 
     private final ZoneId zoneId;
 
@@ -28,11 +29,13 @@ public class BookingService {
             GymClassService gymClassService,
             UserService userService,
             @Lazy BillingService billingService,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) com.gym.booking.service.SubscriptionService subscriptionService,
             @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.bookingRepository = bookingRepository;
         this.gymClassService = gymClassService;
         this.userService = userService;
         this.billingService = billingService;
+        this.subscriptionService = subscriptionService;
         this.zoneId = ZoneId.of(appTimezone);
     }
 
@@ -84,19 +87,71 @@ public class BookingService {
             throw new BookingException("User already has a booking for this class");
         }
 
-        // Enforce wallet/bonus validation: user must have either sufficient wallet
-        // balance for the class kind, or at least 1 bonus day to cover the class.
+        // First, allow booking if the user has an active subscription regardless of
+        // configured kind costs.
+        boolean hasActiveSubscriptionEarly = false;
+        if (this.subscriptionService != null) {
+            try {
+                hasActiveSubscriptionEarly = this.subscriptionService.getActiveByUser(user.getId()).isPresent();
+            } catch (Exception ignored) {
+            }
+        }
+        if (hasActiveSubscriptionEarly) {
+            // Active subscription -> booking allowed (wallet / kind cost checks not
+            // required)
+            return;
+        }
+
+        // Enforce that admin has configured at least one kind/base cost for this
+        // member.
+        boolean anyKindConfigured = (user.getGroupBaseCost() != null) || (user.getSmallGroupBaseCost() != null)
+                || (user.getPersonalBaseCost() != null) || (user.getOpenGymBaseCost() != null)
+                || (user.getBaseCost() != null);
+        if (!anyKindConfigured) {
+            throw new BookingException(
+                    "Booking disabled: administrator has not configured any class costs for this member.");
+        }
+
+        // Ensure the specific class kind has a configured cost for this user (either
+        // kind-specific or a fallback base cost).
+        boolean kindConfigured;
+        switch (classInstance.getKind()) {
+            case GROUP -> kindConfigured = (user.getGroupBaseCost() != null) || (user.getBaseCost() != null);
+            case SMALL_GROUP -> kindConfigured = (user.getSmallGroupBaseCost() != null) || (user.getBaseCost() != null);
+            case PERSONAL -> kindConfigured = (user.getPersonalBaseCost() != null) || (user.getBaseCost() != null);
+            case OPEN_GYM -> kindConfigured = (user.getOpenGymBaseCost() != null) || (user.getBaseCost() != null);
+            default -> kindConfigured = false;
+        }
+        if (!kindConfigured) {
+            throw new BookingException(
+                    "Booking disabled: the administrator has not set a cost for this class kind for the member.");
+        }
+
+        // Enforce wallet/bonus/subscription validation: user must have either
+        // sufficient wallet
+        // balance for the class kind, or at least 1 bonus day, or an active
+        // subscription.
         java.math.BigDecimal chargeAmount = billingService.getChargeAmountForClass(user, classInstance);
         java.math.BigDecimal wallet = java.util.Optional.ofNullable(user.getWalletBalance())
                 .orElse(java.math.BigDecimal.ZERO);
         Integer bonus = java.util.Optional.ofNullable(user.getBonusDays()).orElse(0);
 
-        boolean canPayWithWallet = wallet.compareTo(chargeAmount) >= 0;
+        boolean canPayWithWallet = chargeAmount != null && wallet.compareTo(chargeAmount) >= 0;
         boolean canUseBonus = bonus > 0;
+        boolean hasActiveSubscription = false;
+        if (this.subscriptionService != null) {
+            try {
+                hasActiveSubscription = this.subscriptionService.getActiveByUser(user.getId()).isPresent();
+            } catch (Exception ignored) {
+            }
+        }
 
-        if (chargeAmount.compareTo(java.math.BigDecimal.ZERO) > 0 && !canPayWithWallet && !canUseBonus) {
-            throw new BookingException("Insufficient funds: wallet=" + wallet + " bonusDays=" + bonus +
-                    " required=" + chargeAmount + ". Please top-up wallet or use a bonus day.");
+        // If chargeAmount is positive and none of the payment options are available,
+        // block booking
+        if (chargeAmount != null && chargeAmount.compareTo(java.math.BigDecimal.ZERO) > 0
+                && !canPayWithWallet && !canUseBonus && !hasActiveSubscription) {
+            throw new BookingException("Insufficient funds: wallet=" + wallet + " bonusDays=" + bonus + " required="
+                    + chargeAmount + ". Please top-up wallet, use a bonus day, or subscribe.");
         }
     }
 

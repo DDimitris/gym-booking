@@ -263,6 +263,22 @@
       "setBalance": "Set balance",
       "amount": "Amount"
     }
+    ,
+    "subscription": {
+      "create": "Create Subscription",
+      "active": "Active Subscription",
+      "initialPayment": "Initial payment",
+      "months": "Months",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "status": "Status",
+      "lateCancellations": "Late cancellations",
+      "cancel": "Cancel subscription",
+      "history": "Subscription history",
+      "historyDate": "Date",
+      "historyEvent": "Event",
+      "historyData": "Data"
+    }
   },
   "gymClasses": {
     "list": {
