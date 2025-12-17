@@ -20,4 +20,6 @@ public class ClassTypeDTO {
     private Long trainerId;
 
     private Boolean isActive;
+
+    private String color;
 }

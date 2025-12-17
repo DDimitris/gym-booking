@@ -26,6 +26,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           <mat-label>{{ 'adminManagement.classTypeDialog.fields.description' | translate }}</mat-label>
           <input matInput [(ngModel)]="description" name="description" />
         </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'adminManagement.classTypeDialog.fields.color' | translate }}</mat-label>
+          <input matInput type="color" [(ngModel)]="color" name="color" />
+        </mat-form-field>
       </form>
       <div *ngIf="messageKey" class="message" [ngClass]="messageType">
         {{ messageKey | translate }}
@@ -50,6 +54,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class AdminCreateClassTypeDialogComponent {
   name = '';
   description = '';
+  color = '#3788d8';
   messageKey: string | null = null;
   messageType: 'success' | 'error' | 'info' = 'info';
   // Trainer selection has been removed; class types are no longer bound to a single trainer
@@ -72,7 +77,8 @@ export class AdminCreateClassTypeDialogComponent {
       id: 0,
       name: this.name,
       description: this.description,
-      isActive: true
+      isActive: true,
+      color: this.color
     }).subscribe({
       next: () => {
         this.messageType = 'success';

@@ -433,7 +433,8 @@
       "fields": {
         "trainer": "Trainer",
         "name": "Name",
-        "description": "Description"
+        "description": "Description",
+        "color": "Color"
       },
       "errors": {
         "nameRequired": "Name is required",

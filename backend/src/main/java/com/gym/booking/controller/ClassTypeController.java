@@ -120,6 +120,7 @@ public class ClassTypeController {
         dto.setName(classType.getName());
         dto.setDescription(classType.getDescription());
         dto.setIsActive(classType.getIsActive());
+        dto.setColor(classType.getColor());
         return dto;
     }
 
@@ -129,6 +130,9 @@ public class ClassTypeController {
         classType.setDescription(dto.getDescription());
         if (dto.getIsActive() != null) {
             classType.setIsActive(dto.getIsActive());
+        }
+        if (dto.getColor() != null) {
+            classType.setColor(dto.getColor());
         }
         return classType;
     }

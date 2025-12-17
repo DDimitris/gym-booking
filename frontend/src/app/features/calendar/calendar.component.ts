@@ -202,7 +202,9 @@ export class CalendarComponent implements OnInit {
     // Color code by class type
     const classType = this.classTypes.find(ct => ct.id === gymClass.classTypeId);
     if (!classType) return '#3788d8';
-    
+    // Prefer persisted color when available
+    if (classType.color && classType.color.trim().length) return classType.color;
+
     const colors: Record<string, string> = {
       'Pilates': '#9c27b0',
       'CrossFit': '#f44336',

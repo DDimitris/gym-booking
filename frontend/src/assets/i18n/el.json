@@ -432,7 +432,8 @@
       "fields": {
         "trainer": "Γυμναστής",
         "name": "Όνομα",
-        "description": "Περιγραφή"
+        "description": "Περιγραφή",
+        "color": "Χρώμα"
       },
       "errors": {
         "nameRequired": "Το όνομα είναι υποχρεωτικό",
