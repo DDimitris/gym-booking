@@ -175,5 +175,5 @@ jobs:
             git reset --hard origin/master
             export IMAGE_TAG=latest
             docker compose pull
-            docker compose down -v
+            docker compose stop frontend backend
             docker compose up -d

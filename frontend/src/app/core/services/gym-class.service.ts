@@ -24,6 +24,11 @@ export class GymClassService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  bulkDeleteGymClasses(ids: number[]): Observable<void> {
+    // Send a single DELETE with body containing ids
+    return this.http.request<void>('delete', this.apiUrl, { body: ids });
+  }
+
   getAllGymClasses(): Observable<GymClass[]> {
     return this.http.get<GymClass[]>(this.apiUrl);
   }

@@ -313,8 +313,12 @@
         "classUpdated": "Class updated successfully",
         "classCancelled": "Class cancelled by administrator"
       },
+      "actions": {
+        "deleteSelected": "Delete selected"
+      },
       "confirm": {
-        "cancelClass": "Are you sure you want to cancel this class? All existing bookings will be marked as cancelled by the gym and no charges will apply."
+        "cancelClass": "Are you sure you want to cancel this class? All existing bookings will be marked as cancelled by the gym and no charges will apply.",
+        "deleteSelectedCount": "Are you sure you want to delete {{count}} selected class(es)? This action cannot be undone."
       },
       "prompts": {
         "noMembers": "No members available to book for.",

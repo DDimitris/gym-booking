@@ -117,6 +117,9 @@ export class CalendarComponent implements OnInit {
       slotMinTime: '06:00:00',
       slotMaxTime: '22:00:00',
       nowIndicator: true,
+      // Force 24h formatting for slot labels and event times
+      slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+      eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
     };
   }
 
@@ -185,7 +188,8 @@ export class CalendarComponent implements OnInit {
         status: c.status
       },
       backgroundColor: this.getEventColor(c),
-      borderColor: this.getEventColor(c)
+      borderColor: this.getEventColor(c),
+      textColor: this.getEventTextColor(this.getEventColor(c))
     }));
     
     this.calendarOptions = {
@@ -209,6 +213,19 @@ export class CalendarComponent implements OnInit {
     };
     
     return colors[classType.name] || '#3788d8';
+  }
+
+  // Simple contrast helper: return white for darker backgrounds, black for light ones
+  getEventTextColor(bgHex: string): string {
+    if (!bgHex) return '#000000';
+    // normalize
+    const hex = bgHex.replace('#','');
+    const r = parseInt(hex.substring(0,2),16);
+    const g = parseInt(hex.substring(2,4),16);
+    const b = parseInt(hex.substring(4,6),16);
+    // relative luminance approximation
+    const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return lum > 0.6 ? '#000000' : '#ffffff';
   }
 
   handleEventClick(clickInfo: EventClickArg): void {

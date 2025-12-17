@@ -63,6 +63,16 @@ public class GymClassController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    @DeleteMapping
+    public ResponseEntity<?> bulkDeleteGymClasses(@RequestBody List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        gymClassService.deleteGymClasses(ids);
+        return ResponseEntity.ok().build();
+    }
+
     @PreAuthorize("permitAll()")
     @GetMapping
     public ResponseEntity<List<GymClassDTO>> getAllGymClasses() {
