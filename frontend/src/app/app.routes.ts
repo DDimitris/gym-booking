@@ -78,6 +78,7 @@ class StartComponent implements OnInit {
   register(): void { this.kc.register(); }
 }
 import { ActivityHistoryComponent } from './features/activity-history/activity-history.component';
+import { DocsComponent } from './features/public/docs/docs.component';
 // TODO: Rename component & folder to admin-members; temporary import kept for transition
 import { AdminAthletesComponent } from './features/admin/admin-athletes/admin-athletes.component';
 import { AdminBillingComponent } from './features/admin/admin-billing/admin-billing.component';
@@ -91,6 +92,10 @@ export const routes: Routes = [
   {
     path: '',
     component: StartComponent
+  },
+  {
+    path: 'docs',
+    component: DocsComponent
   },
   {
     path: 'profile',

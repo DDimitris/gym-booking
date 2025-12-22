@@ -190,6 +190,59 @@ export class AdminBillingComponent implements OnInit {
     return parsed;
   }
 
+  // Human-friendly label for subscription event types (fallback to raw type)
+  subscriptionEventLabel(eventType: string | null | undefined): string {
+    if (!eventType) return 'Subscription';
+    switch (eventType.toUpperCase()) {
+      case 'CREATED':
+        return this.translate.instant('adminBilling.subscription.event.created');
+      case 'RENEWED':
+        return this.translate.instant('adminBilling.subscription.event.renewed');
+      case 'CANCELLED':
+      case 'CANCELED':
+        return this.translate.instant('adminBilling.subscription.event.cancelled');
+      case 'PAYMENT':
+        return this.translate.instant('adminBilling.subscription.event.payment');
+      default:
+        return eventType;
+    }
+  }
+
+  // Build a short summary line for a subscription history event
+  subscriptionEventSummary(eventData: string | null): string {
+    if (!eventData) return '';
+    const kv = this.parseHistoryEventData(eventData);
+    // Look for common keys
+    const find = (k: string) => kv.find(x => x.key.toLowerCase() === k.toLowerCase())?.value;
+    const parts: string[] = [];
+    const initialPayment = find('initialPayment') || find('initial_payment') || find('amount');
+    const months = find('months') || find('duration');
+    const reason = find('reason') || find('by');
+    if (initialPayment) parts.push(this.translate.instant('adminBilling.subscription.summary.initialPayment', { amount: initialPayment }));
+    if (months) parts.push(this.translate.instant('adminBilling.subscription.summary.months', { months }));
+    if (reason) parts.push(this.translate.instant('adminBilling.subscription.summary.reason', { reason }));
+    if (parts.length > 0) return parts.join(' — ');
+    // fallback: show raw eventData (shortened)
+    return eventData.length > 120 ? eventData.substring(0, 117) + '...' : eventData;
+  }
+
+  // Human-friendly label for subscription status values
+  subscriptionStatusLabel(status: string | null | undefined): string {
+    if (!status) return this.translate.instant('adminBilling.subscription.status') || 'Status';
+    switch ((status || '').toString().toUpperCase()) {
+      case 'ACTIVE':
+        return this.translate.instant('adminBilling.subscription.active') || 'Active';
+      case 'CANCELLED':
+      case 'CANCELED':
+        return this.translate.instant('adminBilling.subscription.cancel') || 'Cancelled';
+      case 'COMPLETED':
+        return this.translate.instant('adminBilling.subscription.completed') || 'Completed';
+      default:
+        // fallback: capitalize
+        return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    }
+  }
+
   openSubscriptionDialog(): void {
     if (!this.memberId) return;
     const dialogRef = this.dialog.open(SubscriptionDialogComponent, {

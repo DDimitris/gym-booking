@@ -267,7 +267,8 @@
       "referenceHint": "Optional text to record admin notes for the transaction (e.g., 'manual top-up', 'refund').",
       "topUp": "Top-up",
       "setBalance": "Set balance",
-      "amount": "Amount"
+      "amount": "Amount",
+      "notesTitle": "Admin Notes"
     }
     ,
     "subscription": {
@@ -285,6 +286,18 @@
       "historyEvent": "Event",
       "historyData": "Data",
       "daysRemaining": "Days remaining"
+      ,
+      "event": {
+        "created": "Subscription created",
+        "renewed": "Subscription renewed",
+        "cancelled": "Subscription cancelled",
+        "payment": "Payment"
+      },
+      "summary": {
+        "initialPayment": "Initial payment: {{amount}}",
+        "months": "Duration: {{months}} month(s)",
+        "reason": "Note: {{reason}}"
+      }
     }
   },
   "gymClasses": {
@@ -522,5 +535,11 @@
     "trainerTools": "Trainer tools",
     "trainerToolsDesc": "Manage schedules and participants with powerful trainer tools."
   }
- 
+ ,
+  "docs": {
+    "agreement": {
+      "title": "Site Agreement & Disclaimer",
+      "contentHtml": "<h3>Introduction</h3><p>By registering an account on this site you acknowledge and agree to the terms described below. The purpose of this agreement is to set expectations about security, user responsibilities, data handling and the limits of liability of the administrators and creators of this website. Please read carefully before creating an account.</p><p><strong>Alpha phase:</strong> This site is currently in an <strong>Alpha</strong> phase. Features, data models, and service guarantees are experimental and subject to frequent change. Use the platform accordingly and do not rely on it as your sole repository for critical data.</p><h3>User Responsibilities</h3><p>1. Account credentials: Choose a strong password for this site. In particular, be aware that if this platform is compromised and user email addresses and passwords are leaked, attackers may use those credentials to access accounts here. Do not reuse passwords across multiple accounts and consider using a password manager.</p><p>2. Password best practices: Use a long password or passphrase and enable multi-factor authentication (MFA) where supported. Do not share your account credentials with others. If you believe your credentials have been exposed, change your password immediately.</p><p>3. Authorized use: You agree to use the service in compliance with applicable laws and not to attempt unauthorized access, reverse engineering, or other misuse of the site or its APIs.</p><h3>Data, Security & Limitations</h3><p>1. No absolute security: While we strive to follow industry-standard security practices, no system is perfectly secure. The administrators and creators cannot guarantee absolute protection against intrusions, malware, or other security incidents.</p><p>2. Third-party dependencies: The site relies on third-party services, libraries, and hosting infrastructure which may have their own vulnerabilities and outage characteristics. These third parties are outside the control of the site's administrators.</p><p>3. Data retention and backups: We attempt to maintain reasonable backups and retention policies for user data, but backups may fail or be incomplete in rare circumstances.</p><h3>Disclaimer of Liability</h3><p>1. No liability for data loss or disclosure: The administrators, operators, and creators of this website are not liable for any losses, damages, liabilities, costs or expenses (including but not limited to loss of data, loss of revenue or loss of access) arising from or in connection with any data breach, data leak, site hijack, unauthorized access, or other security incident, whether caused by negligence, third-party attack, or circumstances beyond our control.</p><p>2. No liability for outages: The administrators and creators disclaim responsibility for any data loss or damage resulting from service outages, maintenance, hosting failures, or actions taken in emergency response to a security event.</p><p>3. No guarantees of continuity: We do not guarantee uninterrupted service or that the site will be available indefinitely. The site may be modified, suspended, or discontinued at any time.</p><h3>Risk Acknowledgement & Mitigation</h3><p>1. Your data risk: By using the service you acknowledge that storing data online has inherent risks. You should maintain independent copies of any important data and not rely exclusively on the site to store critical records.</p><p>2. Reporting & cooperation: If you discover a security issue, please report it promptly to the site administrators. We may cooperate with law enforcement and third parties to investigate incidents.</p><h3>Legal & General</h3><p>1. No professional advice: The site does not provide professional legal, medical, or financial advice. Any information provided is for general informational purposes only.</p><p>2. Governing law: These terms are governed by the laws applicable where the site's operator is established, unless otherwise required by local mandatory law. If any provision of this agreement is held invalid, the remaining provisions will remain in force.</p><p>3. Updates: We may update this agreement from time to time. When updated, the effective date will be posted. Continued use of the service after notice of changes constitutes acceptance of the revised terms.</p><p><strong>Effective date:</strong> December 22, 2025</p>"
+    }
+  }
 }

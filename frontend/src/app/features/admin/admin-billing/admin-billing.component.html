@@ -106,97 +106,178 @@
             <!-- Subscription creation handled via Angular Material dialog -->
           </div>
           <!-- per-report totalOwed removed -->
-          <div class="wallet-block wallet-panel" *ngIf="memberId">
-            <div class="wallet-info">
-              <label>{{ "adminBilling.wallet.balance" | translate }}</label>
-              <div class="wallet-balance">
-                {{
-                  walletBalance !== null ? "€" + walletBalance.toFixed(2) : "--"
-                }}
+          <div *ngIf="memberId" class="account-cards">
+            <div class="wallet-notes-card">
+              <div class="wallet-block wallet-panel">
+                <div class="wallet-info">
+                  <label>{{ "adminBilling.wallet.balance" | translate }}</label>
+                  <div class="wallet-balance">
+                    {{
+                      walletBalance !== null
+                        ? "€" + walletBalance.toFixed(2)
+                        : "--"
+                    }}
+                  </div>
+                </div>
+                <div class="wallet-actions">
+                  <div class="manual-topup">
+                    <label>{{
+                      "adminBilling.wallet.amount" | translate
+                    }}</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      [(ngModel)]="adminAmount"
+                    />
+                    <label>{{
+                      "adminBilling.wallet.reference" | translate
+                    }}</label>
+                    <input type="text" [(ngModel)]="adminReference" />
+                    <div class="ref-hint">
+                      {{ "adminBilling.wallet.referenceHint" | translate }}
+                    </div>
+                    <div class="manual-actions">
+                      <button
+                        class="btn-xs btn-primary"
+                        (click)="adminTopUpMember()"
+                      >
+                        {{ "adminBilling.wallet.topUp" | translate }}
+                      </button>
+                      <button
+                        class="btn-xs btn-warning"
+                        (click)="adminSetMemberBalance()"
+                      >
+                        {{ "adminBilling.wallet.setBalance" | translate }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Admin notes card: show optional references/notes entered during top-ups or balance sets -->
+              <div *ngIf="walletTransactions?.length" class="admin-notes-card">
+                <h4>{{ "adminBilling.wallet.notesTitle" | translate }}</h4>
+                <div class="notes-list">
+                  <ng-container *ngFor="let tx of walletTransactions">
+                    <div *ngIf="tx.reference" class="note-item">
+                      <div class="note-meta">
+                        <span class="note-date">{{
+                          tx.createdAt | date : "short"
+                        }}</span>
+                        <span class="note-amount"
+                          >{{ tx.amount >= 0 ? "+" : "" }}€{{
+                            tx.amount | number : "1.2-2"
+                          }}</span
+                        >
+                      </div>
+                      <div class="note-text">{{ tx.reference }}</div>
+                    </div>
+                  </ng-container>
+                </div>
               </div>
             </div>
-            <div class="wallet-actions">
-              <div class="manual-topup">
-                <label>{{ "adminBilling.wallet.amount" | translate }}</label>
-                <input type="number" step="0.01" [(ngModel)]="adminAmount" />
-                <label>{{ "adminBilling.wallet.reference" | translate }}</label>
-                <input type="text" [(ngModel)]="adminReference" />
-                <div class="ref-hint">
-                  {{ "adminBilling.wallet.referenceHint" | translate }}
-                </div>
-                <div class="manual-actions">
-                  <button
-                    class="btn-xs btn-primary"
-                    (click)="adminTopUpMember()"
-                  >
-                    {{ "adminBilling.wallet.topUp" | translate }}
-                  </button>
-                  <button
-                    class="btn-xs btn-warning"
-                    (click)="adminSetMemberBalance()"
-                  >
-                    {{ "adminBilling.wallet.setBalance" | translate }}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="subscription-panel">
-              <button
-                class="btn-primary"
-                (click)="openSubscriptionDialog()"
-                *ngIf="!subscription"
-              >
-                {{ "adminBilling.subscription.create" | translate }}
-              </button>
-              <div *ngIf="subscription" class="subscription-info">
-                <div class="sub-header">
-                  <h4>{{ "adminBilling.subscription.active" | translate }}</h4>
-                  <span
-                    class="status-badge sub-{{
-                      subscription.status?.toLowerCase()
-                    }}"
-                    >{{ subscription.status }}</span
-                  >
-                </div>
-                <div class="sub-body">
-                  <div>
-                    {{
-                      "adminBilling.subscription.initialPayment" | translate
-                    }}: €{{ subscription.initialPayment }}
-                  </div>
-                  <div>
-                    {{ "adminBilling.subscription.months" | translate }}:
-                    {{ subscription.months }}
-                  </div>
-                  <div>
-                    {{ "adminBilling.subscription.startDate" | translate }}:
-                    {{ subscription.startDate | date : "shortDate" }}
-                  </div>
-                  <div>
-                    {{ "adminBilling.subscription.endDate" | translate }}:
-                    {{ subscription.endDate | date : "shortDate" }}
-                  </div>
-                  <div>
-                    {{
-                      "adminBilling.subscription.lateCancellations" | translate
-                    }}:
-                    {{ subscription.lateCancellations }}
-                  </div>
-                  <div *ngIf="daysRemainingFor(subscription) !== null">
-                    <strong
-                      >{{
-                        "adminBilling.subscription.daysRemaining" | translate
-                      }}:</strong
+
+            <div class="subscriptions-card">
+              <div class="subscription-panel">
+                <button
+                  class="btn-primary"
+                  (click)="openSubscriptionDialog()"
+                  *ngIf="!subscription"
+                >
+                  {{ "adminBilling.subscription.create" | translate }}
+                </button>
+                <div *ngIf="subscription" class="subscription-info">
+                  <div class="sub-header">
+                    <h4>
+                      {{ "adminBilling.subscription.active" | translate }}
+                    </h4>
+                    <span
+                      class="status-badge sub-{{
+                        subscription.status?.toLowerCase()
+                      }}"
+                      >{{ subscription.status }}</span
                     >
-                    {{ daysRemainingFor(subscription) }}
+                    >
+                  </div>
+                  <div class="sub-body">
+                    <div class="sub-row">
+                      <strong
+                        >{{
+                          "adminBilling.subscription.initialPayment"
+                            | translate
+                        }}:</strong
+                      >
+                      <span
+                        >€{{
+                          subscription.initialPayment?.toFixed
+                            ? (subscription.initialPayment | number : "1.2-2")
+                            : subscription.initialPayment
+                        }}</span
+                      >
+                    </div>
+                    <div class="sub-row">
+                      <strong
+                        >{{
+                          "adminBilling.subscription.months" | translate
+                        }}:</strong
+                      >
+                      <span>{{ subscription.months }}</span>
+                    </div>
+                    <div class="sub-row">
+                      <strong
+                        >{{
+                          "adminBilling.subscription.startDate" | translate
+                        }}:</strong
+                      >
+                      <span>{{ subscription.startDate | date : "short" }}</span>
+                    </div>
+                    <div class="sub-row">
+                      <strong
+                        >{{
+                          "adminBilling.subscription.endDate" | translate
+                        }}:</strong
+                      >
+                      <span>{{ subscription.endDate | date : "short" }}</span>
+                    </div>
+                    <div class="sub-row">
+                      <strong
+                        >{{
+                          "adminBilling.subscription.lateCancellations"
+                            | translate
+                        }}:</strong
+                      >
+                      <span>{{ subscription.lateCancellations }}</span>
+                    </div>
+                    <div
+                      *ngIf="daysRemainingFor(subscription) !== null"
+                      class="sub-row"
+                    >
+                      <strong
+                        >{{
+                          "adminBilling.subscription.daysRemaining" | translate
+                        }}:</strong
+                      >
+                      <span>{{ daysRemainingFor(subscription) }}</span>
+                    </div>
+                    <div class="sub-row">
+                      <strong
+                        >{{
+                          "adminBilling.subscription.status" | translate
+                        }}:</strong
+                      >
+                      <span>{{
+                        subscriptionStatusLabel(subscription.status)
+                      }}</span>
+                    </div>
+                  </div>
+                  <div class="subscription-actions">
+                    <button class="btn-warning" (click)="cancelSubscription()">
+                      {{ "adminBilling.subscription.cancel" | translate }}
+                    </button>
                   </div>
                 </div>
-                <div class="subscription-actions">
-                  <button class="btn-warning" (click)="cancelSubscription()">
-                    {{ "adminBilling.subscription.cancel" | translate }}
-                  </button>
-                </div>
               </div>
+
               <div
                 *ngIf="subscriptionHistory.length"
                 class="subscription-history-cards"
@@ -211,7 +292,12 @@
                       <div class="history-date">
                         {{ h.createdAt | date : "short" }}
                       </div>
-                      <div class="history-type">{{ h.eventType }}</div>
+                      <div class="history-type">
+                        {{ subscriptionEventLabel(h.eventType) }}
+                      </div>
+                    </div>
+                    <div class="history-summary">
+                      {{ subscriptionEventSummary(h.eventData) }}
                     </div>
                     <div class="history-body">
                       <ng-container
