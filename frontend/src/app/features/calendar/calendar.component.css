@@ -6,7 +6,7 @@
   padding: 0.75rem 1rem;
   border-radius: 4px;
   color: #fff;
-  z-index: 1000;
+  z-index: 2100; /* ensure toast appears above modal overlays */
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 .toast.success { background: #2e7d32; }

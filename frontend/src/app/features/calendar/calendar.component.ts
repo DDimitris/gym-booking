@@ -91,7 +91,11 @@ export class CalendarComponent implements OnInit {
   }
 
   private isMobile(): boolean {
-    return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+    // Consider narrow widths or short viewports (landscape on phones) as mobile
+    if (!window) return false;
+    const narrow = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+    const short = window.innerHeight <= 600; // handle landscape phones with small height
+    return Boolean(narrow || short);
   }
 
   private createCalendarOptions(): CalendarOptions {
@@ -309,11 +313,15 @@ export class CalendarComponent implements OnInit {
     this.bookingService.createBooking(this.selectedClass.id).subscribe({
       next: () => {
         console.log('Booking successful');
-        this.showToast(
-          this.translate.instant('calendar.messages.bookingSuccess'),
-          'success'
-        );
+        // Close modal first so the toast is visible on mobile (modal overlay can cover toasts)
         this.closeModal();
+        // Small defer to ensure modal DOM is removed before showing toast
+        setTimeout(() => {
+          this.showToast(
+            this.translate.instant('calendar.messages.bookingSuccess'),
+            'success'
+          );
+        }, 50);
         this.loadData(); // Refresh data
       },
       error: (err) => {
