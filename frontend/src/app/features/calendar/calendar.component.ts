@@ -32,6 +32,9 @@ export class CalendarComponent implements OnInit {
   modalMode: 'view' | 'book' = 'view';
   selectedClass: GymClass | null = null;
   bookingCount = 0;
+  // Client-side flag: true when booking is not allowed because class starts within cutoff
+  lateBooking = false;
+  lateBookingHoursRemaining: number | null = null;
   currentUser: User | null = null;
   backendRole: string | null = null;
   chargeAmount: number | null = null;
@@ -247,6 +250,18 @@ export class CalendarComponent implements OnInit {
     this.bookingService.getClassBookingsCount(classId).subscribe({
       next: (count) => {
         this.bookingCount = count;
+        // Determine late booking status (client-side UX): must be at least 10 hours before start
+        try {
+          const start = new Date(selectedClass.startTime);
+          const now = new Date();
+          const hoursUntil = (start.getTime() - now.getTime()) / (1000 * 60 * 60);
+          this.lateBookingHoursRemaining = Math.max(0, Math.floor(hoursUntil));
+          this.lateBooking = hoursUntil < 10;
+        } catch (e) {
+          this.lateBooking = false;
+          this.lateBookingHoursRemaining = null;
+        }
+
         this.modalMode = 'view';
         this.showModal = true;
         // If user is authenticated, fetch profile to compute wallet/bonus eligibility

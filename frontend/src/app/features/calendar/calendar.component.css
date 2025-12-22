@@ -145,6 +145,16 @@
   border-top: 1px solid #e0e0e0;
 }
 
+/* Late booking notice shown in modal when class starts within cutoff */
+.late-booking {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(220,38,38,0.06);
+  border-left: 4px solid #ef4444;
+  border-radius: 4px;
+  color: #7a1f1f;
+}
+
 /* Button Styles */
 .btn-primary,
 .btn-secondary,

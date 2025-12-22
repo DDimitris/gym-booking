@@ -9,6 +9,7 @@ import com.gym.booking.exception.BookingException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -73,6 +74,13 @@ public class BookingService {
         ZonedDateTime nowZ = ZonedDateTime.now(zoneId);
         if (classStartZ.isBefore(nowZ)) {
             throw new BookingException("Cannot book past classes");
+        }
+
+        // Enforce booking cutoff: bookings must be made at least 10 hours
+        // before the class start time. If within 10 hours, block booking.
+        long hoursUntilStart = Duration.between(nowZ, classStartZ).toHours();
+        if (hoursUntilStart < 10) {
+            throw new BookingException("Late booking: bookings must be made at least 10 hours before class start.");
         }
 
         long confirmedBookings = bookingRepository.countByClassInstanceAndStatus(

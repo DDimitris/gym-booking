@@ -101,6 +101,10 @@
             </strong>
             {{ "calendar.modal.cancellation.text" | translate }}
           </div>
+          <!-- Late booking notice -->
+          <div *ngIf="lateBooking" class="late-booking">
+            {{ 'calendar.messages.lateBooking' | translate }}
+          </div>
         </div>
       </div>
 
@@ -111,7 +115,8 @@
         <button
           class="btn-primary"
           (click)="bookClass()"
-          [disabled]="isFull || selectedClass?.status !== 'SCHEDULED'"
+          [disabled]="isFull || selectedClass?.status !== 'SCHEDULED' || lateBooking"
+          [attr.title]="lateBooking ? ( 'calendar.messages.lateBooking' | translate ) : null"
           *ngIf="!(isAdmin || isInstructor)"
         >
           {{ "calendar.modal.actions.book" | translate }}

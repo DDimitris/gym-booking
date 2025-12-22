@@ -94,7 +94,8 @@
       "loginRequired": "Please login to book a class.",
       "staffCannotBook": "Admins and instructors cannot book classes for themselves.",
       "bookingSuccess": "Booking created successfully!",
-      "alreadyBooked": "You have already booked this class."
+      "alreadyBooked": "You have already booked this class.",
+      "lateBooking": "Late booking: bookings must be made at least 10 hours before class start."
     },
     "errors": {
       "loadData": "Failed to load calendar data.",
