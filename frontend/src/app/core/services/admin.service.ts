@@ -86,8 +86,11 @@ export class AdminService {
   }
 
   // Subscriptions
-  createSubscription(userId: number, initialPayment: number, months: number) {
-    return this.http.post<any>(`${this.apiUrl}/members/${userId}/subscription`, { initialPayment, months });
+  createSubscription(userId: number, initialPayment: number, days: number) {
+    // send days to backend; backend will store the days value (keeps DB
+    // column name 'months' unchanged for schema compatibility) and compute
+    // endDate using days (plusDays).
+    return this.http.post<any>(`${this.apiUrl}/members/${userId}/subscription`, { initialPayment, days });
   }
 
   getActiveSubscription(userId: number) {

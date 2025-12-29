@@ -35,7 +35,9 @@ public class AdminController {
 
     public static class CreateSubscriptionDTO {
         public java.math.BigDecimal initialPayment;
-        public Integer months;
+        // Admin now provides a number of days instead of months. The service
+        // expects `days` and will compute subscription end dates accordingly.
+        public Integer days;
 
         public java.math.BigDecimal getInitialPayment() {
             return initialPayment;
@@ -45,12 +47,12 @@ public class AdminController {
             this.initialPayment = initialPayment;
         }
 
-        public Integer getMonths() {
-            return months;
+        public Integer getDays() {
+            return days;
         }
 
-        public void setMonths(Integer months) {
-            this.months = months;
+        public void setDays(Integer days) {
+            this.days = days;
         }
     }
 
@@ -58,8 +60,14 @@ public class AdminController {
     public ResponseEntity<?> createSubscription(@PathVariable("userId") long userId,
             @RequestBody CreateSubscriptionDTO dto) {
         try {
+            // Validate days and pass through to service.
+            Integer days = dto.getDays();
+            if (days == null || days <= 0) {
+                return ResponseEntity.badRequest().body("days must be a positive integer");
+            }
+
             com.gym.booking.model.Subscription s = subscriptionService.createSubscription(userId,
-                    dto.getInitialPayment(), dto.getMonths());
+                    dto.getInitialPayment(), days);
             return ResponseEntity.ok(s);
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

@@ -9,7 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 export interface SubscriptionDialogData {
   initialPayment: string;
-  months: number;
+  days: number;
 }
 
 @Component({
@@ -35,9 +35,9 @@ export class SubscriptionDialogComponent {
 
   submit(): void {
     // Basic validation
-    const months = Number(this.dataModel.months);
+    const days = Number(this.dataModel.days);
     const initial = parseFloat(this.dataModel.initialPayment || '0');
-    if (isNaN(months) || months <= 0) return;
+    if (isNaN(days) || days <= 0) return;
     if (isNaN(initial) || initial < 0) return;
     this.dialogRef.close(this.dataModel);
   }

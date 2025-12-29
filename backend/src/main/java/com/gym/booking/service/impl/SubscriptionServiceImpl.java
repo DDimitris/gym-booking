@@ -32,7 +32,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Subscription createSubscription(Long userId, BigDecimal initialPayment, int months) {
+    public Subscription createSubscription(Long userId, BigDecimal initialPayment, int days) {
         User user = userService.findById(userId);
 
         // Ensure no active subscription
@@ -44,7 +44,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Subscription sub = new Subscription();
         sub.setUser(user);
         sub.setInitialPayment(initialPayment);
-        sub.setMonths(months);
+        // store incoming days value in the `days` column
+        sub.setDays(days);
 
         // Start immediately only if wallet is zero
         java.math.BigDecimal wallet = java.util.Optional.ofNullable(user.getWalletBalance())
@@ -52,7 +53,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (wallet.compareTo(java.math.BigDecimal.ZERO) <= 0) {
             LocalDate start = LocalDate.now();
             sub.setStartDate(start);
-            sub.setEndDate(start.plusMonths(months));
+            // compute end date using days (plusDays)
+            sub.setEndDate(start.plusDays(days));
             sub.setStatus(Subscription.Status.ACTIVE);
         } else {
             sub.setStatus(Subscription.Status.PENDING);
@@ -62,7 +64,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         SubscriptionHistory ev = new SubscriptionHistory();
         ev.setSubscription(saved);
         ev.setEventType("CREATED");
-        ev.setEventData("initialPayment=" + initialPayment + ", months=" + months + ", status=" + saved.getStatus());
+        ev.setEventData("initialPayment=" + initialPayment + ", days=" + days + ", status=" + saved.getStatus());
         ev.setCreatedAt(java.time.LocalDateTime.now());
         historyRepo.save(ev);
         return saved;
@@ -137,7 +139,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             Subscription s = opt.get();
             LocalDate start = LocalDate.now();
             s.setStartDate(start);
-            s.setEndDate(start.plusMonths(s.getMonths()));
+            // compute endDate by adding stored days
+            s.setEndDate(start.plusDays(s.getDays() != null ? s.getDays() : 0));
             s.setStatus(Subscription.Status.ACTIVE);
             repo.save(s);
             SubscriptionHistory ev = new SubscriptionHistory();

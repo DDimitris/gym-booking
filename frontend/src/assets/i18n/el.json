@@ -260,6 +260,7 @@
       "active": "Ενεργή συνδρομή",
       "initialPayment": "Αρχική πληρωμή",
       "months": "Μήνες",
+      "days": "Ημέρες",
       "startDate": "Ημερομηνία έναρξης",
       "endDate": "Ημερομηνία λήξης",
       "status": "Κατάσταση",
@@ -280,6 +281,7 @@
       "summary": {
         "initialPayment": "Αρχική πληρωμή: {{amount}}",
         "months": "Διάρκεια: {{months}} μήνες",
+        "days": "Διάρκεια: {{days}} ημέρες",
         "reason": "Σημείωση: {{reason}}"
       }
     }

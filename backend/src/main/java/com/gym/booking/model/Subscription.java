@@ -22,8 +22,8 @@ public class Subscription extends BaseEntity {
     @Column(name = "initial_payment", precision = 10, scale = 2, nullable = false)
     private BigDecimal initialPayment;
 
-    @Column(nullable = false)
-    private Integer months;
+    @Column(name = "days")
+    private Integer days;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -57,12 +57,14 @@ public class Subscription extends BaseEntity {
         this.initialPayment = initialPayment;
     }
 
-    public Integer getMonths() {
-        return months;
+
+
+    public Integer getDays() {
+        return days;
     }
 
-    public void setMonths(Integer months) {
-        this.months = months;
+    public void setDays(Integer days) {
+        this.days = days;
     }
 
     public LocalDate getStartDate() {

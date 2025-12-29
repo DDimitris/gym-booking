@@ -85,7 +85,8 @@
           {{ subscription.endDate | date : "shortDate" }}
         </div>
         <div class="sub-line">
-          <strong>Months:</strong> {{ subscription.months }}
+          <strong>{{ "adminBilling.subscription.days" | translate }}:</strong>
+          {{ subscription.days }}
         </div>
         <div class="sub-line">
           <strong>Late cancellations:</strong>

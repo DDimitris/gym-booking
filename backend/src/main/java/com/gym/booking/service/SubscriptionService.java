@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubscriptionService {
-    Subscription createSubscription(Long userId, BigDecimal initialPayment, int months);
+    // Create a subscription for the given user. The `days` parameter is the
+    // number of days the subscription should last; the service computes the
+    // end date using plusDays.
+    Subscription createSubscription(Long userId, BigDecimal initialPayment, int days);
 
     Optional<Subscription> getActiveByUser(Long userId);
 

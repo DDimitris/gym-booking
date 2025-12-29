@@ -216,10 +216,10 @@ export class AdminBillingComponent implements OnInit {
     const find = (k: string) => kv.find(x => x.key.toLowerCase() === k.toLowerCase())?.value;
     const parts: string[] = [];
     const initialPayment = find('initialPayment') || find('initial_payment') || find('amount');
-    const months = find('months') || find('duration');
+      const duration = find('days') || find('months') || find('duration');
     const reason = find('reason') || find('by');
     if (initialPayment) parts.push(this.translate.instant('adminBilling.subscription.summary.initialPayment', { amount: initialPayment }));
-    if (months) parts.push(this.translate.instant('adminBilling.subscription.summary.months', { months }));
+      if (duration) parts.push(this.translate.instant('adminBilling.subscription.summary.days', { days: duration }));
     if (reason) parts.push(this.translate.instant('adminBilling.subscription.summary.reason', { reason }));
     if (parts.length > 0) return parts.join(' — ');
     // fallback: show raw eventData (shortened)
@@ -247,14 +247,14 @@ export class AdminBillingComponent implements OnInit {
     if (!this.memberId) return;
     const dialogRef = this.dialog.open(SubscriptionDialogComponent, {
       width: '420px',
-      data: { initialPayment: '0.00', months: 1 }
+      data: { initialPayment: '0.00', days: 30 }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
       const initialPayment = parseFloat(result.initialPayment as any);
-      const months = Number(result.months);
-      if (isNaN(initialPayment) || isNaN(months) || months <= 0) { alert('Invalid input'); return; }
-      this.adminService.createSubscription(this.memberId!, initialPayment, months).subscribe({
+      const days = Number(result.days);
+      if (isNaN(initialPayment) || isNaN(days) || days <= 0) { alert('Invalid input'); return; }
+      this.adminService.createSubscription(this.memberId!, initialPayment, days).subscribe({
         next: () => { this.loadSubscriptionInfo(this.memberId!); this.loadReports(); },
         error: (err) => { console.error('Failed to create subscription', err); alert('Failed to create subscription: ' + (err?.error || err?.message || err)); }
       });

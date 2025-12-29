@@ -277,6 +277,7 @@
       "active": "Active Subscription",
       "initialPayment": "Initial payment",
       "months": "Months",
+      "days": "Days",
       "startDate": "Start date",
       "endDate": "End date",
       "status": "Status",
@@ -297,6 +298,7 @@
       "summary": {
         "initialPayment": "Initial payment: {{amount}}",
         "months": "Duration: {{months}} month(s)",
+        "days": "Duration: {{days}} day(s)",
         "reason": "Note: {{reason}}"
       }
     }
