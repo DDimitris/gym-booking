@@ -57,8 +57,6 @@ public class Subscription extends BaseEntity {
         this.initialPayment = initialPayment;
     }
 
-
-
     public Integer getDays() {
         return days;
     }

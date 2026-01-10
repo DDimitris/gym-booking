@@ -93,6 +93,10 @@ services:
       KEYCLOAK_AUTH_SERVER_URL: ${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080/auth}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-gym-booking}
       KEYCLOAK_RESOURCE: ${KEYCLOAK_RESOURCE:-gym-booking-client}
+      # Booking and cancellation thresholds (hours). Can be overridden in .env
+      BOOKING_CUTOFF_HOURS: ${BOOKING_CUTOFF_HOURS:-10}
+      CANCELLATION_SAME_DAY_THRESHOLD_HOURS: ${CANCELLATION_SAME_DAY_THRESHOLD_HOURS:-12}
+      BOOKING_COMPLETION_POLL_MS: ${BOOKING_COMPLETION_POLL_MS:-600000}
     # Do NOT publish backend port to the host for improved security; frontend accesses the backend via the compose network.
     depends_on:
       postgres:

@@ -25,18 +25,22 @@ public class BookingService {
     private final com.gym.booking.service.SubscriptionService subscriptionService;
 
     private final ZoneId zoneId;
+    private final long bookingCutoffHours;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public BookingService(BookingRepository bookingRepository,
             GymClassService gymClassService,
             UserService userService,
             @Lazy BillingService billingService,
             @org.springframework.beans.factory.annotation.Autowired(required = false) com.gym.booking.service.SubscriptionService subscriptionService,
+            @org.springframework.beans.factory.annotation.Value("${BOOKING_CUTOFF_HOURS:10}") long bookingCutoffHours,
             @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.bookingRepository = bookingRepository;
         this.gymClassService = gymClassService;
         this.userService = userService;
         this.billingService = billingService;
         this.subscriptionService = subscriptionService;
+        this.bookingCutoffHours = bookingCutoffHours;
         this.zoneId = ZoneId.of(appTimezone);
     }
 
@@ -79,8 +83,10 @@ public class BookingService {
         // Enforce booking cutoff: bookings must be made at least 10 hours
         // before the class start time. If within 10 hours, block booking.
         long hoursUntilStart = Duration.between(nowZ, classStartZ).toHours();
-        if (hoursUntilStart < 10) {
-            throw new BookingException("Late booking: bookings must be made at least 10 hours before class start.");
+        if (hoursUntilStart < this.bookingCutoffHours) {
+            throw new BookingException(
+                    "Late booking: bookings must be made at least " + this.bookingCutoffHours
+                            + " hours before class start.");
         }
 
         long confirmedBookings = bookingRepository.countByClassInstanceAndStatus(

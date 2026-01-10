@@ -23,19 +23,22 @@ public class BillingService {
     private final com.gym.booking.service.WalletService walletService;
     private final com.gym.booking.service.SubscriptionService subscriptionService;
 
-    // Same-day cancellation threshold (12 hours before class start)
-    private static final long SAME_DAY_THRESHOLD_HOURS = 12;
+    // Same-day cancellation threshold (configurable, default 12 hours before class
+    // start)
+    private final long sameDayThresholdHours;
     private final ZoneId zoneId;
 
     public BillingService(BillingEventRepository billingEventRepository,
             UserService userService,
             @org.springframework.beans.factory.annotation.Autowired(required = false) @org.springframework.context.annotation.Lazy com.gym.booking.service.WalletService walletService,
             @org.springframework.beans.factory.annotation.Autowired(required = false) com.gym.booking.service.SubscriptionService subscriptionService,
+            @org.springframework.beans.factory.annotation.Value("${CANCELLATION_SAME_DAY_THRESHOLD_HOURS:12}") long sameDayThresholdHours,
             @org.springframework.beans.factory.annotation.Value("${APP_TIMEZONE:Europe/Athens}") String appTimezone) {
         this.billingEventRepository = billingEventRepository;
         this.userService = userService;
         this.walletService = walletService;
         this.subscriptionService = subscriptionService;
+        this.sameDayThresholdHours = sameDayThresholdHours;
         this.zoneId = ZoneId.of(appTimezone);
     }
 
@@ -78,7 +81,7 @@ public class BillingService {
         long hoursUntilClass = Duration.between(cancellationTime, classStartTime).toHours();
 
         // Only charge if cancelled within same-day threshold
-        if (hoursUntilClass < SAME_DAY_THRESHOLD_HOURS) {
+        if (hoursUntilClass < this.sameDayThresholdHours) {
             // Reload user to obtain latest wallet balance and state
             User user = userService.findById(booking.getUser().getId());
             BigDecimal chargeAmount = resolveBaseCostForClass(user, booking.getClassInstance());
