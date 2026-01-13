@@ -45,6 +45,15 @@ public class BookingService {
     }
 
     public Booking createBooking(Long userId, Long classInstanceId) {
+        return createBooking(userId, classInstanceId, false);
+    }
+
+    /**
+     * Create a booking for a user. If {@code bypassCutoff} is true, the booking
+     * cutoff hours check will be skipped (used by staff/admin endpoints that add
+     * members to classes after the cutoff).
+     */
+    public Booking createBooking(Long userId, Long classInstanceId, boolean bypassCutoff) {
         if (userId == null) {
             throw new BookingException("User id is required");
         }
@@ -54,7 +63,7 @@ public class BookingService {
         User user = userService.findById(userId);
         GymClass classInstance = gymClassService.findById(classInstanceId);
 
-        validateBooking(user, classInstance);
+        validateBooking(user, classInstance, bypassCutoff);
 
         Booking booking = new Booking();
         booking.setUser(user);
@@ -63,7 +72,7 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    private void validateBooking(User user, GymClass classInstance) {
+    private void validateBooking(User user, GymClass classInstance, boolean bypassCutoff) {
         // Disallow self-booking for staff (ADMIN/TRAINER) – they must book on behalf
         // of members instead
         if (user.getRole() == User.UserRole.TRAINER || user.getRole() == User.UserRole.ADMIN) {
@@ -80,10 +89,11 @@ public class BookingService {
             throw new BookingException("Cannot book past classes");
         }
 
-        // Enforce booking cutoff: bookings must be made at least 10 hours
-        // before the class start time. If within 10 hours, block booking.
+        // Enforce booking cutoff: bookings must be made at least configured hours
+        // before the class start time. If within cutoff and bypassCutoff is false,
+        // block booking.
         long hoursUntilStart = Duration.between(nowZ, classStartZ).toHours();
-        if (hoursUntilStart < this.bookingCutoffHours) {
+        if (!bypassCutoff && hoursUntilStart < this.bookingCutoffHours) {
             throw new BookingException(
                     "Late booking: bookings must be made at least " + this.bookingCutoffHours
                             + " hours before class start.");
