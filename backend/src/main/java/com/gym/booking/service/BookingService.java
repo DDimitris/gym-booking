@@ -116,13 +116,20 @@ public class BookingService {
         boolean hasActiveSubscriptionEarly = false;
         if (this.subscriptionService != null) {
             try {
-                hasActiveSubscriptionEarly = this.subscriptionService.getActiveByUser(user.getId()).isPresent();
+                java.util.Optional<com.gym.booking.model.Subscription> opt = this.subscriptionService
+                        .getActiveByUser(user.getId());
+                if (opt.isPresent() && classInstance.getStartTime() != null) {
+                    java.time.LocalDate classDate = classInstance.getStartTime().atZone(zoneId).toLocalDate();
+                    java.time.LocalDate endDate = opt.get().getEndDate();
+                    if (endDate != null && !endDate.isBefore(classDate)) {
+                        hasActiveSubscriptionEarly = true;
+                    }
+                }
             } catch (Exception ignored) {
             }
         }
         if (hasActiveSubscriptionEarly) {
-            // Active subscription -> booking allowed (wallet / kind cost checks not
-            // required)
+            // Active subscription that covers the class date -> booking allowed
             return;
         }
 
@@ -165,7 +172,15 @@ public class BookingService {
         boolean hasActiveSubscription = false;
         if (this.subscriptionService != null) {
             try {
-                hasActiveSubscription = this.subscriptionService.getActiveByUser(user.getId()).isPresent();
+                java.util.Optional<com.gym.booking.model.Subscription> opt = this.subscriptionService
+                        .getActiveByUser(user.getId());
+                if (opt.isPresent() && classInstance.getStartTime() != null) {
+                    java.time.LocalDate classDate = classInstance.getStartTime().atZone(zoneId).toLocalDate();
+                    java.time.LocalDate endDate = opt.get().getEndDate();
+                    if (endDate != null && !endDate.isBefore(classDate)) {
+                        hasActiveSubscription = true;
+                    }
+                }
             } catch (Exception ignored) {
             }
         }
@@ -215,7 +230,16 @@ public class BookingService {
             return java.util.Collections.emptyList();
         }
         GymClass classInstance = gymClassService.findById(classInstanceId);
-        return bookingRepository.findByClassInstance(classInstance);
+        // Return only active/attended bookings. Exclude cancelled bookings so
+        // participants lists do not show members who cancelled.
+        List<Booking> all = bookingRepository.findByClassInstance(classInstance);
+        java.util.List<Booking> filtered = new java.util.ArrayList<>();
+        for (Booking b : all) {
+            if (b.getStatus() == Booking.BookingStatus.BOOKED || b.getStatus() == Booking.BookingStatus.COMPLETED) {
+                filtered.add(b);
+            }
+        }
+        return filtered;
     }
 
     /**

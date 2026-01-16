@@ -73,7 +73,27 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public Optional<Subscription> getActiveByUser(Long userId) {
         User user = userService.findById(userId);
-        return repo.findByUserAndStatus(user, Subscription.Status.ACTIVE);
+        Optional<Subscription> opt = repo.findByUserAndStatus(user, Subscription.Status.ACTIVE);
+        if (opt.isPresent()) {
+            Subscription s = opt.get();
+            // If subscription end date has passed, expire it and return empty
+            if (s.getEndDate() != null && s.getEndDate().isBefore(java.time.LocalDate.now())) {
+                s.setStatus(Subscription.Status.CANCELLED);
+                // Ensure endDate is set to today if somehow earlier
+                if (s.getEndDate().isBefore(java.time.LocalDate.now())) {
+                    s.setEndDate(java.time.LocalDate.now());
+                }
+                repo.save(s);
+                SubscriptionHistory ev = new SubscriptionHistory();
+                ev.setSubscription(s);
+                ev.setEventType("AUTO_EXPIRED");
+                ev.setEventData("expired at " + java.time.LocalDate.now());
+                ev.setCreatedAt(java.time.LocalDateTime.now());
+                historyRepo.save(ev);
+                return Optional.empty();
+            }
+        }
+        return opt;
     }
 
     @Override
