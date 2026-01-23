@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface SubscriptionHistoryRepository extends JpaRepository<SubscriptionHistory, Long> {
     List<SubscriptionHistory> findBySubscriptionOrderByCreatedAtDesc(Subscription subscription);
+
+    void deleteBySubscriptionIn(List<Subscription> subscriptions);
 }

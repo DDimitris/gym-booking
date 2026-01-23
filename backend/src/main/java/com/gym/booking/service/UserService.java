@@ -3,6 +3,12 @@ package com.gym.booking.service;
 import com.gym.booking.model.User;
 import com.gym.booking.model.User.UserRole;
 import com.gym.booking.repository.UserRepository;
+import com.gym.booking.repository.BookingRepository;
+import com.gym.booking.repository.BillingEventRepository;
+import com.gym.booking.repository.WalletTransactionRepository;
+import com.gym.booking.repository.SubscriptionRepository;
+import com.gym.booking.repository.SubscriptionHistoryRepository;
+import com.gym.booking.repository.AuditLogRepository;
 import com.gym.booking.exception.ResourceNotFoundException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -15,9 +21,27 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final BillingEventRepository billingEventRepository;
+    private final WalletTransactionRepository walletTransactionRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final SubscriptionHistoryRepository subscriptionHistoryRepository;
+    private final AuditLogRepository auditLogRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+            BookingRepository bookingRepository,
+            BillingEventRepository billingEventRepository,
+            WalletTransactionRepository walletTransactionRepository,
+            SubscriptionRepository subscriptionRepository,
+            SubscriptionHistoryRepository subscriptionHistoryRepository,
+            AuditLogRepository auditLogRepository) {
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.billingEventRepository = billingEventRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
+        this.subscriptionRepository = subscriptionRepository;
+        this.subscriptionHistoryRepository = subscriptionHistoryRepository;
+        this.auditLogRepository = auditLogRepository;
     }
 
     public User findByKeycloakId(String keycloakId) {
@@ -67,9 +91,46 @@ public class UserService {
     }
 
     public void deleteUser(@NonNull Long id) {
-        userRepository.findById(id)
+        com.gym.booking.model.User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        userRepository.deleteById(id);
+
+        // 1) Remove billing events for the user
+        try {
+            billingEventRepository.deleteByUser(user);
+        } catch (Exception ignored) {
+        }
+
+        // 2) Remove wallet transactions
+        try {
+            walletTransactionRepository.deleteByUser(user);
+        } catch (Exception ignored) {
+        }
+
+        // 3) Remove audit logs where user is actor or target
+        try {
+            auditLogRepository.deleteByActor(user);
+            auditLogRepository.deleteByTargetTypeAndTargetId("User", id);
+        } catch (Exception ignored) {
+        }
+
+        // 4) Remove bookings by user
+        try {
+            bookingRepository.deleteByUser(user);
+        } catch (Exception ignored) {
+        }
+
+        // 5) Remove subscription history and subscriptions
+        try {
+            java.util.List<com.gym.booking.model.Subscription> subs = subscriptionRepository.findByUser(user);
+            if (subs != null && !subs.isEmpty()) {
+                subscriptionHistoryRepository.deleteBySubscriptionIn(subs);
+                subscriptionRepository.deleteAll(subs);
+            }
+        } catch (Exception ignored) {
+        }
+
+        // 6) Finally remove the user
+        userRepository.delete(user);
     }
 
     public List<User> findAllTrainers() {
