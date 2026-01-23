@@ -82,7 +82,7 @@ public class AdminController {
 
     @GetMapping("/members/{userId}/subscription/history")
     public ResponseEntity<?> getSubscriptionHistory(@PathVariable("userId") long userId) {
-        return ResponseEntity.ok(subscriptionService.getHistory(userId));
+        return ResponseEntity.ok(subscriptionService.getEnrichedHistory(userId));
     }
 
     @PostMapping("/members/{userId}/subscription/{subscriptionId}/cancel")

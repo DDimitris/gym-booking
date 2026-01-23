@@ -17,6 +17,8 @@ public interface SubscriptionService {
 
     List<Subscription> getHistory(Long userId);
 
+    java.util.List<com.gym.booking.dto.SubscriptionHistoryDTO> getEnrichedHistory(Long userId);
+
     void cancelSubscription(Long subscriptionId, String reason);
 
     void incrementLateCancellation(Subscription subscription);

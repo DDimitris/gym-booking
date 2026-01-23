@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { SubscriptionDialogComponent } from '../subscription-dialog/subscription-dialog.component';
+import { SubscriptionHistoryDialogComponent } from '../subscription-history-dialog/subscription-history-dialog.component';
 
 @Component({
   selector: 'app-admin-billing',
@@ -226,6 +227,36 @@ export class AdminBillingComponent implements OnInit {
     return eventData.length > 120 ? eventData.substring(0, 117) + '...' : eventData;
   }
 
+  // Format an end reason for display in the tile: prefer parsing key=value pairs
+  formatEndReason(reason: string | null | undefined): string {
+    if (!reason) return 'Unknown reason';
+    // If it's key=value pairs joined by commas, build a short summary
+    if (reason.includes('=')) {
+      const parts = reason.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      const kv: { k: string; v: string }[] = [];
+      for (const p of parts) {
+        const idx = p.indexOf('=');
+        if (idx > 0) {
+          kv.push({ k: p.substring(0, idx).trim(), v: p.substring(idx + 1).trim() });
+        }
+      }
+      if (kv.length > 0) {
+        const find = (k: string) => kv.find(x => x.k.toLowerCase() === k)?.v;
+        const amount = find('initialPayment') || find('initial_payment') || find('amount');
+        const days = find('days') || find('duration');
+        const r = find('reason') || find('by');
+        const partsOut: string[] = [];
+        if (amount) partsOut.push(`Initial payment €${Number(amount).toFixed(2)}`);
+        if (days) partsOut.push(`${days} day${Number(days) === 1 ? '' : 's'}`);
+        if (r) partsOut.push(r);
+        if (partsOut.length > 0) return partsOut.join(' — ');
+        // fallback: join a couple of kvs
+        return kv.slice(0, 2).map(x => `${x.k}: ${x.v}`).join(' — ');
+      }
+    }
+    return reason;
+  }
+
   // Human-friendly label for subscription status values
   subscriptionStatusLabel(status: string | null | undefined): string {
     if (!status) return this.translate.instant('adminBilling.subscription.status') || 'Status';
@@ -259,6 +290,21 @@ export class AdminBillingComponent implements OnInit {
         error: (err) => { console.error('Failed to create subscription', err); alert('Failed to create subscription: ' + (err?.error || err?.message || err)); }
       });
     });
+  }
+
+  openHistoryDialog(item: any): void {
+    const dialogRef = this.dialog.open(SubscriptionHistoryDialogComponent, {
+      width: '520px',
+      data: {
+        subscriptionId: item.subscriptionId || item.id,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        initialPayment: item.initialPayment,
+        classesCompleted: item.classesCompleted || 0,
+        endReason: item.endReason || item.reason || null
+      }
+    });
+    dialogRef.afterClosed().subscribe(() => {});
   }
 
   cancelSubscription(): void {

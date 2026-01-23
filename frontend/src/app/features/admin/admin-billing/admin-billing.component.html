@@ -278,37 +278,23 @@
                 </div>
               </div>
 
-              <div
-                *ngIf="subscriptionHistory.length"
-                class="subscription-history-cards"
-              >
+              <div *ngIf="subscriptionHistory.length" class="subscription-history-cards">
                 <h5>{{ "adminBilling.subscription.history" | translate }}</h5>
-                <div class="history-cards">
-                  <div
-                    *ngFor="let h of subscriptionHistory"
-                    class="history-card"
-                  >
-                    <div class="history-card-header">
-                      <div class="history-date">
-                        {{ h.createdAt | date : "short" }}
+                <div class="history-grid">
+                  <div *ngFor="let h of subscriptionHistory" class="history-tile" (click)="openHistoryDialog(h)" tabindex="0">
+                    <div class="tile-header">
+                      <div class="tile-dates">
+                        <div class="start">{{ h.startDate | date:'shortDate' }}</div>
+                        <div class="arrow">→</div>
+                        <div class="end">{{ h.endDate | date:'shortDate' }}</div>
                       </div>
-                      <div class="history-type">
-                        {{ subscriptionEventLabel(h.eventType) }}
-                      </div>
+                      <div class="tile-amount">€{{ h.initialPayment != null ? (h.initialPayment | number:'1.2-2') : '0.00' }}</div>
                     </div>
-                    <div class="history-summary">
-                      {{ subscriptionEventSummary(h.eventData) }}
+                    <div class="tile-body">
+                      <div class="classes-completed">Classes completed: <strong>{{ h.classesCompleted || 0 }}</strong></div>
+                      <div class="end-reason">{{ formatEndReason(h.endReason) }}</div>
                     </div>
-                    <div class="history-body">
-                      <ng-container
-                        *ngFor="let kv of parseHistoryEventData(h.eventData)"
-                      >
-                        <div class="history-kv">
-                          <strong>{{ kv.key }}:</strong>
-                          <span class="history-val">{{ kv.value }}</span>
-                        </div>
-                      </ng-container>
-                    </div>
+                    <div class="tile-foot">Click for details</div>
                   </div>
                 </div>
               </div>

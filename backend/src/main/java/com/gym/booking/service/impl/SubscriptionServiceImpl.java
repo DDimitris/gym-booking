@@ -22,13 +22,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository repo;
     private final SubscriptionHistoryRepository historyRepo;
+    private final com.gym.booking.repository.BookingRepository bookingRepository;
     private final UserService userService;
 
     public SubscriptionServiceImpl(SubscriptionRepository repo, SubscriptionHistoryRepository historyRepo,
-            UserService userService) {
+            UserService userService, com.gym.booking.repository.BookingRepository bookingRepository) {
         this.repo = repo;
         this.historyRepo = historyRepo;
         this.userService = userService;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -104,6 +106,70 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         for (Subscription s : all) {
             if (s.getUser().getId().equals(userId))
                 out.add(s);
+        }
+        return out;
+    }
+
+    @Override
+    public java.util.List<com.gym.booking.dto.SubscriptionHistoryDTO> getEnrichedHistory(Long userId) {
+        User user = userService.findById(userId);
+        java.util.List<Subscription> subs = repo.findByUser(user);
+        java.util.List<com.gym.booking.dto.SubscriptionHistoryDTO> out = new java.util.ArrayList<>();
+        for (Subscription s : subs) {
+            com.gym.booking.dto.SubscriptionHistoryDTO dto = new com.gym.booking.dto.SubscriptionHistoryDTO();
+            dto.setSubscriptionId(s.getId());
+            dto.setStartDate(s.getStartDate());
+            dto.setEndDate(s.getEndDate());
+            dto.setInitialPayment(s.getInitialPayment());
+
+            // compute classes completed during subscription period
+            int classesCompleted = 0;
+            try {
+                if (s.getStartDate() != null && s.getEndDate() != null) {
+                    java.time.LocalDateTime start = s.getStartDate().atStartOfDay();
+                    java.time.LocalDateTime end = s.getEndDate().plusDays(1).atStartOfDay();
+                    classesCompleted = (int) bookingRepository.countByUserAndStatusAndClassInstance_StartTimeBetween(user,
+                            com.gym.booking.model.Booking.BookingStatus.COMPLETED, start, end);
+                }
+            } catch (Exception ignored) {
+            }
+            dto.setClassesCompleted(classesCompleted);
+
+            // determine end reason from subscription history
+            String reason = null;
+            try {
+                java.util.List<com.gym.booking.model.SubscriptionHistory> hist = historyRepo
+                        .findBySubscriptionOrderByCreatedAtDesc(s);
+                for (com.gym.booking.model.SubscriptionHistory h : hist) {
+                    String t = h.getEventType() == null ? "" : h.getEventType().toUpperCase();
+                    if (t.contains("CANCEL") || t.contains("EXPIRE") || t.contains("AUTO_")) {
+                        // use eventData if available, otherwise a human-friendly fallback
+                        String data = h.getEventData();
+                        if (data != null && !data.isBlank()) {
+                            reason = data;
+                        } else if (t.contains("EXPIRE")) {
+                            reason = "Reached end date";
+                        } else if (t.contains("CANCEL")) {
+                            reason = "Cancelled";
+                        } else {
+                            reason = h.getEventType();
+                        }
+                        break;
+                    }
+                }
+                if (reason == null) {
+                    // fallback: if subscription status is CANCELLED or EXPIRED
+                    if (s.getStatus() == Subscription.Status.CANCELLED) {
+                        reason = "Cancelled";
+                    } else if (s.getStatus() == Subscription.Status.EXPIRED) {
+                        reason = "Reached end date";
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            dto.setEndReason(reason);
+
+            out.add(dto);
         }
         return out;
     }

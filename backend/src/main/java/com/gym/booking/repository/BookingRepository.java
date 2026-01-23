@@ -14,6 +14,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     void deleteByUser(User user);
 
+        long countByUserAndStatusAndClassInstance_StartTimeBetween(User user, Booking.BookingStatus status,
+            java.time.LocalDateTime start, java.time.LocalDateTime end);
+
     List<Booking> findByClassInstance(GymClass classInstance);
 
     long countByClassInstanceAndStatus(GymClass classInstance, Booking.BookingStatus status);
