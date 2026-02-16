@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ "adminBilling.subscription.create" | translate }}</h2>
+<div mat-dialog-content class="subscription-dialog-content">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label
+      >{{
+        "adminBilling.subscription.initialPayment" | translate
+      }}
+      (€)</mat-label
+    >
+    <input
+      matInput
+      [(ngModel)]="dataModel.initialPayment"
+      type="number"
+      step="0.01"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>{{ "adminBilling.subscription.days" | translate }}</mat-label>
+    <input matInput [(ngModel)]="dataModel.days" type="number" min="1" />
+  </mat-form-field>
+</div>
+<div mat-dialog-actions class="actions-row">
+  <button mat-button (click)="cancel()">
+    {{ "common.cancel" | translate }}
+  </button>
+  <button mat-raised-button color="primary" (click)="submit()">
+    {{ "common.create" | translate }}
+  </button>
+</div>

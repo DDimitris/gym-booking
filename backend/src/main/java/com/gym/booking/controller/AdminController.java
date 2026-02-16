@@ -22,12 +22,79 @@ public class AdminController {
     private final UserService userService;
     private final BillingService billingService;
     private final com.gym.booking.repository.GymClassRepository gymClassRepository;
+    private final com.gym.booking.service.SubscriptionService subscriptionService;
 
     public AdminController(UserService userService, BillingService billingService,
-            com.gym.booking.repository.GymClassRepository gymClassRepository) {
+            com.gym.booking.repository.GymClassRepository gymClassRepository,
+            com.gym.booking.service.SubscriptionService subscriptionService) {
         this.userService = userService;
         this.billingService = billingService;
         this.gymClassRepository = gymClassRepository;
+        this.subscriptionService = subscriptionService;
+    }
+
+    public static class CreateSubscriptionDTO {
+        public java.math.BigDecimal initialPayment;
+        // Admin now provides a number of days instead of months. The service
+        // expects `days` and will compute subscription end dates accordingly.
+        public Integer days;
+
+        public java.math.BigDecimal getInitialPayment() {
+            return initialPayment;
+        }
+
+        public void setInitialPayment(java.math.BigDecimal initialPayment) {
+            this.initialPayment = initialPayment;
+        }
+
+        public Integer getDays() {
+            return days;
+        }
+
+        public void setDays(Integer days) {
+            this.days = days;
+        }
+    }
+
+    @PostMapping("/members/{userId}/subscription")
+    public ResponseEntity<?> createSubscription(@PathVariable("userId") long userId,
+            @RequestBody CreateSubscriptionDTO dto) {
+        try {
+            // Validate days and pass through to service.
+            Integer days = dto.getDays();
+            if (days == null || days <= 0) {
+                return ResponseEntity.badRequest().body("days must be a positive integer");
+            }
+
+            com.gym.booking.model.Subscription s = subscriptionService.createSubscription(userId,
+                    dto.getInitialPayment(), days);
+            return ResponseEntity.ok(s);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/members/{userId}/subscription")
+    public ResponseEntity<?> getActiveSubscription(@PathVariable("userId") long userId) {
+        java.util.Optional<com.gym.booking.model.Subscription> opt = subscriptionService.getActiveByUser(userId);
+        return opt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/members/{userId}/subscription/history")
+    public ResponseEntity<?> getSubscriptionHistory(@PathVariable("userId") long userId) {
+        return ResponseEntity.ok(subscriptionService.getEnrichedHistory(userId));
+    }
+
+    @PostMapping("/members/{userId}/subscription/{subscriptionId}/cancel")
+    public ResponseEntity<?> cancelSubscription(@PathVariable("userId") long userId,
+            @PathVariable("subscriptionId") long subscriptionId,
+            @RequestParam(name = "reason", required = false) String reason) {
+        try {
+            subscriptionService.cancelSubscription(subscriptionId, reason == null ? "cancelled by admin" : reason);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping("/members")

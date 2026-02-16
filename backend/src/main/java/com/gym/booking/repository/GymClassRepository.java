@@ -12,4 +12,7 @@ public interface GymClassRepository extends JpaRepository<GymClass, Long> {
     long countByClassType_Id(Long classTypeId);
 
     long countByTrainer_Id(Long trainerId);
+
+    // Find scheduled classes whose end time is before the given time
+    List<GymClass> findByStatusAndEndTimeBefore(GymClass.ClassStatus status, java.time.LocalDateTime time);
 }

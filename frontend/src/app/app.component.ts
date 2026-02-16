@@ -45,6 +45,12 @@ export class AppComponent implements OnInit {
     const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'en';
     this.currentLang = storedLang;
     this.translate.use(storedLang);
+    // Debug: log language events to help diagnose language-switch issues
+    this.translate.onLangChange?.subscribe(evt => console.log('Translate:onLangChange', evt));
+    this.translate.getTranslation('el').subscribe({
+      next: (t) => console.log('Translate:el-loaded, keys:', Object.keys(t || {}).length),
+      error: (e) => console.error('Translate:el-load-fail', e)
+    });
   }
 
   async logout() {
@@ -95,6 +101,9 @@ export class AppComponent implements OnInit {
   get showHistory(): boolean {
     if (!(this.kc.isReady() && this.kc.isAuthenticated())) return false;
     const roles = this.kc.getRoles();
+    // Ensure trainer/instructor roles take precedence and do NOT see history
+    if (roles.includes('TRAINER') || roles.includes('INSTRUCTOR')) return false;
+    if (this.backendRole === 'TRAINER' || this.backendRole === 'INSTRUCTOR') return false;
     return roles.includes('MEMBER') || roles.includes('ATHLETE') || ['MEMBER','ATHLETE'].includes(this.backendRole || '');
   }
 
@@ -110,6 +119,7 @@ export class AppComponent implements OnInit {
       return;
     }
     this.currentLang = lang;
+    console.log('Translate:setLang ->', lang);
     this.translate.use(lang);
     localStorage.setItem('lang', lang);
   }

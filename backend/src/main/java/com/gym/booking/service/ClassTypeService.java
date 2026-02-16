@@ -26,6 +26,9 @@ public class ClassTypeService {
 
     public ClassType createClassType(@NonNull ClassType classType) {
         classType.setIsActive(true);
+        if (classType.getColor() == null || classType.getColor().isBlank()) {
+            classType.setColor("#3788d8");
+        }
         return classTypeRepository.save(classType);
     }
 
@@ -33,6 +36,9 @@ public class ClassTypeService {
         ClassType classType = findById(id);
         classType.setName(classTypeDetails.getName());
         classType.setDescription(classTypeDetails.getDescription());
+        if (classTypeDetails.getColor() != null) {
+            classType.setColor(classTypeDetails.getColor());
+        }
         if (classTypeDetails.getIsActive() != null) {
             classType.setIsActive(classTypeDetails.getIsActive());
         }

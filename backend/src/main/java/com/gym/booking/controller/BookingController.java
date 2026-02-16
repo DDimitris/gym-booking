@@ -48,15 +48,16 @@ public class BookingController {
 
         Long effectiveUserId = currentUserId;
         // Allow booking on behalf of another user only for ADMIN/TRAINER
+        boolean isPrivileged = authentication.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .anyMatch(a -> "ROLE_ADMIN".equals(a) || "ROLE_TRAINER".equals(a));
         if (userId != null) {
-            boolean isPrivileged = authentication.getAuthorities().stream()
-                    .map(org.springframework.security.core.GrantedAuthority::getAuthority)
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a) || "ROLE_TRAINER".equals(a));
             if (isPrivileged) {
                 effectiveUserId = userId;
             }
         }
-        Booking booking = bookingService.createBooking(effectiveUserId, classInstanceId);
+        boolean bypassCutoff = userId != null && isPrivileged;
+        Booking booking = bookingService.createBooking(effectiveUserId, classInstanceId, bypassCutoff);
         return ResponseEntity.ok(convertToDTO(booking));
     }
 

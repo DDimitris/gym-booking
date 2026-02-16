@@ -31,6 +31,7 @@ export class ActivityHistoryComponent implements OnInit {
   messageType: 'success' | 'error' | 'info' = 'info';
   isLoading = true;
   isInstructor = false;
+  backendRole: string | null = null;
   // UI state for member combined view
   // Removed combined chronological view feature
 
@@ -45,7 +46,22 @@ export class ActivityHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     // Route is guarded; assume authenticated
-  this.isInstructor = this.kc.isReady() && this.kc.isAuthenticated() && (this.kc.getRoles().includes('TRAINER') || this.kc.getRoles().includes('INSTRUCTOR'));
+    this.isInstructor = this.kc.isReady() && this.kc.isAuthenticated() && (this.kc.getRoles().includes('TRAINER') || this.kc.getRoles().includes('INSTRUCTOR'));
+    // Also check backend role to immediately reflect promotions/demotions
+    if (this.kc.isReady() && this.kc.isAuthenticated()) {
+      this.userService.getMe().subscribe({
+        next: (me) => {
+          const br = (me as any)?.role || null;
+          this.backendRole = br;
+          if (br === 'INSTRUCTOR' || br === 'TRAINER') {
+            this.isInstructor = true;
+          }
+        },
+        error: () => {
+          this.backendRole = null;
+        }
+      });
+    }
     this.loadActivityHistory();
   }
 

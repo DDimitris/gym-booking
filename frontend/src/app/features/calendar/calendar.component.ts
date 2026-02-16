@@ -32,7 +32,11 @@ export class CalendarComponent implements OnInit {
   modalMode: 'view' | 'book' = 'view';
   selectedClass: GymClass | null = null;
   bookingCount = 0;
+  // Client-side flag: true when booking is not allowed because class starts within cutoff
+  lateBooking = false;
+  lateBookingHoursRemaining: number | null = null;
   currentUser: User | null = null;
+  backendRole: string | null = null;
   chargeAmount: number | null = null;
   canBookByFunds: boolean | null = null;
   // simple in-component toast message
@@ -67,11 +71,34 @@ export class CalendarComponent implements OnInit {
   this.isInstructor = ready && (roles.includes('INSTRUCTOR') || roles.includes('TRAINER'));
   this.isMember = ready && (roles.includes('MEMBER') || roles.includes('ATHLETE'));
 
+    // If backend role differs from token roles (e.g. promoted by admin while logged in),
+    // fetch current profile and respect backend role to correctly hide member-only UI.
+    if (this.kc.isReady() && this.kc.isAuthenticated()) {
+      this.users.getMe().subscribe({
+        next: (me) => {
+          const br = (me as any)?.role || null;
+          this.backendRole = br;
+          // If backend says user is trainer/instructor, ensure member UI is hidden
+          if (br === 'INSTRUCTOR' || br === 'TRAINER') {
+            this.isInstructor = true;
+            this.isMember = false;
+          }
+        },
+        error: () => {
+          this.backendRole = null;
+        }
+      });
+    }
+
     this.loadData();
   }
 
   private isMobile(): boolean {
-    return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+    // Consider narrow widths or short viewports (landscape on phones) as mobile
+    if (!window) return false;
+    const narrow = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+    const short = window.innerHeight <= 600; // handle landscape phones with small height
+    return Boolean(narrow || short);
   }
 
   private createCalendarOptions(): CalendarOptions {
@@ -97,6 +124,9 @@ export class CalendarComponent implements OnInit {
       slotMinTime: '06:00:00',
       slotMaxTime: '22:00:00',
       nowIndicator: true,
+      // Force 24h formatting for slot labels and event times
+      slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+      eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
     };
   }
 
@@ -165,7 +195,8 @@ export class CalendarComponent implements OnInit {
         status: c.status
       },
       backgroundColor: this.getEventColor(c),
-      borderColor: this.getEventColor(c)
+      borderColor: this.getEventColor(c),
+      textColor: this.getEventTextColor(this.getEventColor(c))
     }));
     
     this.calendarOptions = {
@@ -178,7 +209,9 @@ export class CalendarComponent implements OnInit {
     // Color code by class type
     const classType = this.classTypes.find(ct => ct.id === gymClass.classTypeId);
     if (!classType) return '#3788d8';
-    
+    // Prefer persisted color when available
+    if (classType.color && classType.color.trim().length) return classType.color;
+
     const colors: Record<string, string> = {
       'Pilates': '#9c27b0',
       'CrossFit': '#f44336',
@@ -189,6 +222,19 @@ export class CalendarComponent implements OnInit {
     };
     
     return colors[classType.name] || '#3788d8';
+  }
+
+  // Simple contrast helper: return white for darker backgrounds, black for light ones
+  getEventTextColor(bgHex: string): string {
+    if (!bgHex) return '#000000';
+    // normalize
+    const hex = bgHex.replace('#','');
+    const r = parseInt(hex.substring(0,2),16);
+    const g = parseInt(hex.substring(2,4),16);
+    const b = parseInt(hex.substring(4,6),16);
+    // relative luminance approximation
+    const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return lum > 0.6 ? '#000000' : '#ffffff';
   }
 
   handleEventClick(clickInfo: EventClickArg): void {
@@ -204,6 +250,18 @@ export class CalendarComponent implements OnInit {
     this.bookingService.getClassBookingsCount(classId).subscribe({
       next: (count) => {
         this.bookingCount = count;
+        // Determine late booking status (client-side UX): must be at least 10 hours before start
+        try {
+          const start = new Date(selectedClass.startTime);
+          const now = new Date();
+          const hoursUntil = (start.getTime() - now.getTime()) / (1000 * 60 * 60);
+          this.lateBookingHoursRemaining = Math.max(0, Math.floor(hoursUntil));
+          this.lateBooking = hoursUntil < 10;
+        } catch (e) {
+          this.lateBooking = false;
+          this.lateBookingHoursRemaining = null;
+        }
+
         this.modalMode = 'view';
         this.showModal = true;
         // If user is authenticated, fetch profile to compute wallet/bonus eligibility
@@ -211,6 +269,13 @@ export class CalendarComponent implements OnInit {
           this.users.getMe().subscribe({
             next: (me) => {
               this.currentUser = me as User;
+              const br = (me as any)?.role || null;
+              this.backendRole = br;
+              // Apply backend role to instructor/member flags immediately for modal context
+              if (br === 'INSTRUCTOR' || br === 'TRAINER') {
+                this.isInstructor = true;
+                this.isMember = false;
+              }
               // Compute charge amount based on user's per-kind costs
               const kind = selectedClass.kind as string;
               const amount = this.resolveChargeAmountFromUser(this.currentUser, kind);
@@ -263,11 +328,15 @@ export class CalendarComponent implements OnInit {
     this.bookingService.createBooking(this.selectedClass.id).subscribe({
       next: () => {
         console.log('Booking successful');
-        this.showToast(
-          this.translate.instant('calendar.messages.bookingSuccess'),
-          'success'
-        );
+        // Close modal first so the toast is visible on mobile (modal overlay can cover toasts)
         this.closeModal();
+        // Small defer to ensure modal DOM is removed before showing toast
+        setTimeout(() => {
+          this.showToast(
+            this.translate.instant('calendar.messages.bookingSuccess'),
+            'success'
+          );
+        }, 50);
         this.loadData(); // Refresh data
       },
       error: (err) => {

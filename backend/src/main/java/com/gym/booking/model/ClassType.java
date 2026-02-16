@@ -20,4 +20,7 @@ public class ClassType extends BaseEntity {
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Column(length = 7)
+    private String color = "#3788d8";
+
 }

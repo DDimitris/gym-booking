@@ -153,27 +153,3 @@ jobs:
             docker compose pull
             docker compose stop frontend backend
             docker compose up -d
-
-  deploy-master:
-    name: Deploy latest image to production host
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    steps:
-      - name: SSH deploy latest to production host
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
-            set -e
-            cd /home/dimitris/gym-booking
-            git checkout .
-            git fetch origin
-            git checkout master
-            git reset --hard origin/master
-            export IMAGE_TAG=latest
-            docker compose pull
-            docker compose down -v
-            docker compose up -d

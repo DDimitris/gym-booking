@@ -37,6 +37,16 @@ export class UserService {
     return this.http.get<User>(`${this.apiUrl}/me`);
   }
 
+  // Member subscription endpoints (for current authenticated user)
+  getMySubscription() {
+    // Member-facing subscription endpoints live under /api/members
+    return this.http.get<any>(`${environment.apiUrl}/members/me/subscription`);
+  }
+
+  getMySubscriptionHistory() {
+    return this.http.get<any[]>(`${environment.apiUrl}/members/me/subscription/history`);
+  }
+
   updateMe(payload: { name: string; avatarUrl?: string | null }): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/me`, payload);
   }

@@ -58,6 +58,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
                     </mat-form-field>
                   </ng-container>
                   <ng-template #viewName>
+                    <span class="type-color" [style.background-color]="t.color"></span>
                     <span [class.inactive]="!t.isActive">{{ t.name }}</span>
                     <mat-chip color="warn" selected *ngIf="!t.isActive" class="chip">
                       {{ 'adminManagement.classTypes.badges.inactive' | translate }}
@@ -73,6 +74,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
                   <ng-container *ngIf="editingId === t.id; else viewDesc">
                     <mat-form-field appearance="outline">
                       <input matInput [(ngModel)]="edited.description" name="desc_{{t.id}}" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>{{ 'adminManagement.classTypeDialog.fields.color' | translate }}</mat-label>
+                      <input matInput type="color" [(ngModel)]="edited.color" name="color_{{t.id}}" />
                     </mat-form-field>
                   </ng-container>
                   <ng-template #viewDesc>{{ t.description }}</ng-template>
@@ -125,6 +130,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .filters { margin-bottom: 8px; }
     .inactive { opacity: 0.65; }
     .chip { margin-left: 6px; height: 22px; line-height: 22px; }
+    .type-color { display:inline-block; width:14px; height:14px; border-radius:3px; margin-right:8px; vertical-align:middle; border:1px solid rgba(0,0,0,0.12); }
   `]
 })
 export class ManagementComponent {
@@ -176,7 +182,7 @@ export class ManagementComponent {
 
   startEdit(t: ClassType): void {
     this.editingId = t.id;
-    this.edited = { name: t.name, description: t.description };
+    this.edited = { name: t.name, description: t.description, color: t.color };
   }
   cancelEdit(): void {
     this.editingId = null;
@@ -187,7 +193,8 @@ export class ManagementComponent {
       id: t.id,
       name: this.edited.name || t.name,
       description: this.edited.description || t.description,
-      isActive: t.isActive
+      isActive: t.isActive,
+      color: (this.edited as any).color || t.color
     };
     this.classTypeService.updateClassType(t.id, payload).subscribe({
       next: () => {

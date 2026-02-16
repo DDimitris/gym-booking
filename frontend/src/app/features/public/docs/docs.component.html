@@ -1,0 +1,18 @@
+<div class="docs-page container">
+  <h1>{{ "docs.agreement.title" | translate }}</h1>
+  <div class="docs-grid">
+    <section class="lang-col en">
+      <h2>English</h2>
+      <div class="docs-body" [innerHTML]="enHtml"></div>
+    </section>
+
+    <section class="lang-col el">
+      <h2>Ελληνικά</h2>
+      <div class="docs-body" [innerHTML]="elHtml"></div>
+    </section>
+  </div>
+
+  <div class="actions">
+    <a routerLink="/" class="btn ghost">{{ "common.close" | translate }}</a>
+  </div>
+</div>

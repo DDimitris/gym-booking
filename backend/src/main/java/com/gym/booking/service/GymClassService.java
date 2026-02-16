@@ -18,7 +18,7 @@ public class GymClassService {
     private final BookingService bookingService;
 
     public GymClassService(GymClassRepository gymClassRepository, UserService userService,
-        @Lazy BookingService bookingService) {
+            @Lazy BookingService bookingService) {
         this.gymClassRepository = gymClassRepository;
         this.userService = userService;
         this.bookingService = bookingService;
@@ -49,25 +49,27 @@ public class GymClassService {
     }
 
     public void deleteGymClass(@NonNull Long id) {
-                GymClass gymClass = gymClassRepository.findById(id)
-                                .orElseThrow(() -> new ResourceNotFoundException("Gym class not found with id: " + id));
+        GymClass gymClass = gymClassRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gym class not found with id: " + id));
 
-                // If the class has no attendees at all, we can safely hard-delete it.
-                // This avoids cluttering the schedule/history with unused classes.
-                long bookedCount = bookingService.countActiveBookingsForClass(gymClass);
-                if (bookedCount == 0) {
-                        gymClassRepository.delete(gymClass);
-                        return;
-                }
+        // If the class has no attendees at all, we can safely hard-delete it.
+        // This avoids cluttering the schedule/history with unused classes.
+        long bookedCount = bookingService.countActiveBookingsForClass(gymClass);
+        if (bookedCount == 0) {
+            gymClassRepository.delete(gymClass);
+            return;
+        }
 
-                // When an admin deletes/cancels a class that has attendees, mark the instance as cancelled and
-                // mark all associated bookings as cancelled by gym, without creating billing events.
-                gymClass.setStatus(GymClass.ClassStatus.CANCELLED);
-                gymClass.setIsCancelled(true);
-                gymClassRepository.save(gymClass);
+        // When an admin deletes/cancels a class that has attendees, mark the instance
+        // as cancelled and
+        // mark all associated bookings as cancelled by gym, without creating billing
+        // events.
+        gymClass.setStatus(GymClass.ClassStatus.CANCELLED);
+        gymClass.setIsCancelled(true);
+        gymClassRepository.save(gymClass);
 
-                // Cancel all active bookings for this class as CANCELLED_BY_GYM (no billing)
-                bookingService.cancelBookingsByGymForClass(id);
+        // Cancel all active bookings for this class as CANCELLED_BY_GYM (no billing)
+        bookingService.cancelBookingsByGymForClass(id);
     }
 
     public List<GymClass> findAll() {
@@ -85,4 +87,16 @@ public class GymClassService {
     }
 
     // Removed searchByName() - cannot search by name as it's derived from ClassType
+
+    public void deleteGymClasses(@NonNull List<Long> ids) {
+        if (ids == null || ids.isEmpty())
+            return;
+        for (Long id : ids) {
+            try {
+                deleteGymClass(id);
+            } catch (com.gym.booking.exception.ResourceNotFoundException rnfe) {
+                // ignore missing entries and continue
+            }
+        }
+    }
 }

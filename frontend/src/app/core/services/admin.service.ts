@@ -85,6 +85,27 @@ export class AdminService {
     return this.http.delete<void>(`${this.apiUrl}/users/${userId}`);
   }
 
+  // Subscriptions
+  createSubscription(userId: number, initialPayment: number, days: number) {
+    // send days to backend; backend will store the days value (keeps DB
+    // column name 'months' unchanged for schema compatibility) and compute
+    // endDate using days (plusDays).
+    return this.http.post<any>(`${this.apiUrl}/members/${userId}/subscription`, { initialPayment, days });
+  }
+
+  getActiveSubscription(userId: number) {
+    return this.http.get<any>(`${this.apiUrl}/members/${userId}/subscription`);
+  }
+
+  getSubscriptionHistory(userId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}/members/${userId}/subscription/history`);
+  }
+
+  cancelSubscription(userId: number, subscriptionId: number, reason?: string) {
+    const params = reason ? { params: { reason } } : {} as any;
+    return this.http.post<void>(`${this.apiUrl}/members/${userId}/subscription/${subscriptionId}/cancel`, null, params);
+  }
+
   // Ensure backend receives ISO DATE_TIME (LocalDateTime) strings
   private toStartOfDayDateTime(date?: string): string {
     if (!date) return '';

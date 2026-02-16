@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
+import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
 import { GymClassDialogComponent } from './gym-class-dialog.component';
 import { GymClass, ClassKind } from '../../core/models/gym-class.model';
 import { GymClassService } from '../../core/services/gym-class.service';
@@ -17,11 +18,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-gym-class-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule],
+  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule, MatCheckboxModule],
   template: `
     <div class="container">
       <div class="header">
         <h1>{{ 'gymClasses.list.title' | translate }}</h1>
+        <div class="header-actions" *ngIf="canManage()">
+          <button mat-stroked-button color="warn" (click)="bulkDelete()" [disabled]="!selectedCount()">
+            {{ 'gymClasses.list.actions.deleteSelected' | translate }}
+          </button>
+        </div>
       </div>
 
       <mat-form-field>
@@ -53,6 +59,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
           <div class="day-list">
             <div class="class-item" *ngFor="let c of group.items; trackBy: trackById">
+              <mat-checkbox class="select-checkbox" [checked]="isSelected(c.id)" (change)="toggleSelection(c.id, $event)"></mat-checkbox>
               <div class="left">
                 <div class="title">
                   {{ c.name }}
@@ -91,6 +98,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   styles: [`
     .container {
       padding: 20px;
+      box-sizing: border-box;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     
     .header {
@@ -106,6 +116,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     }
     .controls { margin-bottom: 8px; }
     .day-list { display: flex; flex-direction: column; gap: 8px; }
+    .select-checkbox { margin-right: 12px; }
+    .header-actions { display:flex; align-items:center; gap:8px; }
     .class-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; gap: 8px; }
     .class-item:last-child { border-bottom: none; }
     .left { flex: 1; min-width: 0; }
@@ -119,17 +131,17 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       color: #424242;
       text-transform: uppercase;
     }
-    .desc { color: #555; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .middle { width: 140px; text-align: center; font-variant-numeric: tabular-nums; }
-    .right { width: auto; min-width: 140px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .desc { color: #555; font-size: 13px; white-space: normal; overflow-wrap: anywhere; }
+    .middle { flex: 0 0 120px; min-width: 90px; text-align: center; font-variant-numeric: tabular-nums; }
+    .right { width: auto; min-width: 120px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 
     /* Responsive alignment: avoid overlap on small screens */
-    @media (max-width: 720px) {
+    @media (max-width: 960px) {
       .class-item {
         flex-wrap: wrap;
         align-items: flex-start;
       }
-      .left { flex: 1 1 100%; }
+      .left { flex: 1 1 100%; min-width: 0; }
       .middle { flex: 0 0 auto; width: auto; order: 2; }
       .right { flex: 1 1 100%; order: 3; justify-content: flex-start; }
     }
@@ -138,6 +150,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class GymClassListComponent implements OnInit {
   classes: GymClass[] = [];
   filteredClasses: GymClass[] = [];
+  selectedClassIds = new Set<number>();
   showPast = false;
   groupedByDay: Array<{ date: Date, items: GymClass[] }> = [];
 
@@ -334,6 +347,46 @@ export class GymClassListComponent implements OnInit {
         }
       });
     }
+  }
+
+  toggleSelection(id: number, event: MatCheckboxChange): void {
+    const checked = event?.checked ?? false;
+    if (checked) this.selectedClassIds.add(id);
+    else this.selectedClassIds.delete(id);
+  }
+
+  isSelected(id: number): boolean {
+    return this.selectedClassIds.has(id);
+  }
+
+  selectedCount(): number {
+    return this.selectedClassIds.size;
+  }
+
+  bulkDelete(): void {
+    if (!this.selectedCount()) return;
+    const confirmMsg = this.translate.instant('gymClasses.list.confirm.deleteSelectedCount', { count: this.selectedCount() });
+    if (!confirm(confirmMsg)) return;
+
+    const ids = Array.from(this.selectedClassIds.values());
+    this.gymClassService.bulkDeleteGymClasses(ids).subscribe({
+      next: () => {
+        this.selectedClassIds.clear();
+        this.loadClasses();
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.messages.classCancelled'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
+      },
+      error: (error) => {
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.errors.cancelClass'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
+      }
+    });
   }
 
   computeGroups(): void {

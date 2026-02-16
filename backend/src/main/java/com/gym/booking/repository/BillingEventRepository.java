@@ -10,18 +10,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BillingEventRepository extends JpaRepository<BillingEvent, Long> {
-    List<BillingEvent> findByUser(User user);
+        List<BillingEvent> findByUser(User user);
 
-    List<BillingEvent> findByUserAndSettledFalse(User user);
+        void deleteByUser(User user);
 
-    @Query("SELECT b FROM BillingEvent b WHERE b.user = :user AND b.eventDate BETWEEN :startDate AND :endDate")
-    List<BillingEvent> findByUserAndDateRange(
-            @Param("user") User user,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        List<BillingEvent> findByUserAndSettledFalse(User user);
 
-    @Query("SELECT b FROM BillingEvent b WHERE b.eventDate BETWEEN :startDate AND :endDate")
-    List<BillingEvent> findByDateRange(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT b FROM BillingEvent b WHERE b.user = :user AND b.eventDate BETWEEN :startDate AND :endDate")
+        List<BillingEvent> findByUserAndDateRange(
+                        @Param("user") User user,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
+
+        @Query("SELECT b FROM BillingEvent b WHERE b.eventDate BETWEEN :startDate AND :endDate")
+        List<BillingEvent> findByDateRange(
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 }

@@ -17,4 +17,8 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     Page<AuditLog> findByTargetTypeAndTargetId(String targetType, Long targetId, Pageable pageable);
 
     List<AuditLog> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    void deleteByActor(User actor);
+
+    void deleteByTargetTypeAndTargetId(String targetType, Long targetId);
 }

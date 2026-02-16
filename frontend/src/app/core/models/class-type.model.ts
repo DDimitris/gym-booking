@@ -3,4 +3,5 @@ export interface ClassType {
   name: string;
   description: string;
   isActive: boolean;
+  color?: string;
 }
