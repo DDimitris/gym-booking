@@ -20,7 +20,6 @@ export class AppComponent implements OnInit {
   backendRole: string | null = null;
   currentYear = new Date().getFullYear();
   mobileMenuOpen = false;
-  theme: 'dark' | 'light' = 'dark';
   currentLang: 'en' | 'el' = 'en';
 
   constructor(
@@ -37,9 +36,8 @@ export class AppComponent implements OnInit {
         error: () => this.backendRole = null
       });
     }
-    // Theme preference
-    const pref = (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
-    this.applyTheme(pref);
+    // Always use light theme
+    this.applyLightTheme();
 
     // Language preference
     const storedLang = (localStorage.getItem('lang') as 'en' | 'el') || 'en';
@@ -110,10 +108,6 @@ export class AppComponent implements OnInit {
   toggleMenu(): void { this.mobileMenuOpen = !this.mobileMenuOpen; }
   closeMenu(): void { this.mobileMenuOpen = false; }
 
-  toggleTheme(): void {
-    this.applyTheme(this.theme === 'dark' ? 'light' : 'dark');
-  }
-
   setLang(lang: 'en' | 'el'): void {
     if (this.currentLang === lang) {
       return;
@@ -124,15 +118,14 @@ export class AppComponent implements OnInit {
     localStorage.setItem('lang', lang);
   }
 
-  private applyTheme(next: 'dark' | 'light'): void {
-    this.theme = next;
+  private applyLightTheme(): void {
+    // Force light theme globally; no persistence
     const root = document.documentElement;
-    if (next === 'light') {
-      root.classList.add('light');
-    } else {
-      root.classList.remove('light');
+    const body = document.body;
+    root.classList.add('light');
+    if (body) {
+      body.classList.add('light');
     }
-    localStorage.setItem('theme', next);
   }
 
   get showAuthDebug(): boolean {

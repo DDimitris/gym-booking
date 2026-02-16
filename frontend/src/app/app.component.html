@@ -73,13 +73,6 @@
           <button class="btn ghost" (click)="logout()">
             {{ "nav.logout" | translate }}
           </button>
-          <button
-            class="btn ghost toggle"
-            (click)="toggleTheme()"
-            aria-label="Toggle theme"
-          >
-            🌓
-          </button>
         </ng-container>
         <ng-template #guest>
           <div class="lang-switcher" aria-label="Language selector">
@@ -100,13 +93,6 @@
             </button>
           </div>
           <!-- Login CTA removed from header to avoid duplication on landing page -->
-          <button
-            class="btn ghost toggle"
-            (click)="toggleTheme()"
-            aria-label="Toggle theme"
-          >
-            🌓
-          </button>
         </ng-template>
       </div>
     </div>
