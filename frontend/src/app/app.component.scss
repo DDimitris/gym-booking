@@ -1,7 +1,7 @@
 /* Layout shell */
-.layout-shell { min-height: 100vh; display: flex; flex-direction: column; }
-.app-header { border-bottom: 1px solid rgba(0,0,0,0.12); background: linear-gradient(90deg, var(--color-surface-2), rgba(0,0,0,0.25)); position: sticky; top: 0; z-index: 20; }
-.header-inner { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+.layout-shell { min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+.app-header { border-bottom: 1px solid rgba(0,0,0,0.08); background: linear-gradient(90deg, var(--color-surface-2), rgba(0,0,0,0.06)); position: sticky; top: 0; z-index: 20; }
+.header-inner { display: flex; align-items: center; gap: 12px; padding: 12px 0; flex-wrap: wrap; }
 .brand-group { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
 .brand-group .logo { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; }
 .brand-group .logo img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
@@ -20,7 +20,38 @@
 
 /* Mobile nav */
 @media (max-width: 860px) {
+  .header-inner { padding: 8px 0; }
+  .brand-group .brand-text { font-size: 0.95rem; }
   .menu-toggle { display: inline-flex; }
-  .primary-nav { position: fixed; top: 56px; left: 12px; right: 12px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 8px; flex-direction: column; display: none; }
+  .primary-nav {
+    position: fixed;
+    top: 56px;
+    left: 12px;
+    right: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 8px;
+    flex-direction: column;
+    display: none;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  }
   .primary-nav.open { display: flex; }
+  .primary-nav a {
+    padding: 10px 12px;
+  }
+  .user-actions {
+    gap: 4px;
+  }
+  .user-chip {
+    max-width: 160px;
+  }
+}
+
+/* Backdrop behind mobile nav when open */
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 10;
 }

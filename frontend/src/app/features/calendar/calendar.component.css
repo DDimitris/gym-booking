@@ -1,13 +1,16 @@
 /* Simple toast styles */
 .toast {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
   padding: 0.75rem 1rem;
   border-radius: 4px;
   color: #fff;
   z-index: 2100; /* ensure toast appears above modal overlays */
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  max-width: calc(100vw - 2rem);
+  box-sizing: border-box;
 }
 .toast.success { background: #2e7d32; }
 .toast.error { background: #c62828; }
@@ -56,6 +59,7 @@
   /* leave a small gap from viewport edges and use calc for precise height control */
   max-height: calc(100vh - 3rem);
   overflow-y: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
@@ -143,6 +147,10 @@
   gap: 0.75rem;
   padding: 1.5rem;
   border-top: 1px solid #e0e0e0;
+  /* Keep action buttons visible while scrolling inside the modal */
+  position: sticky;
+  bottom: 0;
+  background: var(--color-surface);
 }
 
 /* Late booking notice shown in modal when class starts within cutoff */
@@ -234,4 +242,26 @@
   .calendar-container { padding: 1rem; }
   :host ::ng-deep .fc-toolbar-title { font-size: 1.2rem; }
   :host ::ng-deep .fc-view-harness { min-height: 60vh; }
+  .modal-overlay {
+    /* extra bottom padding so modal content and buttons don't sit under OS bars */
+    padding: 1rem 1rem 3rem;
+  }
+  .modal-content {
+    max-width: 100%;
+    /* slightly smaller than full height to avoid being covered by mobile chrome */
+    max-height: calc(100vh - 6rem);
+  }
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+  .detail-row {
+    padding: 0.5rem;
+  }
+  .detail-row strong {
+    width: 100%;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
 }
