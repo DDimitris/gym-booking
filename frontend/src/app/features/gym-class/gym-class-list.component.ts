@@ -14,12 +14,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ClassAttendeesDialogComponent } from './class-attendees-dialog.component';
 import { BookForUserDialogComponent } from './book-for-user-dialog.component';
 
 @Component({
   selector: 'app-gym-class-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule, MatCheckboxModule, BookForUserDialogComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    SharedModule,
+    TranslateModule,
+    MatTooltipModule,
+    MatCheckboxModule,
+    BookForUserDialogComponent,
+    ClassAttendeesDialogComponent
+  ],
   template: `
     <div class="container">
       <div class="header">
@@ -199,13 +209,17 @@ export class GymClassListComponent implements OnInit {
   }
 
   openAttendees(gymClass: GymClass): void {
-    // Fetch bookings for class and show simple alert (later replace with dialog component)
     this.bookingService.getClassBookings(gymClass.id).subscribe({
       next: (bookings) => {
-        const list = bookings.map(b => `${b.userName || ('User#'+b.userId)}`).join('\n');
-        const title = this.translate.instant('gymClasses.list.prompts.attendeesTitle', { name: gymClass.name });
-        const noAttendees = this.translate.instant('gymClasses.list.prompts.noAttendees', { name: gymClass.name });
-        alert(list ? `${title}:\n\n${list}` : noAttendees);
+        this.dialog.open(ClassAttendeesDialogComponent, {
+          width: '560px',
+          maxWidth: '95vw',
+          data: {
+            className: gymClass.name,
+            startTime: gymClass.startTime,
+            attendees: bookings || []
+          }
+        });
       },
       error: () => {
         this.snackBar.open(
