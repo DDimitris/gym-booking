@@ -274,6 +274,23 @@ export class AdminBillingComponent implements OnInit {
     }
   }
 
+  // CSS class for subscription status pill
+  subscriptionStatusClass(status: string | null | undefined): string {
+    if (!status) return 'status-unknown';
+    const normalized = status.toString().toLowerCase();
+    switch (normalized) {
+      case 'active':
+        return 'status-active';
+      case 'cancelled':
+      case 'canceled':
+        return 'status-cancelled';
+      case 'completed':
+        return 'status-completed';
+      default:
+        return 'status-' + normalized.replace(/[^a-z0-9]+/g, '-');
+    }
+  }
+
   openSubscriptionDialog(): void {
     if (!this.memberId) return;
     const dialogRef = this.dialog.open(SubscriptionDialogComponent, {

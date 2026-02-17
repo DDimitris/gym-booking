@@ -98,20 +98,60 @@
   background: rgba(255,255,255,0.02);
 }
 
-/* Mobile-friendly table: stack rows into cards */
+/* Mobile-friendly table: stack rows into cards and ensure no horizontal scrolling */
 @media (max-width: 768px) {
+  .admin-athletes-container {
+    padding: 1rem;
+  }
+  .athletes-table-container {
+    overflow-x: visible;
+    padding: 8px;
+  }
   .athletes-table thead { display: none; }
-  .athletes-table, .athletes-table tbody, .athletes-table tr, .athletes-table td { display: block; width: 100%; }
-  .athletes-table tr { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 10px; padding: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
-  .athletes-table td { border-bottom: 0; padding: 8px 6px; display: flex; justify-content: space-between; align-items: center; }
-  .athletes-table td::before { content: attr(data-label); font-weight: 600; color: var(--color-text-muted); margin-right: 8px; }
+  .athletes-table,
+  .athletes-table tbody,
+  .athletes-table tr,
+  .athletes-table td { display: block; width: 100%; box-sizing: border-box; }
+  .athletes-table tr {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .athletes-table td {
+    border-bottom: 0;
+    padding: 8px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .athletes-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-right: 8px;
+  }
   /* Card title (name cell) */
-  .athletes-table td.name-cell { display: block; padding: 4px 6px 10px; font-weight: 600; font-size: 1.05rem; letter-spacing: .3px; }
+  .athletes-table td.name-cell {
+    display: block;
+    padding: 4px 6px 10px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: .3px;
+  }
   .athletes-table td.name-cell::before { display: none; }
   /* Action cell tweaks */
   .athletes-table td.action-cell { padding-top: 4px; }
   .athletes-table td.action-cell::before { align-self: flex-start; margin-bottom: 6px; }
-  .athletes-table td.action-cell .action-buttons { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-start; width: 100%; }
+  .athletes-table td.action-cell .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-start;
+    width: 100%;
+  }
   .athletes-table td.action-cell .btn-small { margin: 0; }
   .action-buttons { justify-content: flex-start; }
 }
