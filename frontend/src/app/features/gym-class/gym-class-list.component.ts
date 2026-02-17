@@ -14,11 +14,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { BookForUserDialogComponent } from './book-for-user-dialog.component';
 
 @Component({
   selector: 'app-gym-class-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule, MatCheckboxModule],
+  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule, MatCheckboxModule, BookForUserDialogComponent],
   template: `
     <div class="container">
       <div class="header">
@@ -217,47 +218,31 @@ export class GymClassListComponent implements OnInit {
   }
 
   openBookForDialog(gymClass: GymClass): void {
-    // Simple prompt-based selection for now; later replace with proper dialog
-    this.userService.getAllMembers().subscribe({
-      next: (members) => {
-        if (!members.length) {
-          alert(this.translate.instant('gymClasses.list.prompts.noMembers'));
-          return;
+    const dialogRef = this.dialog.open(BookForUserDialogComponent, {
+      width: '520px',
+      maxWidth: '95vw',
+      data: { gymClassName: gymClass.name }
+    });
+
+    dialogRef.afterClosed().subscribe((chosenId: number | null | undefined) => {
+      if (!chosenId) { return; }
+      this.bookingService.createBookingForUser(gymClass.id, chosenId).subscribe({
+        next: () => {
+          this.snackBar.open(
+            this.translate.instant('gymClasses.list.messages.bookingCreated'),
+            this.translate.instant('common.close'),
+            { duration: 3000 }
+          );
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open(
+            this.translate.instant('gymClasses.list.errors.createBooking'),
+            this.translate.instant('common.close'),
+            { duration: 3000 }
+          );
         }
-        const options = members.map(a => `${a.id}: ${a.name || a.email || ('User#'+a.id)}`).join('\n');
-        const promptTitle = this.translate.instant('gymClasses.list.prompts.selectMemberTitle', { name: gymClass.name });
-        const input = prompt(`${promptTitle}:\n\n${options}`);
-        if (!input) return;
-        const chosenId = parseInt(input, 10);
-        if (!members.some(a => a.id === chosenId)) {
-          alert(this.translate.instant('gymClasses.list.prompts.invalidMemberId'));
-          return;
-        }
-        this.bookingService.createBookingForUser(gymClass.id, chosenId).subscribe({
-          next: () => {
-            this.snackBar.open(
-              this.translate.instant('gymClasses.list.messages.bookingCreated'),
-              this.translate.instant('common.close'),
-              { duration: 3000 }
-            );
-          },
-          error: (err) => {
-            console.error(err);
-            this.snackBar.open(
-              this.translate.instant('gymClasses.list.errors.createBooking'),
-              this.translate.instant('common.close'),
-              { duration: 3000 }
-            );
-          }
-        });
-      },
-      error: () => {
-        this.snackBar.open(
-          this.translate.instant('gymClasses.list.errors.loadMembers'),
-          this.translate.instant('common.close'),
-          { duration: 3000 }
-        );
-      }
+      });
     });
   }
 
