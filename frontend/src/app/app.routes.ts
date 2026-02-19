@@ -47,17 +47,81 @@ import { KeycloakService } from './core/services/keycloak.service';
     </section>
   `,
   styles: [`
-    .hero { padding: 56px 0; }
-    .hero-inner { display: grid; grid-template-columns: 1.2fr .8fr; gap: 24px; align-items: center; }
-    .copy h1 { font-size: 44px; line-height: 1.05; margin: 0 0 12px; color: var(--color-text); }
-    .lead { color: var(--color-text-muted); margin: 0 0 20px; font-size: 18px; }
-    .actions { display: flex; gap: 12px; }
-    .art { text-align: center; }
-  .logo-object { max-width: 420px; width: 100%; height: auto; object-fit: contain; }
-    .brand-logo-img { max-width: 420px; width: 100%; height: 240px; object-fit: contain; }
-    .features { padding: 20px 0 56px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; } }
+    .hero {
+      position: relative;
+      padding: 72px 0 64px;
+      min-height: calc(100vh - 160px);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0,1.3fr) minmax(0,0.9fr);
+      gap: 32px;
+      align-items: center;
+      padding: 32px 32px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 24px 70px rgba(15,23,42,0.40);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(148,163,184,0.35);
+    }
+    .copy h1 {
+      font-size: 44px;
+      line-height: 1.05;
+      margin: 0 0 12px;
+      color: var(--color-text);
+    }
+    .lead {
+      color: var(--color-text-muted);
+      margin: 0 0 22px;
+      font-size: 18px;
+      max-width: 34rem;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .art {
+      text-align: center;
+    }
+    .logo-object {
+      max-width: 360px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .features {
+      padding: 16px 0 56px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .hero {
+        padding: 40px 0 32px;
+        min-height: auto;
+      }
+      .hero-inner {
+        grid-template-columns: minmax(0,1fr);
+        padding: 24px 20px;
+        gap: 20px;
+      }
+      .art {
+        margin-top: 8px;
+      }
+      .grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+    }
   `]
 })
 class StartComponent implements OnInit {

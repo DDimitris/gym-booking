@@ -249,12 +249,16 @@ export class GymClassListComponent implements OnInit {
           );
         },
         error: (err) => {
-          console.error(err);
-          this.snackBar.open(
-            this.translate.instant('gymClasses.list.errors.createBooking'),
-            this.translate.instant('common.close'),
-            { duration: 3000 }
-          );
+          console.error('Failed to create booking for user', err);
+          // If the session expired or token is missing, hint to re-login
+          if (err && (err.status === 401 || err.status === 403)) {
+            const msg = this.translate.instant('calendar.messages.loginRequired') || 'Session expired, please sign in again.';
+            this.snackBar.open(msg, this.translate.instant('common.close'), { duration: 4000 });
+            return;
+          }
+          const backendMessage = (err && (err.error?.message || err.error)) || err?.message;
+          const fallback = this.translate.instant('gymClasses.list.errors.createBooking');
+          this.snackBar.open(backendMessage || fallback, this.translate.instant('common.close'), { duration: 4000 });
         }
       });
     });

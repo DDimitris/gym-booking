@@ -72,8 +72,9 @@
               ΕΛ
             </button>
           </div>
-          <button class="btn ghost" (click)="logout()">
-            {{ "nav.logout" | translate }}
+          <button class="btn ghost logout-btn" (click)="logout()">
+            <mat-icon class="logout-icon" aria-hidden="true">power_settings_new</mat-icon>
+            <span class="logout-label">{{ "nav.logout" | translate }}</span>
           </button>
         </ng-container>
         <ng-template #guest>

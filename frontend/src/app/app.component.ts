@@ -6,11 +6,12 @@ import { KeycloakService } from './core/services/keycloak.service';
 import { UserService } from './core/services/user.service';
 import { environment } from '../environments/environment';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslateModule],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, MatIconModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -64,7 +65,20 @@ export class AppComponent implements OnInit {
   get displayName(): string {
     if (this.kc.isReady() && this.kc.isAuthenticated()) {
       const token: any = this.kc.getParsedToken();
-      return token?.preferred_username || token?.email || 'user';
+      // Prefer human-friendly name over technical username
+      const fullName: string | undefined = token?.name;
+      const given = (token?.given_name || '').toString().trim();
+      const family = (token?.family_name || '').toString().trim();
+      const composed = (given || family) ? `${given}${given && family ? ' ' : ''}${family}`.trim() : '';
+
+      if (fullName && fullName.trim().length > 0) {
+        return fullName.trim();
+      }
+      if (composed && composed.length > 0) {
+        return composed;
+      }
+
+      return token?.email || token?.preferred_username || 'user';
     }
   return 'guest';
   }
