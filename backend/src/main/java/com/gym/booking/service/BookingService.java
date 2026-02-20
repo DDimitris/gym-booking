@@ -208,6 +208,29 @@ public class BookingService {
         billingService.createCancellationCharge(booking);
     }
 
+    /**
+     * Admin/gym-initiated cancellation of a single booking.
+     *
+     * Marks the booking as CANCELLED_BY_GYM without creating any billing
+     * events for gym-initiated cancellations when outside the same-day
+     * threshold. Same-day cancellations still apply the normal
+     * cancellation policy via BillingService. This is used when staff
+     * remove an attendee from a class.
+     */
+    public void cancelBookingByGym(Long bookingId) {
+        Booking booking = findById(bookingId);
+        ZonedDateTime startZ = booking.getClassInstance().getStartTime().atZone(zoneId);
+        if (startZ.isBefore(ZonedDateTime.now(zoneId))) {
+            throw new BookingException("Cannot cancel past bookings");
+        }
+        booking.setStatus(Booking.BookingStatus.CANCELLED_BY_GYM);
+        booking.setCancelledAt(LocalDateTime.now(zoneId));
+        bookingRepository.save(booking);
+
+        // Apply same-day cancellation policy even for admin-initiated removals
+        billingService.createCancellationCharge(booking);
+    }
+
     public void markCompleted(Long bookingId) {
         Booking booking = findById(bookingId);
         booking.setStatus(Booking.BookingStatus.COMPLETED);

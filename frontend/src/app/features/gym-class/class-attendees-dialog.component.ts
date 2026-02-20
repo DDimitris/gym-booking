@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Booking } from '../../core/models/booking.model';
+import { BookingService } from '../../core/services/booking.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ClassAttendeesDialogData {
   className: string;
@@ -59,6 +61,22 @@ export interface ClassAttendeesDialogData {
             <div *ngIf="a.completedAt" class="ts">Completed: {{ a.completedAt | date:'short' }}</div>
             <div *ngIf="a.cancelledAt" class="ts">Cancelled: {{ a.cancelledAt | date:'short' }}</div>
           </div>
+          <button
+            mat-icon-button
+            color="warn"
+            class="remove-btn"
+            *ngIf="a.status === 'BOOKED'"
+            (click)="removeAttendee(a)"
+            [disabled]="removingIds.has(a.id)"
+            [attr.aria-label]="'gymClasses.list.attendees.removeAria' | translate"
+          >
+            <mat-icon *ngIf="!removingIds.has(a.id)">person_remove</mat-icon>
+            <mat-progress-spinner
+              *ngIf="removingIds.has(a.id)"
+              diameter="20"
+              mode="indeterminate"
+            ></mat-progress-spinner>
+          </button>
         </div>
       </div>
 
@@ -194,6 +212,10 @@ export interface ClassAttendeesDialogData {
     .ts + .ts {
       margin-top: 2px;
     }
+    .remove-btn {
+      margin-left: 8px;
+      align-self: center;
+    }
     .actions-footer {
       margin-top: 12px;
       text-align: right;
@@ -222,8 +244,12 @@ export class ClassAttendeesDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ClassAttendeesDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ClassAttendeesDialogData,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private bookingService: BookingService,
+    private snackBar: MatSnackBar
   ) {}
+
+  removingIds = new Set<number>();
 
   avatarInitial(a: Booking): string {
     const name = a.userName || '';
@@ -253,5 +279,35 @@ export class ClassAttendeesDialogComponent {
       default:
         return status;
     }
+  }
+
+  removeAttendee(booking: Booking): void {
+    if (!booking || !booking.id) {
+      return;
+    }
+    const confirmed = confirm(this.translate.instant('gymClasses.list.attendees.removeConfirm'));
+    if (!confirmed) {
+      return;
+    }
+    this.removingIds.add(booking.id);
+    this.bookingService.cancelBookingByGym(booking.id).subscribe({
+      next: () => {
+        this.data.attendees = this.data.attendees.filter(b => b.id !== booking.id);
+        this.removingIds.delete(booking.id);
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.attendees.removeSuccess'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
+      },
+      error: () => {
+        this.removingIds.delete(booking.id);
+        this.snackBar.open(
+          this.translate.instant('gymClasses.list.attendees.removeError'),
+          this.translate.instant('common.close'),
+          { duration: 4000 }
+        );
+      }
+    });
   }
 }

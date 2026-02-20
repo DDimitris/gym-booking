@@ -82,6 +82,13 @@ public class BookingController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','TRAINER')")
+    @PutMapping("/{id}/cancel-by-gym")
+    public ResponseEntity<?> cancelBookingByGym(@PathVariable Long id) {
+        bookingService.cancelBookingByGym(id);
+        return ResponseEntity.ok().build();
+    }
+
     @PreAuthorize("hasRole('TRAINER')")
     @PutMapping("/{id}/complete")
     public ResponseEntity<?> markCompleted(@PathVariable Long id) {

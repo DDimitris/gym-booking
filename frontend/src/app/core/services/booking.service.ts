@@ -30,6 +30,11 @@ export class BookingService {
     return this.http.put<void>(`${this.apiUrl}/${id}/cancel`, {});
   }
 
+   // Admin/Trainer gym-initiated cancellation of a booking
+   cancelBookingByGym(id: number): Observable<void> {
+     return this.http.put<void>(`${this.apiUrl}/${id}/cancel-by-gym`, {});
+   }
+
   completeBooking(id: number): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/complete`, {});
   }
