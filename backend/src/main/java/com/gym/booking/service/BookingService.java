@@ -6,6 +6,7 @@ import com.gym.booking.model.User;
 import com.gym.booking.repository.BookingRepository;
 import com.gym.booking.exception.ResourceNotFoundException;
 import com.gym.booking.exception.BookingException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,11 +66,18 @@ public class BookingService {
 
         validateBooking(user, classInstance, bypassCutoff);
 
-        Booking booking = new Booking();
-        booking.setUser(user);
-        booking.setClassInstance(classInstance);
-        booking.setStatus(Booking.BookingStatus.BOOKED);
-        return bookingRepository.save(booking);
+        try {
+            Booking booking = new Booking();
+            booking.setUser(user);
+            booking.setClassInstance(classInstance);
+            booking.setStatus(Booking.BookingStatus.BOOKED);
+            return bookingRepository.save(booking);
+        } catch (DataIntegrityViolationException ex) {
+            // Protect against race conditions / double-clicks: if a unique
+            // constraint on (user_id, class_instance_id, status=BOOKED)
+            // is violated, translate it into a friendly booking error.
+            throw new BookingException("User already has a booking for this class");
+        }
     }
 
     private void validateBooking(User user, GymClass classInstance, boolean bypassCutoff) {
