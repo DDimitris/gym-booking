@@ -6,6 +6,7 @@ import { AdminService } from '../../../core/services/admin.service';
 import { KeycloakService } from '../../../core/services/keycloak.service';
 import { User, UserRole } from '../../../core/models/user.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ScrollPositionService } from '../../../core/services/scroll-position.service';
 
 @Component({
   selector: 'app-admin-athletes',
@@ -34,11 +35,15 @@ export class AdminAthletesComponent implements OnInit {
     openGymBaseCost: 0
   };
 
+  private readonly scrollKey = 'admin-members';
+  private shouldRestoreScroll = false;
+
   constructor(
     private adminService: AdminService,
     private kc: KeycloakService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private scrollService: ScrollPositionService
   ) {}
 
   ngOnInit(): void {
@@ -48,7 +53,11 @@ export class AdminAthletesComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
-    
+    const saved = this.scrollService.get(this.scrollKey);
+    if (saved !== null) {
+      this.shouldRestoreScroll = true;
+    }
+
     this.loadAllUsers();
   }
   loadAllUsers(): void {
@@ -63,10 +72,12 @@ export class AdminAthletesComponent implements OnInit {
       this.filteredMembers = [...this.members].sort((a,b) => a.name.localeCompare(b.name));
       this.filteredTrainers = [...this.trainers].sort((a,b) => a.name.localeCompare(b.name));
       this.isLoading = false;
+      this.restoreScrollIfNeeded();
     }).catch(err => {
       console.error('Error loading users:', err);
       alert(this.translate.instant('adminAthletes.errors.loadUsers'));
       this.isLoading = false;
+      this.restoreScrollIfNeeded();
     });
   }
 
@@ -187,6 +198,8 @@ export class AdminAthletesComponent implements OnInit {
   }
 
   viewBilling(member: User): void {
+    const currentY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    this.scrollService.set(this.scrollKey, currentY);
     this.router.navigate(['/admin/billing', member.id]);
   }
 
@@ -227,5 +240,21 @@ export class AdminAthletesComponent implements OnInit {
       return this.translate.instant('adminAthletes.modal.titles.promote');
     }
     return '';
+  }
+
+  private restoreScrollIfNeeded(): void {
+    if (!this.shouldRestoreScroll) {
+      return;
+    }
+    const pos = this.scrollService.get(this.scrollKey);
+    if (pos === null) {
+      this.shouldRestoreScroll = false;
+      return;
+    }
+    setTimeout(() => {
+      window.scrollTo({ top: pos, behavior: 'auto' });
+    }, 0);
+    this.shouldRestoreScroll = false;
+    this.scrollService.clear(this.scrollKey);
   }
 }
