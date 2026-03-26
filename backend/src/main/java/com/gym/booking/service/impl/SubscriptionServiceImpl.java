@@ -128,8 +128,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 if (s.getStartDate() != null && s.getEndDate() != null) {
                     java.time.LocalDateTime start = s.getStartDate().atStartOfDay();
                     java.time.LocalDateTime end = s.getEndDate().plusDays(1).atStartOfDay();
-                    classesCompleted = (int) bookingRepository.countByUserAndStatusAndClassInstance_StartTimeBetween(user,
-                            com.gym.booking.model.Booking.BookingStatus.COMPLETED, start, end);
+                    classesCompleted = (int) bookingRepository
+                            .countByUserAndStatusAndClassInstance_StartTimeBetween(user,
+                                    com.gym.booking.model.Booking.BookingStatus.COMPLETED, start, end);
                 }
             } catch (Exception ignored) {
             }

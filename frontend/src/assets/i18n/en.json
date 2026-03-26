@@ -342,6 +342,12 @@
         "invalidMemberId": "Invalid member ID.",
         "attendeesTitle": "Attendees for {{name}}",
         "noAttendees": "No attendees yet for {{name}}."
+      },
+      "attendees": {
+        "removeConfirm": "Remove this attendee from the class? Their booking will be marked as cancelled by the gym.",
+        "removeSuccess": "Attendee removed from class.",
+        "removeError": "Failed to remove attendee.",
+        "removeAria": "Remove attendee from class"
       }
     },
     "dialog": {

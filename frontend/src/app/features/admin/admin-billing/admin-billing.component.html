@@ -279,23 +279,69 @@
               </div>
 
               <div *ngIf="subscriptionHistory.length" class="subscription-history-cards">
-                <h5>{{ "adminBilling.subscription.history" | translate }}</h5>
-                <div class="history-grid">
-                  <div *ngFor="let h of subscriptionHistory" class="history-tile" (click)="openHistoryDialog(h)" tabindex="0">
-                    <div class="tile-header">
-                      <div class="tile-dates">
-                        <div class="start">{{ h.startDate | date:'shortDate' }}</div>
-                        <div class="arrow">→</div>
-                        <div class="end">{{ h.endDate | date:'shortDate' }}</div>
-                      </div>
-                      <div class="tile-amount">€{{ h.initialPayment != null ? (h.initialPayment | number:'1.2-2') : '0.00' }}</div>
-                    </div>
-                    <div class="tile-body">
-                      <div class="classes-completed">Classes completed: <strong>{{ h.classesCompleted || 0 }}</strong></div>
-                      <div class="end-reason">{{ formatEndReason(h.endReason) }}</div>
-                    </div>
-                    <div class="tile-foot">Click for details</div>
-                  </div>
+                <div class="subscription-history-header">
+                  <h5>{{ "adminBilling.subscription.history" | translate }}</h5>
+                  <span class="history-pill">{{ subscriptionHistory.length }} records</span>
+                </div>
+                <div class="subscription-history-table-container">
+                  <table class="subscription-history-table">
+                    <thead>
+                      <tr>
+                        <th>Period</th>
+                        <th>Type</th>
+                        <th>Initial payment</th>
+                        <th>Status</th>
+                        <th>Classes</th>
+                        <th>Summary</th>
+                        <th>End reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let h of subscriptionHistory"
+                        (click)="openHistoryDialog(h)"
+                        (keyup.enter)="openHistoryDialog(h)"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div class="period-cell">
+                            <span class="date">{{ h.startDate | date : 'shortDate' }}</span>
+                            <span class="arrow">→</span>
+                            <span class="date">{{ h.endDate | date : 'shortDate' }}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="chip chip-type">
+                            {{ subscriptionEventLabel(h.eventType) }}
+                          </span>
+                        </td>
+                        <td class="amount">
+                          €{{
+                            h.initialPayment != null
+                              ? (h.initialPayment | number : '1.2-2')
+                              : '0.00'
+                          }}
+                        </td>
+                        <td>
+                          <span
+                            class="chip chip-status"
+                            [ngClass]="subscriptionStatusClass(h.status)"
+                          >
+                            {{ subscriptionStatusLabel(h.status) }}
+                          </span>
+                        </td>
+                        <td class="numeric">
+                          {{ h.classesCompleted || 0 }}
+                        </td>
+                        <td class="summary">
+                          {{ subscriptionEventSummary(h.eventData) }}
+                        </td>
+                        <td class="end-reason">
+                          {{ formatEndReason(h.endReason || h.reason) }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

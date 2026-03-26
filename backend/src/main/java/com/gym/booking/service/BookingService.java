@@ -6,6 +6,7 @@ import com.gym.booking.model.User;
 import com.gym.booking.repository.BookingRepository;
 import com.gym.booking.exception.ResourceNotFoundException;
 import com.gym.booking.exception.BookingException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,11 +66,18 @@ public class BookingService {
 
         validateBooking(user, classInstance, bypassCutoff);
 
-        Booking booking = new Booking();
-        booking.setUser(user);
-        booking.setClassInstance(classInstance);
-        booking.setStatus(Booking.BookingStatus.BOOKED);
-        return bookingRepository.save(booking);
+        try {
+            Booking booking = new Booking();
+            booking.setUser(user);
+            booking.setClassInstance(classInstance);
+            booking.setStatus(Booking.BookingStatus.BOOKED);
+            return bookingRepository.save(booking);
+        } catch (DataIntegrityViolationException ex) {
+            // Protect against race conditions / double-clicks: if a unique
+            // constraint on (user_id, class_instance_id, status=BOOKED)
+            // is violated, translate it into a friendly booking error.
+            throw new BookingException("User already has a booking for this class");
+        }
     }
 
     private void validateBooking(User user, GymClass classInstance, boolean bypassCutoff) {
@@ -205,6 +213,29 @@ public class BookingService {
         bookingRepository.save(booking);
 
         // Create billing event if same-day cancellation (user-initiated only)
+        billingService.createCancellationCharge(booking);
+    }
+
+    /**
+     * Admin/gym-initiated cancellation of a single booking.
+     *
+     * Marks the booking as CANCELLED_BY_GYM without creating any billing
+     * events for gym-initiated cancellations when outside the same-day
+     * threshold. Same-day cancellations still apply the normal
+     * cancellation policy via BillingService. This is used when staff
+     * remove an attendee from a class.
+     */
+    public void cancelBookingByGym(Long bookingId) {
+        Booking booking = findById(bookingId);
+        ZonedDateTime startZ = booking.getClassInstance().getStartTime().atZone(zoneId);
+        if (startZ.isBefore(ZonedDateTime.now(zoneId))) {
+            throw new BookingException("Cannot cancel past bookings");
+        }
+        booking.setStatus(Booking.BookingStatus.CANCELLED_BY_GYM);
+        booking.setCancelledAt(LocalDateTime.now(zoneId));
+        bookingRepository.save(booking);
+
+        // Apply same-day cancellation policy even for admin-initiated removals
         billingService.createCancellationCharge(booking);
     }
 

@@ -37,10 +37,11 @@ body {
 	background: var(--color-bg);
 	color: var(--color-text);
 	transition: background .2s ease, color .2s ease;
+	overflow-x: hidden;
 }
 
 /* Containers */
-.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
 .page { padding: 24px; }
 
 /* Buttons */
@@ -75,6 +76,8 @@ p.lead { font-size: 18px; color: var(--color-text-muted); }
 		border-radius: 12px !important;
 		/* Make dialog content scrollable and respect viewport on small screens */
 		max-height: calc(100vh - 2rem);
+		max-width: min(480px, 100vw - 2rem);
+		width: 100%;
 		overflow-y: auto;
 		box-sizing: border-box;
 }
@@ -106,6 +109,13 @@ body:not(.light) .mat-mdc-tab .mdc-tab-indicator__content--underline { border-co
 body:not(.light) .mat-mdc-menu-panel { background: var(--color-surface); color: var(--color-text); }
 body:not(.light) .mat-mdc-snack-bar-container { background: var(--color-surface-2); color: var(--color-text); }
 body:not(.light) .mat-mdc-chip { background: var(--color-surface-2); color: var(--color-text); }
+
+/* Snackbars - ensure they fit safely on mobile */
+.mat-mdc-snack-bar-container {
+	max-width: calc(100vw - 32px) !important;
+	box-sizing: border-box;
+	margin: 0 auto 16px !important;
+}
 
 /* Tables */
 .mat-mdc-table { background: var(--color-surface); }
@@ -142,6 +152,18 @@ a:hover { color: #111; }
 .btn.primary { background: var(--color-primary); color: #000; padding: 12px 18px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); }
 .btn.primary:hover { background: var(--color-primary-700); }
 .btn.ghost { border: 1px solid rgba(255,255,255,0.08); color: var(--color-text); }
+
+@media (max-width: 768px) {
+	.hero { padding: 32px 0; }
+	.hero .hero-inner {
+		grid-template-columns: 1fr;
+		text-align: left;
+	}
+	.hero .art { order: -1; }
+	.page {
+		padding: 16px;
+	}
+}
 
 /* FullCalendar toolbar and buttons (make consistent with brand) */
 .fc .fc-button, .fc-button, .fc-toolbar button, .fc-toolbar .fc-button {

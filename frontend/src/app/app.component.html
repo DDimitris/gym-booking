@@ -27,22 +27,24 @@
         *ngIf="kc.isReady() && kc.isAuthenticated()"
         [class.open]="mobileMenuOpen"
       >
-        <a routerLink="/classes" routerLinkActive="active">{{
+        <a routerLink="/classes" routerLinkActive="active" (click)="closeMenu()">{{
           "nav.calendar" | translate
         }}</a>
         <a
           *ngIf="showHistory"
           routerLink="/history"
           routerLinkActive="active"
+          (click)="closeMenu()"
           >{{ "nav.history" | translate }}</a
         >
-        <a routerLink="/profile" routerLinkActive="active">{{
+        <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">{{
           "nav.profile" | translate
         }}</a>
         <a
           *ngIf="showManagement"
           routerLink="/admin/management"
           routerLinkActive="active"
+          (click)="closeMenu()"
           >{{ "nav.admin" | translate }}</a
         >
       </nav>
@@ -70,15 +72,9 @@
               ΕΛ
             </button>
           </div>
-          <button class="btn ghost" (click)="logout()">
-            {{ "nav.logout" | translate }}
-          </button>
-          <button
-            class="btn ghost toggle"
-            (click)="toggleTheme()"
-            aria-label="Toggle theme"
-          >
-            🌓
+          <button class="btn ghost logout-btn" (click)="logout()">
+            <mat-icon class="logout-icon" aria-hidden="true">power_settings_new</mat-icon>
+            <span class="logout-label">{{ "nav.logout" | translate }}</span>
           </button>
         </ng-container>
         <ng-template #guest>
@@ -100,17 +96,16 @@
             </button>
           </div>
           <!-- Login CTA removed from header to avoid duplication on landing page -->
-          <button
-            class="btn ghost toggle"
-            (click)="toggleTheme()"
-            aria-label="Toggle theme"
-          >
-            🌓
-          </button>
         </ng-template>
       </div>
     </div>
   </header>
+  <!-- Mobile nav backdrop: close menu when tapping outside on small screens -->
+  <div
+    class="nav-backdrop"
+    *ngIf="mobileMenuOpen && kc.isReady() && kc.isAuthenticated()"
+    (click)="closeMenu()"
+  ></div>
   <main class="app-main container">
     <router-outlet></router-outlet>
   </main>

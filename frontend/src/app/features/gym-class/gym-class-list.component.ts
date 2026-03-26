@@ -14,11 +14,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ClassAttendeesDialogComponent } from './class-attendees-dialog.component';
+import { BookForUserDialogComponent } from './book-for-user-dialog.component';
 
 @Component({
   selector: 'app-gym-class-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule, TranslateModule, MatTooltipModule, MatCheckboxModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    SharedModule,
+    TranslateModule,
+    MatTooltipModule,
+    MatCheckboxModule,
+    BookForUserDialogComponent,
+    ClassAttendeesDialogComponent
+  ],
   template: `
     <div class="container">
       <div class="header">
@@ -198,13 +209,17 @@ export class GymClassListComponent implements OnInit {
   }
 
   openAttendees(gymClass: GymClass): void {
-    // Fetch bookings for class and show simple alert (later replace with dialog component)
     this.bookingService.getClassBookings(gymClass.id).subscribe({
       next: (bookings) => {
-        const list = bookings.map(b => `${b.userName || ('User#'+b.userId)}`).join('\n');
-        const title = this.translate.instant('gymClasses.list.prompts.attendeesTitle', { name: gymClass.name });
-        const noAttendees = this.translate.instant('gymClasses.list.prompts.noAttendees', { name: gymClass.name });
-        alert(list ? `${title}:\n\n${list}` : noAttendees);
+        this.dialog.open(ClassAttendeesDialogComponent, {
+          width: '560px',
+          maxWidth: '95vw',
+          data: {
+            className: gymClass.name,
+            startTime: gymClass.startTime,
+            attendees: bookings || []
+          }
+        });
       },
       error: () => {
         this.snackBar.open(
@@ -217,47 +232,35 @@ export class GymClassListComponent implements OnInit {
   }
 
   openBookForDialog(gymClass: GymClass): void {
-    // Simple prompt-based selection for now; later replace with proper dialog
-    this.userService.getAllMembers().subscribe({
-      next: (members) => {
-        if (!members.length) {
-          alert(this.translate.instant('gymClasses.list.prompts.noMembers'));
-          return;
-        }
-        const options = members.map(a => `${a.id}: ${a.name || a.email || ('User#'+a.id)}`).join('\n');
-        const promptTitle = this.translate.instant('gymClasses.list.prompts.selectMemberTitle', { name: gymClass.name });
-        const input = prompt(`${promptTitle}:\n\n${options}`);
-        if (!input) return;
-        const chosenId = parseInt(input, 10);
-        if (!members.some(a => a.id === chosenId)) {
-          alert(this.translate.instant('gymClasses.list.prompts.invalidMemberId'));
-          return;
-        }
-        this.bookingService.createBookingForUser(gymClass.id, chosenId).subscribe({
-          next: () => {
-            this.snackBar.open(
-              this.translate.instant('gymClasses.list.messages.bookingCreated'),
-              this.translate.instant('common.close'),
-              { duration: 3000 }
-            );
-          },
-          error: (err) => {
-            console.error(err);
-            this.snackBar.open(
-              this.translate.instant('gymClasses.list.errors.createBooking'),
-              this.translate.instant('common.close'),
-              { duration: 3000 }
-            );
+    const dialogRef = this.dialog.open(BookForUserDialogComponent, {
+      width: '520px',
+      maxWidth: '95vw',
+      data: { gymClassName: gymClass.name }
+    });
+
+    dialogRef.afterClosed().subscribe((chosenId: number | null | undefined) => {
+      if (!chosenId) { return; }
+      this.bookingService.createBookingForUser(gymClass.id, chosenId).subscribe({
+        next: () => {
+          this.snackBar.open(
+            this.translate.instant('gymClasses.list.messages.bookingCreated'),
+            this.translate.instant('common.close'),
+            { duration: 3000 }
+          );
+        },
+        error: (err) => {
+          console.error('Failed to create booking for user', err);
+          // If the session expired or token is missing, hint to re-login
+          if (err && (err.status === 401 || err.status === 403)) {
+            const msg = this.translate.instant('calendar.messages.loginRequired') || 'Session expired, please sign in again.';
+            this.snackBar.open(msg, this.translate.instant('common.close'), { duration: 4000 });
+            return;
           }
-        });
-      },
-      error: () => {
-        this.snackBar.open(
-          this.translate.instant('gymClasses.list.errors.loadMembers'),
-          this.translate.instant('common.close'),
-          { duration: 3000 }
-        );
-      }
+          const backendMessage = (err && (err.error?.message || err.error)) || err?.message;
+          const fallback = this.translate.instant('gymClasses.list.errors.createBooking');
+          this.snackBar.open(backendMessage || fallback, this.translate.instant('common.close'), { duration: 4000 });
+        }
+      });
     });
   }
 
